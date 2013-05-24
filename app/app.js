@@ -1,11 +1,10 @@
 define([
   "socketio",
   "backbone.layoutmanager",
-  "plugins/backbone.iobind",
-  "plugins/jquery.svg"
+  "plugins/backbone.iobind"
+//  "plugins/jquery.svg"
 
 ], function(io) {
-  console.log(io);
   // Provide a global location to place configuration settings and module
   // creation.
   var app = {
@@ -16,8 +15,10 @@ define([
   // Localize or create a new JavaScript Template object.
   var JST = window.JST = window.JST || {};
 
+  console.log(Backbone);
+
   // Configure LayoutManager with Backbone Boilerplate defaults.
-  Backbone.LayoutManager.configure({
+  Backbone.Layout.configure({
     // Allow LayoutManager to augment Backbone.View.prototype.
     manage: true,
 
