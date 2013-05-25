@@ -8,12 +8,12 @@ define(["app"],
 function () { // wrap in function so we can "use strict"
 	"use strict"
 
-	var ClickerApp = Backbone.Model.extend({
+	var ClickerApp = _.extend({}, Backbone.Events, {
 		config: {},
 		users: [],
 		userMap: {},
 
-		init: function () {
+		initialize: function () {
 			ClickerServer.on("data", $.proxy(this.dataHandler, this));
 			this.build();
 		},

@@ -2,39 +2,36 @@ define([
   // Application.
   "app",
 
-  "modules/ClickerServer",
-  "modules/ClickerApp",
-  "modules/ClickerDisplay"
+  "modules/ParticipantServer",
+  "modules/Participant"
 ],
 
-function(app, ClickerServer, ClickerApp, ClickerDisplay) {
+function(app, ParticipantServer, Participant) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
-      ClickerServer.initialize();
-      // TODO Clean this up...
-      /*
+      ParticipantServer.initialize();
+
       var collections = {
         // Set up the users.
-        users: new User.Collection(),
+        participants: new Participant.Collection(),
 
-        // Set the repos.
-        repos: new Repo.Collection(),
-
-        // Set up the commits.
-        commits: new Commit.Collection()
       };
 
+      collections.participants.add([
+        {pid: "18981F9F", choice: "A"},
+        {pid: "1FC5AE74", choice: "B"},
+        {pid: "INSTRUCTOR", choice: "E"},
+        ]);
 
       // Ensure the router has references to the collections.
       _.extend(this, collections);
-      */
 
       // Use main layout and set Views.
-      //app.useLayout("main-layout").setViews({
-       // ".users": new User.Views.List(collections),
-      //}).render();
+      app.useLayout("main-layout").setViews({
+        ".participants": new Participant.Views.List(collections),
+      }).render();
     },
 
     routes: {
@@ -42,10 +39,10 @@ function(app, ClickerServer, ClickerApp, ClickerDisplay) {
     },
 
     index: function() {
-      console.log(ClickerApp);
-      display = new ClickerDisplay();
-      //display.build();
-      //display.handleClick({id: 0, clicker: "Peter"}, "C");
+      console.log("index");
+      ParticipantServer.on("connect", function () {
+        console.log("connect???")
+      });
     }
   });
 
