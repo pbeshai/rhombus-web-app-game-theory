@@ -26,7 +26,14 @@ define(["app", "socketio"],
 			status: "status"
 		};
 
-	var ParticipantServer = _.extend({}, Backbone.Events, {
+	var ParticipantServer = app.module();
+
+	ParticipantServer.Model = Backbone.Model.extend({
+		defaults: {
+			connected: false,
+			acceptingChoices: false // whether submitting choices is enabled
+		},
+
 		initialize: function () {
 			// bind this to the callbacks
 			_.bindAll(this, "dataCallback", "statusCallback", "connectCallback",
@@ -50,6 +57,7 @@ define(["app", "socketio"],
 
 	  connectCallback: function (data) {
 			console.log("connect callback", data);
+			this.set("connected", data);
 			this.trigger(events.connect, data);
 		},
 
@@ -68,6 +76,7 @@ define(["app", "socketio"],
 
 	  enableChoicesCallback: function (data) {
 			console.log("enable choices callback", data);
+			this.set("acceptingChoices", data);
 			this.trigger(events.enableChoices, data);
 		},
 
@@ -77,6 +86,7 @@ define(["app", "socketio"],
 
 	  disableChoicesCallback: function (data) {
 			console.log("disable choices callback", data);
+			this.set("acceptingChoices", !data);
 			this.trigger(events.disableChoices, data);
 		},
 
@@ -86,6 +96,7 @@ define(["app", "socketio"],
 
 	  statusCallback: function (data) {
 			console.log("status callback", data);
+			this.set("acceptingChoices", data.acceptingChoices)
 			this.trigger(events.status, data);
 		},
 
@@ -113,9 +124,17 @@ define(["app", "socketio"],
 		}
 	});
 
-	// TODO: remove; for debugging
-	console.log("Making ParticipantServer available in window");
-	window.ParticipantServer = ParticipantServer;
+	ParticipantServer.Views.Status = Backbone.View.extend({
+		template: "participantServer/status",
+
+		serialize: function () {
+  		return { model: this.model };
+  	},
+
+  	initialize: function () {
+  		this.listenTo(this.model, "change", this.render);
+  	}
+	});
 
 	return ParticipantServer;
 });

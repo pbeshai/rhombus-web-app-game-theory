@@ -6,11 +6,9 @@
 define([
   // Application.
   "app",
-
-  "modules/ParticipantServer"
 ],
 
-function(app, ParticipantServer) {
+function(app) {
 
   var Participant = app.module();
 
@@ -23,9 +21,10 @@ function(app, ParticipantServer) {
   	model: Participant.Model,
 
   	initialize: function (models, options) {
+      this.participantServer = options.participantServer;
 
   		// update models on data received from server.
-			ParticipantServer.on("data", function (data) {
+			this.participantServer.on("data", function (data) {
         console.log("data received", data);
 				_.each(data, function (choiceData) {
 					var model = this.get(choiceData.id);

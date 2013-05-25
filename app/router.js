@@ -12,11 +12,15 @@ function(app, ParticipantServer, Participant, Grid) {
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
-      ParticipantServer.initialize();
+      var participantServer = new ParticipantServer.Model();
+
+  // TODO: remove; for debugging
+  console.log("Making ParticipantServer available in window");
+  window.participantServer = participantServer;
 
       var collections = {
         // Set up the users.
-        participants: new Participant.Collection(),
+        participants: new Participant.Collection([], { participantServer: participantServer }),
 
       };
 
@@ -35,6 +39,7 @@ function(app, ParticipantServer, Participant, Grid) {
 
       // Use main layout and set Views.
       app.useLayout("main-layout").setViews({
+        ".server-status": new ParticipantServer.Views.Status({ model: participantServer}),
         ".participants": new Participant.Views.List(collections),
       });
     },
