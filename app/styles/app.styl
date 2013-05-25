@@ -12,16 +12,10 @@
 	height: 600px;
 }
 
-#main {
+#main-content {
 	padding: 20px;
 }
 
-.clicker-toolbar {
-	background: #eee;
-	border: 1px solid #ccc;
-	border-top: 0;
-	padding: 20px;
-}
 
 .clicker-toolbar button {
 	margin-right: 10px;
@@ -55,4 +49,38 @@
 
 .clicker-btn {
 	font-weight: bold;
+}
+
+
+/** Status bar **/
+.server-status {
+	background: #eee;
+	border: 1px solid #ccc;
+	border-top: 0;
+	padding: 10px;
+}
+
+.server-status ul {
+	margin-bottom: 0;
+}
+
+.circle-status {
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	border-radius .5em
+	background-color #ccc
+	vertical-align text-top
+	margin-top: 1px
+}
+
+.circle-status.status-on {
+	background-color #5bb75b
+}
+.circle-status.status-off {
+	background-color #da4f49
+}
+
+.not-connected > .accepting-choices {
+	display: none;
 }

@@ -128,7 +128,19 @@ define(["app", "socketio"],
 		template: "participantServer/status",
 
 		serialize: function () {
-  		return { model: this.model };
+  		return {
+  			model: this.model,
+  			classes: {
+  				isConnected: this.model.get("connected") ? "is-connected" : "not-connected",
+  				isAcceptingChoices: this.model.get("acceptingChoices") ? "is-accepting-choices" : "not-accepting-choices",
+  				connected: this.model.get("connected") ? "status-on" : "status-off",
+  				acceptingChoices: this.model.get("acceptingChoices") ? "status-on" : "status-off"
+  			},
+  			labels: {
+  				connected: this.model.get("connected") ? "Connected" : "Disconnected",
+  				acceptingChoices: this.model.get("acceptingChoices") ? "Accepting Choices" : "Not Accepting Choices"
+  			}
+  		};
   	},
 
   	initialize: function () {
