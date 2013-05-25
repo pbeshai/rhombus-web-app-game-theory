@@ -26,8 +26,9 @@ function(app, ParticipantServer) {
 
   		// update models on data received from server.
 			ParticipantServer.on("data", function (data) {
+        console.log("data received", data);
 				_.each(data, function (choiceData) {
-					var model = this.find(function (model) { return model.get("pid") === choiceData.id; });
+					var model = this.get(choiceData.id);
 					if (model) {
 						model.set("choice", choiceData.choice)
 					}
