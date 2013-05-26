@@ -7,9 +7,7 @@ define([
   // Application.
   "app",
 
-  "modules/Participant",
-
-  "plugins/jquery.svg"
+  "modules/Participant"
 ],
 
 function(app, Participant) {

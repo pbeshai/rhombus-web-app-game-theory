@@ -44,7 +44,6 @@ function(app) {
   	},
 
   	initialize: function () {
-  		console.log("item init: ", this);
   		this.listenTo(this.model, "change", this.render);
   	}
   });
@@ -63,7 +62,6 @@ function(app) {
   	},
 
   	initialize: function () {
-  		console.log("collection init: ", this);
   		this.listenTo(this.options.participants, {
   			"reset": this.render,
 

@@ -4,15 +4,16 @@ define([
 
   "modules/ParticipantServer",
   "modules/Participant",
-  "modules/Grid"
+  "modules/Grid",
+  "modules/Controls"
 ],
 
-function(app, ParticipantServer, Participant, Grid) {
+function(app, ParticipantServer, Participant, Grid, Controls) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
-      var participantServer = new ParticipantServer.Model();
+      var participantServer = app.participantServer = new ParticipantServer.Model();
 
   // TODO: remove; for debugging
   console.log("Making ParticipantServer available in window");
@@ -40,27 +41,33 @@ function(app, ParticipantServer, Participant, Grid) {
       // Use main layout and set Views.
       app.useLayout("main-layout").setViews({
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer}),
-        ".participants": new Participant.Views.List(collections),
+        "#main-content": new Participant.Views.List(collections),
       });
     },
 
     routes: {
       "": "index",
-      "grid": "grid"
+      "grid": "grid",
+      "controls": "controls"
     },
 
     index: function () {
-      console.log("index");
-      ParticipantServer.on("connect", function () {
-        console.log("connect???")
-      });
+      console.log("[router: index]");
       app.layout.render();
     },
 
     grid: function () {
-      console.log("grid");
+      console.log("[router: grid]");
       app.layout.setViews({
-        ".participants": new Grid.Views.Participants({participants: this.participants})
+        "#main-content": new Grid.Views.Participants({participants: this.participants})
+      }).render();
+    },
+
+    controls: function () {
+      console.log("[router: controls]");
+
+      app.layout.setViews({
+        "#main-content": new Controls.Views.Controls()
       }).render();
 
     }
