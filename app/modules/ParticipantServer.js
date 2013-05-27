@@ -28,16 +28,20 @@ define(["app", "socketio"],
 
 	var ParticipantServer = app.module();
 
+
 	ParticipantServer.Model = Backbone.Model.extend({
 		defaults: {
 			connected: false,
 			acceptingChoices: false // whether submitting choices is enabled
 		},
+		events: events,
 
 		initialize: function () {
 			// bind this to the callbacks
 			_.bindAll(this, "dataCallback", "statusCallback", "connectCallback",
-				"disconnectCallback", "enableChoicesCallback", "disableChoicesCallback");
+				"disconnectCallback", "enableChoicesCallback", "disableChoicesCallback",
+				"connect", "disconnect", "enableChoices", "disableChoices", "status",
+				"submitChoice");
 
 			// connect to the websocket
 		  var socket = this.socket = io.connect(config.websocketUrl);
