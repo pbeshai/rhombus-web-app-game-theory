@@ -25,7 +25,7 @@ function(app, ParticipantServer, Participant, Grid, Controls) {
 
       };
 
-      collections.participants.add([
+      /*collections.participants.add([
         {id: "Peter", choice: "D"},
         {id: "Beshai", choice: "C"},
         {id: "18981F9F", choice: "A"},
@@ -33,7 +33,7 @@ function(app, ParticipantServer, Participant, Grid, Controls) {
         {id: "INSTRUCTOR", choice: "E"}
 
         ]);
-
+      */
       // Ensure the router has references to the collections.
       _.extend(this, collections);
 
@@ -53,6 +53,7 @@ function(app, ParticipantServer, Participant, Grid, Controls) {
 
     index: function () {
       console.log("[router: index]");
+      this.participants.fetch();
       app.layout.render();
     },
 

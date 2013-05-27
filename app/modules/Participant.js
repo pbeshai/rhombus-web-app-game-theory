@@ -18,6 +18,7 @@ function(app) {
   });
 
   Participant.Collection = Backbone.Collection.extend({
+    url: "/api/participant/list",
   	model: Participant.Model,
 
   	initialize: function (models, options) {
