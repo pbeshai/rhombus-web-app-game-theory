@@ -1,31 +1,10 @@
 <div>
 	<h1>Register Participant</h1>
-	<div class="register-participant">
-		<form>
-			<div class="control-group">
-				<label>Server ID</label>
-				<div class="controls">
-					<div class="input-append">
-						<input type="text" class="input-small server-id" placeholder="" />
-						<button class="btn listen-server-id" type="button">Listen</button>
-					</div>
-					<span class="help-block">Click "Listen" to receive the ID from the Participant Server. The server must be accepting choices.</span>
-				</div>
-			</div>
-			<div class="control-group">
-				<label>System ID</label>
-				<div class="controls">
-					<input type="text" class="input-small system-id" placeholder="" />
-				</div>
-			</div>
-
-			<div class="control-group">
-				<div class="controls">
-					<button type="submit" class="btn register-submit">Register</button>
-				</div>
-			</div>
-		</form>
+	<div class="btn-group v-spacing" data-toggle="buttons-radio">
+		<button class="btn manual-reg-btn active">Manual</button>
+		<button class="btn auto-reg-btn">Auto</button>
 	</div>
+	<div class="register-participant"></div>
 </div>
 <div>
 	<h3>Registered Participants</h3>

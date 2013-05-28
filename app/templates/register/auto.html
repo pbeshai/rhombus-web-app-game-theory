@@ -1,0 +1,39 @@
+<h4>Automatic Registration</h4>
+<p>
+	When started, choices sent from the Participation Server will populate the server ID field,
+	while the system ID is generated from the prefix and an internal counter. The first choice
+	received will populate the field, a second consecutive choice submits the registration (i.e.,
+	it does the same as clicking the Register button.)
+</p>
+
+<form>
+	<div class="control-group">
+	<div class="controls">
+		<button class="btn auto-start-btn btn-success" type="button">Start</button><br>
+	</div>
+</div>
+	<div class="control-group">
+		<label for="auto-reg-prefix">Prefix</label>
+		<div class="controls">
+			<input type="text" id="auto-reg-prefix" class="input-small prefix" value="<%= prefix %>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label for="auto-reg-server-id">Server ID</label>
+		<div class="controls">
+			<input type="text" id="auto-reg-server-id" class="input-small server-id" value="<%= model.get("server_id") %>" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label for="auto-reg-system-id">System ID</label>
+		<div class="controls">
+			<input type="text" id="auto-reg-system-id" class="input-small system-id" value="<%= model.get("system_id") %>" />
+		</div>
+	</div>
+
+	<div class="control-group">
+		<div class="controls">
+			<button type="submit" class="btn auto-register-submit">Register</button>
+		</div>
+	</div>
+</form>

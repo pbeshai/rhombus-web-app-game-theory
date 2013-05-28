@@ -102,8 +102,8 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register) {
 
       app.layout.setViews({
         "#main-content": new Register.Views.Register({
-          model: new Participant.Model,
-          participants: this.participants })
+          participants: this.participants
+        })
       }).render();
     },
   });
