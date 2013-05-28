@@ -14,7 +14,16 @@ function(app) {
 
   // TODO: do we need this?
   Participant.Model = Backbone.Model.extend({
+    url: "/api/participant",
 
+    validate: function (attrs, options) {
+      if (_.isEmpty(attrs.system_id)) {
+        return "cannot have empty system_id"
+      }
+      if (_.isEmpty(attrs.server_id)) {
+        return "cannot have empty server_id"
+      }
+    }
   });
 
   Participant.Collection = Backbone.Collection.extend({
