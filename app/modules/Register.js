@@ -42,6 +42,11 @@ function(app, Participant) {
 
     events: {
       "click .register-submit" : "register",
+      "change .server-id": "hideAlert"
+    },
+
+    hideAlert: function () {
+      this.$(".alert").alert('close');
     },
 
     listenForId: function (event) {
