@@ -79,6 +79,18 @@ define([
         title += " - " + subtitle;
       }
       document.title = title;
+    },
+
+    // make an API call
+    api: function (options) {
+      console.log("Making API call ",options);
+      $.ajax({
+        url: "/api/" + options.call,
+        type: options.type || "GET",
+        data: options.data,
+        success: options.success,
+        error: options.error
+      });
     }
   }, Backbone.Events);
 

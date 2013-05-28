@@ -59,6 +59,10 @@ function(app) {
     className: "controls",
     template: "controls/controls",
 
+    events: {
+      "click .clear-database": "clearDatabase"
+    },
+
   	serialize: function () {
   		return { participantServer: app.participantServer };
   	},
@@ -67,8 +71,28 @@ function(app) {
       enableChoicesButton(this.$(".enable-choices-button"), app.participantServer);
     },
 
+    clearDatabase: function () {
+      // TODO: make confirm prettier
+      var verify = confirm("Are you sure you want to clear the participant database?");
+
+      if (verify) {
+        console.log("clearing database");
+        app.api({
+          call: "participant",
+          type: "DELETE",
+          success: function () {
+            console.log("successful deletion of participants");
+          },
+          error: function () {
+            console.log("error deleting participants");
+          }
+        });
+      }
+    },
+
   	initialize: function () {
       console.log("controls server: ", app.participantServer);
+      app.setTitle("Control Panel");
       /*
       this.listenTo(this.options.participants, {
   			"reset": this.render
