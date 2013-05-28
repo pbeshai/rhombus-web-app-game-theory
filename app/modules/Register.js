@@ -17,6 +17,26 @@ function(app, Participant) {
 
   var Register = app.module();
 
+  function updateModel(data, systemId) {
+    // check if we already have this guy
+    var exists = this.collection.find(function (elem) {
+      return elem.get("server_id") === data.id;
+    });
+
+    if (exists) {
+      var message = data.id + " is already mapped to " + exists.get("system_id");
+      console.log(message);
+      $("<div class='alert fade in'>"+message+"</div>").appendTo(this.$(".alert-container").empty()).alert();
+      return false;
+    }
+
+    this.model.set("server_id", data.id);
+    if (systemId) {
+      this.model.set("system_id", systemId);
+    }
+    return true;
+  }
+
   Register.Views.FormRegistration = Backbone.View.extend({
     template: "register/form",
 
@@ -33,7 +53,8 @@ function(app, Participant) {
         this.cancelListen();
         console.log(data[0]);
         this.$(".listen-server-id").trigger("to-state1");
-        this.model.set("server_id", data[0].id);
+
+        updateModel.apply(this, [data[0]]);
       });
     },
 
@@ -86,7 +107,8 @@ function(app, Participant) {
 
     events: {
       "click .auto-register-submit" : "register",
-      "change .prefix" : "updatePrefix"
+      "change .prefix" : "updatePrefix",
+      "change .server-id": "hideAlert"
     },
 
     serialize: function () {
@@ -139,6 +161,10 @@ function(app, Participant) {
       return false; // no update
     },
 
+    hideAlert: function () {
+      this.$(".alert").alert('close');
+    },
+
     startAuto: function () {
       this.listenTo(app.participantServer, "data", function (data) {
         // ensure the prefix is up to date
@@ -148,8 +174,7 @@ function(app, Participant) {
           // no prefix change, but same ID came in => save
           this.register();
         } else {
-          this.model.set("server_id", data[0].id);
-          this.model.set("system_id", this.generateSystemId());
+          updateModel.apply(this, [data[0], this.generateSystemId()]);
         }
       });
     },
@@ -200,7 +225,7 @@ function(app, Participant) {
   	initialize: function () {
       app.setTitle("Register Participant");
 
-      this.currentView = new Register.Views.FormRegistration({ model: new Participant.Model() });
+      this.currentView = new Register.Views.FormRegistration({ model: new Participant.Model(), collection: this.options.participants });
 
       this.on("save-registration", this.register);
   	},
@@ -232,14 +257,14 @@ function(app, Participant) {
 
     manualRegistration: function () {
       if (!(this.currentView instanceof Register.Views.FormRegistration)) {
-        this.currentView = new Register.Views.FormRegistration({ model: new Participant.Model() });
+        this.currentView = new Register.Views.FormRegistration({ model: new Participant.Model(), collection: this.options.participants });
         this.updateRegistrationView();
       }
     },
 
     autoRegistration: function () {
       if (!(this.currentView instanceof Register.Views.AutoRegistration)) {
-        this.currentView = new Register.Views.AutoRegistration({ model: new Participant.Model() });
+        this.currentView = new Register.Views.AutoRegistration({ model: new Participant.Model(), collection: this.options.participants });
         this.updateRegistrationView();
       }
     }
