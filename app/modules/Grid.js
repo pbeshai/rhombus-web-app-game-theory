@@ -63,6 +63,7 @@ function(app, Participant) {
       this.listenTo(this.options.participants, {
   			"reset": this.render
   		});
+      app.setTitle("Grid");
   	}
 
   });

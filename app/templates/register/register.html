@@ -1,19 +1,35 @@
 <div>
 	<h1>Register Participant</h1>
 	<div class="register-participant">
-		<form class="form-inline">
-			<div class="input-append">
-				<input type="text" class="input-small server-id" placeholder="Server ID" />
-				<button class="btn listen-server-id" type="button">Listen</button>
+		<form>
+			<div class="control-group">
+				<label>Server ID</label>
+				<div class="controls">
+					<div class="input-append">
+						<input type="text" class="input-small server-id" placeholder="" />
+						<button class="btn listen-server-id" type="button">Listen</button>
+					</div>
+					<span class="help-block">Click "Listen" to receive the ID from the Participant Server. The server must be accepting choices.</span>
+				</div>
 			</div>
-			<i class="icon-arrow-right"></i>
-			<input type="text" class="input-small system-id" placeholder="System ID" />
-			<button type="submit" class="btn register-submit">Register</button>
-		</label>
-	</form>
+			<div class="control-group">
+				<label>System ID</label>
+				<div class="controls">
+					<input type="text" class="input-small system-id" placeholder="" />
+				</div>
+			</div>
+
+			<div class="control-group">
+				<div class="controls">
+					<button type="submit" class="btn register-submit">Register</button>
+				</div>
+			</div>
+		</form>
 	</div>
 </div>
 <div>
 	<h3>Registered Participants</h3>
-	<div class="participants"></div>
+	<div class="row">
+		<div class="participants span5"></div>
+	</div>
 </div>

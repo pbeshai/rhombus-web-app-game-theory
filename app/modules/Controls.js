@@ -33,9 +33,9 @@ function(app) {
 
       participantServer.on("status", function (state) {
         if (state.acceptingChoices) {
-          $button.trigger("state2");
+          $button.trigger("to-state2");
         } else {
-          $button.trigger("state1");
+          $button.trigger("to-state1");
         }
       });
 

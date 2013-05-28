@@ -47,7 +47,7 @@ function(app) {
   });
 
   Participant.Views.Item = Backbone.View.extend({
-  	template: "participant_data",
+  	template: "participant/item",
 
   	serialize: function () {
   		return { model: this.model };
@@ -59,7 +59,7 @@ function(app) {
   });
 
   Participant.Views.List = Backbone.View.extend({
-  	template: "participant_list",
+  	template: "participant/list",
 
   	serialize: function () {
   		return { collection: this.options.participants };
@@ -68,7 +68,7 @@ function(app) {
   	beforeRender: function () {
   		this.options.participants.each(function (participant) {
   			this.insertView(".participant-list", new Participant.Views.Item({ model: participant }));
-  		}, this)
+  		}, this);
   	},
 
   	initialize: function () {
@@ -80,6 +80,50 @@ function(app) {
   			}
   		});
   	}
+
+  });
+
+  Participant.Views.TableItem = Backbone.View.extend({
+    template: "participant/table_item",
+    tagName: "tr",
+
+    serialize: function () {
+      return {
+        model: this.model,
+        showChoice: this.options.showChoice
+      };
+    },
+
+    initialize: function () {
+      this.listenTo(this.model, "change", this.render);
+    }
+  });
+
+  Participant.Views.Table = Backbone.View.extend({
+    template: "participant/table",
+
+    serialize: function () {
+      return {
+        collection: this.options.participants,
+        showChoice: this.options.showChoice
+      };
+    },
+
+    beforeRender: function () {
+      this.options.participants.each(function (participant) {
+        this.insertView("tbody", new Participant.Views.TableItem({ model: participant, showChoice: this.options.showChoice }));
+      }, this);
+    },
+
+    initialize: function () {
+      this.listenTo(this.options.participants, {
+        "reset": this.render,
+
+        "fetch": function () {
+          console.log("Fetch participants???");
+        }
+      });
+    }
 
   });
 

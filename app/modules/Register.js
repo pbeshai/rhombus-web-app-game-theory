@@ -7,7 +7,10 @@ define([
   // Application.
   "app",
 
-  "modules/Participant"
+  "modules/Participant",
+
+
+  "plugins/jQuery.toggleButton"
 ],
 
 function(app, Participant) {
@@ -20,17 +23,25 @@ function(app, Participant) {
 
     events: {
       "click .register-submit" : "register",
-      "click .listen-server-id" : "listenForId"
-
     },
 
     listenForId: function (event) {
       console.log("listen for server id", this);
+      this.model.set("server_id", "");
+      this.$("input.server-id").attr("placeholder", "Listening...").prop("disabled", true);
       // should be listenToOnce
       this.listenTo(app.participantServer, "data", function (data) {
-        this.stopListening(app.participantServer, "data");
+        this.cancelListen();
+        this.$(".listen-server-id").trigger("to-state1");
         this.model.set("server_id", data[0].id);
       });
+    },
+
+
+    cancelListen: function () {
+      console.log("cancel");
+      this.stopListening(app.participantServer, "data");
+      this.$("input.server-id").removeAttr("placeholder").prop("disabled", false);
     },
 
     register: function (event) {
@@ -69,18 +80,28 @@ function(app, Participant) {
   	},
 
   	beforeRender: function () {
-      this.insertView(".participants", new Participant.Views.List({ participants: this.options.participants }));
+      this.insertView(".participants", new Participant.Views.Table({ participants: this.options.participants }));
   	},
+
+    afterRender: function () {
+      this.$(".listen-server-id").toggleButton({
+        textState1: "Listen",
+        textState2: "Cancel",
+        clickState1: this.listenForId,
+        clickState2: this.cancelListen
+      });
+    },
 
 
   	initialize: function () {
-      var that = this;
+      _.bindAll(this, "listenForId", "cancelListen");
       this.listenTo(this.model, {
   	  	change: function () {
           this.$("input.server-id").val(this.model.get("server_id"));
           this.$("input.system-id").val(this.model.get("system_id"));
         }
   		 });
+      app.setTitle("Register Participant");
   	}
 
   });

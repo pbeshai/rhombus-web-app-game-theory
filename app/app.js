@@ -71,6 +71,14 @@ define([
 
       // Cache the refererence.
       return this.layout = layout;
+    },
+
+    setTitle: function (subtitle) {
+      var title = "Clicker Testing"
+      if (!_.isEmpty(subtitle)) {
+        title += " - " + subtitle;
+      }
+      document.title = title;
     }
   }, Backbone.Events);
 
