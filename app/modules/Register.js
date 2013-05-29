@@ -17,22 +17,22 @@ function(app, Participant) {
 
   var Register = app.module();
 
-  function updateModel(data, systemId) {
+  function updateModel(data, alias) {
     // check if we already have this guy
     var exists = this.collection.find(function (elem) {
-      return elem.get("server_id") === data.id;
+      return elem.get("serverId") === data.id;
     });
 
     if (exists) {
-      var message = data.id + " is already mapped to " + exists.get("system_id");
+      var message = data.id + " is already mapped to " + exists.get("alias");
       console.log(message);
       $("<div class='alert fade in'>"+message+"</div>").appendTo(this.$(".alert-container").empty()).alert();
       return false;
     }
 
-    this.model.set("server_id", data.id);
-    if (systemId) {
-      this.model.set("system_id", systemId);
+    this.model.set("serverId", data.id);
+    if (alias) {
+      this.model.set("alias", alias);
     }
     return true;
   }
@@ -51,7 +51,7 @@ function(app, Participant) {
 
     listenForId: function (event) {
       console.log("listen for server id", this);
-      this.model.set("server_id", "");
+      this.model.set("serverId", "");
       this.$("input.server-id").attr("placeholder", "Listening...").prop("disabled", true);
       // should be listenToOnce
       this.listenTo(app.participantServer, "data", function (data) {
@@ -74,11 +74,11 @@ function(app, Participant) {
       event.preventDefault();
 
       var serverId = this.$("input.server-id").val();
-      var systemId = this.$("input.system-id").val();
+      var alias = this.$("input.alias").val();
 
       this.model.set({
-        "server_id": serverId,
-        "system_id": systemId
+        "serverId": serverId,
+        "alias": alias
       });
 
       this.trigger("save-registration", this.model);
@@ -98,8 +98,8 @@ function(app, Participant) {
       this.listenTo(this.model, {
         change: function () {
           console.log("model changed!");
-          this.$("input.server-id").val(this.model.get("server_id"));
-          this.$("input.system-id").val(this.model.get("system_id"));
+          this.$("input.server-id").val(this.model.get("serverId"));
+          this.$("input.alias").val(this.model.get("alias"));
         }
        });
     }
@@ -139,13 +139,13 @@ function(app, Participant) {
 
       this.listenTo(this.model, {
         change: function () {
-          this.$("input.server-id").val(this.model.get("server_id"));
-          this.$("input.system-id").val(this.model.get("system_id"));
+          this.$("input.server-id").val(this.model.get("serverId"));
+          this.$("input.alias").val(this.model.get("alias"));
         }
        });
     },
 
-    generateSystemId: function () {
+    generateAlias: function () {
       return this.idPrefix+this.counter.toString();
     },
 
@@ -155,9 +155,9 @@ function(app, Participant) {
       if (this.idPrefix !== prefixVal) {
         this.idPrefix = prefixVal; // update the value to match the textfield
 
-        // update system id to use new prefix
-        if (!_.isEmpty(this.model.get("system_id"))) {
-          this.model.set("system_id", this.generateSystemId());
+        // update alias to use new prefix
+        if (!_.isEmpty(this.model.get("alias"))) {
+          this.model.set("alias", this.generateAlias());
         }
 
         return true; // updated
@@ -175,11 +175,11 @@ function(app, Participant) {
         // ensure the prefix is up to date
         var prefixChanged = this.updatePrefix();
 
-        if (!prefixChanged && this.model.get("server_id") === data[0].id) {
+        if (!prefixChanged && this.model.get("serverId") === data[0].id) {
           // no prefix change, but same ID came in => save
           this.register();
         } else {
-          updateModel.apply(this, [data[0], this.generateSystemId()]);
+          updateModel.apply(this, [data[0], this.generateAlias()]);
         }
       });
     },
@@ -194,11 +194,11 @@ function(app, Participant) {
       }
 
       var serverId = this.$("input.server-id").val();
-      var systemId = this.$("input.system-id").val();
+      var alias = this.$("input.alias").val();
 
       this.model.set({
-        "server_id": serverId,
-        "system_id": systemId
+        "serverId": serverId,
+        "alias": alias
       });
 
       this.counter += 1;
@@ -236,7 +236,7 @@ function(app, Participant) {
   	},
 
     register: function (participant) {
-      console.log("registering ", participant.get("server_id"), participant.get("system_id"));
+      console.log("registering ", participant.get("serverId"), participant.get("alias"));
 
       var participants = this.options.participants;
       var saved = participant.save(null, {

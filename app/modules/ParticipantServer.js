@@ -15,7 +15,6 @@ define(["app", "socketio"],
 		},
 	  config = {
 			websocketUrl: "http://localhost",
-			choiceRegExp: /(\w+):([A-E])/g  // regular expression for choice data. Matches ID:Choice (e.g., 17fa321:A)
 		},
 	  events = { // client-side events that we allow handlers for
 			data: "data",
@@ -108,23 +107,8 @@ define(["app", "socketio"],
 			this.socket.emit(socketEvents.submitChoice, data);
 		},
 
-		// returns an array [{ id: x, choice: x }, ...]
-	  parseData: function (data) {
-			var result, id, choice;
-			var choiceData = [];
-			while(result = config.choiceRegExp.exec(data.choices)) {
-				id = result[1];
-				choice = result[2];
-
-				choiceData.push({id: id, choice: choice});
-			}
-
-			return choiceData;
-		},
-
 	  dataCallback: function (data) {
-			var choiceData = this.parseData(data);
-			this.trigger(events.data, choiceData);
+			this.trigger(events.data, data);
 		}
 	});
 

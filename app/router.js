@@ -74,14 +74,7 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register) {
     grid: function () {
       console.log("[router: grid]");
 
-      // test data
-      this.participants.add([
-        {id: "Peter", choice: "D"},
-        {id: "Beshai", choice: "C"},
-        {id: "18981F9F", choice: "A"},
-        {id: "1FC5AE74", choice: "B"},
-        {id: "INSTRUCTOR", choice: "E"}
-      ]);
+      this.participants.fetch();
 
       app.layout.setViews({
         "#main-content": new Grid.Views.Participants({participants: this.participants})

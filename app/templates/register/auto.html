@@ -1,7 +1,7 @@
 <h4>Automatic Registration</h4>
 <p>
 	When started, choices sent from the Participation Server will populate the server ID field,
-	while the system ID is generated from the prefix and an internal counter. The first choice
+	while the alias is generated from the prefix and an internal counter. The first choice
 	received will populate the field, a second consecutive choice submits the registration (i.e.,
 	it does the same as clicking the Register button.)
 </p>
@@ -22,13 +22,13 @@
 	<div class="control-group">
 		<label for="auto-reg-server-id">Server ID</label>
 		<div class="controls">
-			<input type="text" id="auto-reg-server-id" class="input-small server-id" value="<%= model.get("server_id") %>" />
+			<input type="text" id="auto-reg-server-id" class="input-small server-id" value="<%= model.get("serverId") %>" />
 		</div>
 	</div>
 	<div class="control-group">
-		<label for="auto-reg-system-id">System ID</label>
+		<label for="auto-reg-alias">Alias</label>
 		<div class="controls">
-			<input type="text" id="auto-reg-system-id" class="input-small system-id" value="<%= model.get("system_id") %>" />
+			<input type="text" id="auto-reg-alias" class="input-small alias" value="<%= model.get("id") %>" />
 		</div>
 	</div>
 

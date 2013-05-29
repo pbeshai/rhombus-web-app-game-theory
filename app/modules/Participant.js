@@ -17,11 +17,11 @@ function(app) {
     url: "/api/participant",
 
     validate: function (attrs, options) {
-      if (_.isEmpty(attrs.system_id)) {
-        return "cannot have empty system_id"
+      if (_.isEmpty(attrs.alias)) {
+        return "cannot have empty alias"
       }
-      if (_.isEmpty(attrs.server_id)) {
-        return "cannot have empty server_id"
+      if (_.isEmpty(attrs.serverId)) {
+        return "cannot have empty serverId"
       }
     }
   });
@@ -36,8 +36,8 @@ function(app) {
   		// update models on data received from server.
 			this.participantServer.on("data", function (data) {
         console.log("data received", data);
-				_.each(data, function (choiceData) {
-					var model = this.get(choiceData.id);
+				_.each(data.choices, function (choiceData, i) {
+					var model = this.get(i+1); //choiceData.id);
 					if (model) {
 						model.set("choice", choiceData.choice)
 					}
