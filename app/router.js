@@ -6,10 +6,11 @@ define([
   "modules/Participant",
   "modules/Grid",
   "modules/Controls",
-  "modules/Register"
+  "modules/Register",
+  "modules/Attendance"
 ],
 
-function(app, ParticipantServer, Participant, Grid, Controls, Register) {
+function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendance) {
 
   var baseRoute = function(name, logic, views) {
     return function () {
@@ -61,7 +62,8 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register) {
       "": "index",
       "grid": "grid",
       "controls": "controls",
-      "register": "register"
+      "register": "register",
+      "attendance": "attendance"
     },
 
     index: function () {
@@ -99,6 +101,16 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register) {
         })
       }).render();
     },
+
+    attendance: function () {
+      console.log("[router: attendance]");
+
+      this.participants.fetch();
+
+      app.layout.setViews({
+        "#main-content": new Attendance.Views.Participants({participants: this.participants})
+      }).render();
+    }
   });
 
   return Router;

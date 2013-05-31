@@ -29,16 +29,32 @@ function(app) {
   Participant.Collection = Backbone.Collection.extend({
     url: "/api/participant/list",
   	model: Participant.Model,
+    aliasMap: {},
 
   	initialize: function (models, options) {
+      // initialize alias->model map
+      this.on("reset", function () {
+        this.aliasMap = {};
+        //_.each(collection.models)
+        this.each(function (model) {
+          var alias = model.get("alias");
+          if (alias !== undefined) {
+            this.aliasMap[alias] = model;
+          }
+        }, this);
+
+        console.log(this.aliasMap);
+      });
+
       this.participantServer = options.participantServer;
 
   		// update models on data received from server.
 			this.participantServer.on("data", function (data) {
         console.log("data received", data);
 				_.each(data.choices, function (choiceData, i) {
-					var model = this.get(i+1); //choiceData.id);
+					var model = this.aliasMap[choiceData.id];
 					if (model) {
+            console.log(model);
 						model.set("choice", choiceData.choice)
 					}
 				}, this);
