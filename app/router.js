@@ -7,10 +7,11 @@ define([
   "modules/Grid",
   "modules/Controls",
   "modules/Register",
-  "modules/Attendance"
+  "modules/Attendance",
+  "apps/GridApp"
 ],
 
-function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendance) {
+function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendance, GridApp) {
 
   var baseRoute = function(name, logic, views) {
     return function () {
@@ -50,7 +51,6 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       // Ensure the router has references to the collections.
       _.extend(this, collections);
 
-
       // Use main layout and set Views.
       app.useLayout("main-layout").setViews({
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer}),
@@ -63,7 +63,8 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       "grid": "grid",
       "controls": "controls",
       "register": "register",
-      "attendance": "attendance"
+      "attendance": "attendance",
+      "apps/:name": "appHandler"
     },
 
     index: function () {
@@ -110,6 +111,18 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       app.layout.setViews({
         "#main-content": new Attendance.Views.Participants({participants: this.participants})
       }).render();
+    },
+
+    appHandler: function (name) {
+      console.log("[router: app/"+name+"]");
+      if (name === "grid") {
+        this.participants.fetch();
+        GridApp.options.participants = this.participants;
+        GridApp.initialize();
+        window.GridApp = GridApp;
+        console.log("GridApp in window", GridApp);
+
+      }
     }
   });
 

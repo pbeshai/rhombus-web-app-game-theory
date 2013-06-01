@@ -34,6 +34,7 @@ function(app) {
   	initialize: function (models, options) {
       // initialize alias->model map
       this.on("reset", function () {
+        console.log("participants reset");
         this.aliasMap = {};
         //_.each(collection.models)
         this.each(function (model) {
@@ -42,8 +43,6 @@ function(app) {
             this.aliasMap[alias] = model;
           }
         }, this);
-
-        console.log(this.aliasMap);
       });
 
       this.participantServer = options.participantServer;
@@ -54,7 +53,6 @@ function(app) {
 				_.each(data.choices, function (choiceData, i) {
 					var model = this.aliasMap[choiceData.id];
 					if (model) {
-            console.log(model);
 						model.set("choice", choiceData.choice)
 					}
 				}, this);
