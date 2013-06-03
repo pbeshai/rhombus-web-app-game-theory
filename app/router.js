@@ -52,6 +52,7 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       _.extend(this, collections);
 
       // Use main layout and set Views.
+      console.log("use layout");
       app.useLayout("main-layout").setViews({
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer}),
         "#main-content": new Participant.Views.List(collections),
@@ -72,6 +73,7 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       this.participants.fetch();
 
       app.layout.render();
+      console.log("rendered");
     },
 
     grid: function () {
@@ -117,11 +119,10 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       console.log("[router: app/"+name+"]");
       if (name === "grid") {
         this.participants.fetch();
-        GridApp.options.participants = this.participants;
-        GridApp.initialize();
-        window.GridApp = GridApp;
-        console.log("GridApp in window", GridApp);
-
+        var gridApp = new GridApp({ participants: this.participants });
+        //gridApp.initialize();
+        window.gridApp = gridApp;
+        console.log("gridApp in window", gridApp);
       }
     }
   });

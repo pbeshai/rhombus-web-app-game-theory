@@ -7,10 +7,12 @@ define([
   // Application.
   "app",
 
-  "modules/Participant"
+  "modules/Participant",
+
+  "apps/StateApp"
 ],
 
-function(app, Participant) {
+function(app, Participant, StateApp) {
 
   var Grid = app.module();
 
@@ -67,6 +69,16 @@ function(app, Participant) {
   	}
 
   });
+
+  // To be used in StateApps
+  Grid.State = function (options) {
+    this.options = options
+    this.initialize();
+  }
+  Grid.State.prototype = new StateApp.State(Grid.Views.Participants);
+  Grid.State.prototype.initialize = function () {
+    this.options.viewOptions = { participants: this.options.participants }
+  }
 
   return Grid;
 });

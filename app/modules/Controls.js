@@ -60,7 +60,9 @@ function(app) {
     template: "controls/controls",
 
     events: {
-      "click .clear-database": "clearDatabase"
+      "click .clear-database": "clearDatabase",
+      "click .next-state" : "nextState",
+      "click .prev-state" : "prevState"
     },
 
   	serialize: function () {
@@ -88,6 +90,14 @@ function(app) {
           }
         });
       }
+    },
+
+    nextState: function () {
+      app.participantServer.appNext();
+    },
+
+    prevState: function () {
+      app.participantServer.appPrev();
     },
 
   	initialize: function () {

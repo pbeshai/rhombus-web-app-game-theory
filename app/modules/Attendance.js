@@ -7,10 +7,12 @@ define([
   // Application.
   "app",
 
-  "modules/Participant"
+  "modules/Participant",
+
+  "apps/StateApp"
 ],
 
-function(app, Participant) {
+function(app, Participant, StateApp) {
 
   var Attendance = app.module();
 
@@ -63,6 +65,16 @@ function(app, Participant) {
   	}
 
   });
+
+  // To be used in StateApps
+  Attendance.State = function (options) {
+    this.options = options;
+    this.initialize();
+  }
+  Attendance.State.prototype = new StateApp.State(Attendance.Views.Participants);
+  Attendance.State.prototype.initialize = function () {
+    this.options.viewOptions = { participants: this.options.participants }
+  }
 
   return Attendance;
 });

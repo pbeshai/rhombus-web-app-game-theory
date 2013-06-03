@@ -7,63 +7,65 @@ define([
   // Application.
   "app",
 
+  "apps/StateApp",
+
   "modules/Participant",
   "modules/Attendance",
   "modules/Grid"
 ],
 
-function(app, Participant, Attendance, Grid) {
+function(app, StateApp, Participant, Attendance, Grid) {
 
-	// define the State prototype object
-	var State = function (view, next, prev) {
-		this.view = view;
-		this.flow = {};
-		this.flow.next = next;
-		this.flow.prev = prev;
-	};
-
-
-	// define the StateApp prototype object
-	var StateApp = function (options) {
+	/**
+	 *  Grid App
+	 */
+	var GridApp = function (options) {
 		this.options = options;
+		this.initialize();
 	};
-	StateApp.prototype.initialize = function () {
-		this.states = this.options.states;
-		var stateKeys = _.keys(this.states);
 
-		if (stateKeys.length > 0) {
-			// save the key of the state in the name property
-			_.each(stateKeys, function (key) {
-				this.states[key].name = key;
-			}, this);
+	GridApp.prototype = new StateApp.App();
+	_.extend(GridApp.prototype, {
+		defineStates: function () {
+			console.log("define states");
+			var attendanceState = new Attendance.State({
+				participants: this.options.participants
+			});
+			var gridState = new Grid.State({
+				participants: this.options.participants
+			});
 
-			this.initialState = this.currentState = this.states[stateKeys[0]];
+			this.states = {
+		  	"attendance": attendanceState,
+		  	"grid": gridState
+	  	};
+
+			attendanceState.setNext(gridState);
+		},
+
+		initialize: function () {
+			StateApp.App.prototype.initialize.call(this);
+			console.log("grid app initialize");
+		},
+
+		transitions: {
+	  		attendance_grid: function () {
+	  			// take output from attendance and use it in grid
+	  			console.log("going from attendance to grid");
+	  			var participants = this.options.participants;
+	  			var notHere = participants.filter(function (participant) {
+	  				return participant.get("choice") === undefined;
+	  			});
+	  			this.options.participants.remove(notHere);
+	  		},
+
+	  		grid_attendance: function () {
+				  console.log("going from grid to attendance");
+				  this.options.participants.fetch();
+	  		}
 		}
+	});
 
-		if (this.options.initialize) {
-			this.options.initialize.call(this);
-		}
-	};
-	StateApp.prototype.loadState = function (name) {
-		var state = this.states[name];
-		console.log("state = ", state, this.options.participants);
-		app.layout.setViews({
-      "#main-content": new state.view({participants: this.options.participants})
-    }).render();
-	}
-//        "#main-content": new Attendance.Views.Participants({participants: this.participants})
-
-	var GridApp = new StateApp({
-		states: {
-	  	"attendance": new State(Attendance.Views.Participants, "grid", null),
-	  	"grid": new State(Grid.Views.Participants, null, "attendance")
-  	},
-
-  	initialize: function () {
-  		console.log("initializing grid app", this);
-  		this.loadState(this.initialState.name);
-  	}
-  });
 
   return GridApp;
 });

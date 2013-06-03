@@ -5,6 +5,8 @@ define(["app", "socketio"],
 	"use strict"
 
 	var socketEvents = { // events we send across the websocket
+			appNext: "app-next",
+			appPrev: "app-prev",
 		  connect: "connect-participant-server",
 		  disconnect: "disconnect-participant-server",
 		  choiceData: "choice-data",
@@ -17,6 +19,8 @@ define(["app", "socketio"],
 			websocketUrl: "http://localhost",
 		},
 	  events = { // client-side events that we allow handlers for
+			appNext: "app-next",
+			appPrev: "app-prev",
 			data: "data",
 			connect: "connect",
 			disconnect: "disconnect",
@@ -40,7 +44,7 @@ define(["app", "socketio"],
 			_.bindAll(this, "dataCallback", "statusCallback", "connectCallback",
 				"disconnectCallback", "enableChoicesCallback", "disableChoicesCallback",
 				"connect", "disconnect", "enableChoices", "disableChoices", "status",
-				"submitChoice");
+				"submitChoice", "appNext", "appPrev", "appNextCallback", "appPrevCallback");
 
 			// connect to the websocket
 		  var socket = this.socket = io.connect(config.websocketUrl);
@@ -52,6 +56,24 @@ define(["app", "socketio"],
 		  socket.on(socketEvents.disconnect, this.disconnectCallback);
 		  socket.on(socketEvents.enableChoices, this.enableChoicesCallback);
 		  socket.on(socketEvents.disableChoices, this.disableChoicesCallback);
+		  socket.on(socketEvents.appNext, this.appNextCallback);
+		  socket.on(socketEvents.appPrev, this.appPrevCallback);
+		},
+
+		appNext: function () {
+			this.socket.emit(socketEvents.appNext);
+		},
+
+		appNextCallback: function (data) {
+			this.trigger(events.appNext, data);
+		},
+
+		appPrev: function () {
+			this.socket.emit(socketEvents.appPrev);
+		},
+
+		appPrevCallback: function (data) {
+			this.trigger(events.appPrev, data);
 		},
 
 	  connect: function () {
@@ -59,7 +81,7 @@ define(["app", "socketio"],
 		},
 
 	  connectCallback: function (data) {
-			console.log("connect callback", data);
+			// console.log("connect callback", data);
 			this.set("connected", data);
 			this.trigger(events.connect, data);
 		},
@@ -98,7 +120,7 @@ define(["app", "socketio"],
 		},
 
 	  statusCallback: function (data) {
-			console.log("status callback", data);
+			// console.log("status callback", data);
 			this.set("acceptingChoices", data.acceptingChoices)
 			this.trigger(events.status, data);
 		},
