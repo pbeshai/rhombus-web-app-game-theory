@@ -8,10 +8,12 @@ define([
   "modules/Controls",
   "modules/Register",
   "modules/Attendance",
+  "modules/Clicker",
+
   "apps/GridApp"
 ],
 
-function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendance, GridApp) {
+function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendance, Clicker, GridApp) {
 
   var baseRoute = function(name, logic, views) {
     return function () {
@@ -65,6 +67,7 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
       "controls": "controls",
       "register": "register",
       "attendance": "attendance",
+      "clicker": "clicker",
       "apps/:name": "appHandler"
     },
 
@@ -112,6 +115,17 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
 
       app.layout.setViews({
         "#main-content": new Attendance.Views.Participants({participants: this.participants})
+      }).render();
+    },
+
+    clicker: function () {
+      console.log("[router: clicker]");
+
+      this.participants.fetch();
+
+
+      app.layout.setViews({
+        "#main-content": new Clicker.Views.Clickers({participants: this.participants})
       }).render();
     },
 

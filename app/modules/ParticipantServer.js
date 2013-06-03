@@ -125,8 +125,8 @@ define(["app", "socketio"],
 			this.trigger(events.status, data);
 		},
 
-	  submitChoice: function (data) {
-			this.socket.emit(socketEvents.submitChoice, data);
+	  submitChoice: function (id, choice) {
+			this.socket.emit(socketEvents.submitChoice, id + ":" + choice);
 		},
 
 	  dataCallback: function (data) {
