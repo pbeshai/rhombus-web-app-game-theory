@@ -72,9 +72,22 @@ function(app, Participant, StateApp) {
     this.initialize();
   }
   Attendance.State.prototype = new StateApp.State(Attendance.Views.Participants);
-  Attendance.State.prototype.initialize = function () {
-    this.options.viewOptions = { participants: this.options.participants }
-  }
+  _.extend(Attendance.State.prototype, {
+    initialize: function () {
+      this.options.viewOptions = { participants: this.options.participants }
+    },
+
+    getOutput: function () {
+      console.log("attendance output");
+      var presentParticipants = this.options.participants;
+      var notHere = presentParticipants.filter(function (participant) {
+        return participant.get("choice") === undefined;
+      });
+      presentParticipants.remove(notHere);
+
+      return presentParticipants;
+    }
+  });
 
   return Attendance;
 });

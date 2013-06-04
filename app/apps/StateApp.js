@@ -22,6 +22,10 @@ function(app) {
 	};
 	_.extend(State.prototype, Backbone.Events);
 
+	State.prototype.getOutput = function () { }; // no-op
+	State.prototype.beforeRender = function () { }; // no-op
+	State.prototype.afterRender = function () { }; // no-op
+
 	State.prototype.setNext = function(nextState, mutual) {
 		mutual = (mutual === undefined) ? true : mutual; // default to mutual
 		this.flow.next = nextState;
@@ -40,11 +44,13 @@ function(app) {
 	};
 
 	// enter the state
-	State.prototype.enter = function (options) {
-		if (options) {
-			this.options = options;
+	State.prototype.enter = function (input) {
+		if (input) {
+			this.input = input;
 		}
+		this.beforeRender();
 		this.render();
+		this.afterRender();
 	};
 
 	// render the view of the state
@@ -57,7 +63,7 @@ function(app) {
 	// go to the next state
 	State.prototype.next = function () {
 		if (this.flow.next) {
-			this.flow.next.enter();
+			this.flow.next.enter(this.getOutput());
 		}
 		return this.flow.next;
 	};
@@ -125,22 +131,22 @@ function(app) {
 	};
 	StateApp.prototype.next = function () {
 		if (this.currentState.flow.next) {
-			this.transition(this.currentState.name, this.currentState.flow.next.name);
+			this.transition(this.currentState.flow.next.name);
 		}
 	};
 	StateApp.prototype.prev = function () {
 		if (this.currentState.flow.prev) {
-			this.transition(this.currentState.name, this.currentState.flow.prev.name);
+			this.transition(this.currentState.flow.prev.name);
 		}
 	};
 
-	// calls function this.transitions.<state1>_<state2>();
-	StateApp.prototype.transition = function (state1, state2) {
-		this.transitions[state1 + "_" + state2].call(this);
-		this.currentState = this.states[state2];
-		this.currentState.enter();
+	// calls function this.transitions.<currentState>_<destinationState>(currentStateOutput);
+	StateApp.prototype.transition = function (destinationState) {
+		var output = this.currentState.getOutput();
+		this.transitions[this.currentState.name + "_" + destinationState].apply(this, [output]);
+		this.currentState = this.states[destinationState];
+		this.currentState.enter(output);
 	};
-
 
 	return {
 		State: State,

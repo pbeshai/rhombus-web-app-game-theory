@@ -60,7 +60,7 @@ define([
 		},
 
 	  submitChoice: function (id, choice) {
-			this.socket.emit(socketEvents.submitChoice, id + ":" + choice);
+			this.socket.emit(this.socketEvents.submitChoice, id + ":" + choice);
 		}
 	});
 

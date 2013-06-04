@@ -50,13 +50,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 
 		transitions: {
 	  		attendance_grid: function () {
-	  			// take output from attendance and use it in grid
 	  			console.log("going from attendance to grid");
-	  			var participants = this.options.participants;
-	  			var notHere = participants.filter(function (participant) {
-	  				return participant.get("choice") === undefined;
-	  			});
-	  			this.options.participants.remove(notHere);
 	  		},
 
 	  		grid_attendance: function () {

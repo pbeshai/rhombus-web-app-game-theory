@@ -12,7 +12,6 @@ function(app) {
 
   var Participant = app.module();
 
-  // TODO: do we need this?
   Participant.Model = Backbone.Model.extend({
     url: "/api/participant",
 
@@ -33,22 +32,14 @@ function(app) {
 
   	initialize: function (models, options) {
       // initialize alias->model map
-      this.on("reset", function () {
-        console.log("participants reset");
-        this.aliasMap = {};
-        //_.each(collection.models)
-        this.each(function (model) {
-          var alias = model.get("alias");
-          if (alias !== undefined) {
-            this.aliasMap[alias] = model;
-          }
-        }, this);
-      });
+      console.log("models = ", models, "this.models = ", this.models)
+      this.on("reset", this.initAliasMap);
+      this.initAliasMap(models);
 
-      this.participantServer = options.participantServer;
+      this.participantServer = app.participantServer;
 
   		// update models on data received from server.
-			this.participantServer.on("data", function (data) {
+      this.listenTo(participantServer, "data", function (data) {
         console.log("data received", data);
 				_.each(data.choices, function (choiceData, i) {
 					var model = this.aliasMap[choiceData.id];
@@ -57,7 +48,23 @@ function(app) {
 					}
 				}, this);
 			}, this);
-  	}
+  	},
+
+    initAliasMap: function (models) {
+      this.aliasMap = {};
+      if (_.isArray(models)) {
+        _.each(models, setAlias, this);
+      } else {
+        this.each(setAlias, this);
+      }
+
+      function setAlias(model) {
+        var alias = model.get("alias");
+        if (alias !== undefined) {
+          this.aliasMap[alias] = model;
+        }
+      }
+    }
   });
 
   Participant.Views.Item = Backbone.View.extend({

@@ -76,9 +76,19 @@ function(app, Participant, StateApp) {
     this.initialize();
   }
   Grid.State.prototype = new StateApp.State(Grid.Views.Participants);
-  Grid.State.prototype.initialize = function () {
-    this.options.viewOptions = { participants: this.options.participants }
-  }
+  _.extend(Grid.State.prototype, {
+    initialize: function () {
+      this.options.viewOptions = { participants: this.options.participants }
+    },
+
+    beforeRender: function () {
+      console.log("grid before render: ", this.input);
+      if (this.input) {
+        this.options.viewOptions = { participants: this.input };
+      }
+    }
+  })
+
 
   return Grid;
 });

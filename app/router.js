@@ -12,10 +12,13 @@ define([
   "modules/Attendance",
   "modules/Clicker",
 
-  "apps/GridApp"
+  "apps/GridApp",
+  "apps/PrisonersDilemmaApp"
+
 ],
 
-function(app, ParticipantServer, StateController, Participant, Grid, Controls, Register, Attendance, Clicker, GridApp) {
+function(app, ParticipantServer, StateController, Participant, Grid, Controls, Register, Attendance, Clicker, GridApp,
+  PrisonersDilemmaApp) {
 
   var baseRoute = function(name, logic, views) {
     return function () {
@@ -49,7 +52,7 @@ function(app, ParticipantServer, StateController, Participant, Grid, Controls, R
 
       var collections = {
         // Set up the users.
-        participants: new Participant.Collection([], { participantServer: participantServer }),
+        participants: new Participant.Collection(),
 
       };
 
@@ -94,8 +97,10 @@ function(app, ParticipantServer, StateController, Participant, Grid, Controls, R
 
     controls: function () {
       console.log("[router: controls]");
+
+      this.participants.fetch();
       app.layout.setViews({
-        "#main-content": new Controls.Views.Controls()
+        "#main-content": new Controls.Views.Controls({participants: this.participants})
       }).render();
     },
 
@@ -137,9 +142,15 @@ function(app, ParticipantServer, StateController, Participant, Grid, Controls, R
       if (name === "grid") {
         this.participants.fetch();
         var gridApp = new GridApp({ participants: this.participants });
-        //gridApp.initialize();
+
         window.gridApp = gridApp;
         console.log("gridApp in window", gridApp);
+      } else if (name === "pd") {
+        this.participants.fetch();
+        var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
+
+        window.prisonersDilemmaApp = prisonersDilemmaApp;
+        console.log("prisonersDilemmaApp in window", gridApp);
       }
     }
   });

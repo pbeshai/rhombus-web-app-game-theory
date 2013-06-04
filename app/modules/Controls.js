@@ -7,10 +7,12 @@ define([
   // Application.
   "app",
 
+  "modules/Clicker",
+
   "plugins/jQuery.psToggleButton"
 ],
 
-function(app) {
+function(app, Clicker) {
 
   var Controls = app.module();
 
@@ -73,6 +75,10 @@ function(app) {
   	serialize: function () {
   		return { participantServer: app.participantServer };
   	},
+
+    beforeRender: function () {
+      this.insertView(".clicker-panel", new Clicker.Views.Clickers({participants: this.options.participants}));
+    },
 
     afterRender: function () {
       enableChoicesButton(this.$(".enable-choices-button"), app.participantServer);
