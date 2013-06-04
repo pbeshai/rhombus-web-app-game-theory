@@ -102,6 +102,7 @@ function(app, Participant, StateApp) {
       }, this));
 
       participantServer.on("disconnect", $.proxy(this.disable, this));
+      this.enabled = participantServer.get("connected");
   	}
   });
 
@@ -120,6 +121,9 @@ function(app, Participant, StateApp) {
 
   	initialize: function () {
       app.setTitle("Clickers");
+      this.listenTo(this.options.participants, {
+        "reset": this.render
+      });
   	}
   });
 
