@@ -52,6 +52,11 @@ function(app) {
           $button.addClass("disabled").prop("disabled", true);
         }
       });
+
+      // check the current state, so we initialize correctly
+      if (participantServer.get("acceptingChoices")) {
+        $button.trigger("to-state2");
+      }
     }
 
   Controls.Views.Controls = Backbone.View.extend({
