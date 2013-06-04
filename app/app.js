@@ -1,15 +1,20 @@
 define([
   "socketio",
+  "jquery",
   "backbone.layoutmanager",
   "plugins/backbone.iobind"
 //  "plugins/jquery.svg"
 
 ], function(io) {
+  var socketUrl = "http://localhost";
+
   // Provide a global location to place configuration settings and module
   // creation.
   var app = {
     // The root path to run the application.
-    root: "/"
+    root: "/",
+
+    socket: io.connect(socketUrl) // websocket
   };
 
   // Localize or create a new JavaScript Template object.
@@ -43,6 +48,7 @@ define([
 
   // Mix Backbone.Events, modules, and layout management into the app object.
   return _.extend(app, {
+
     // Create a custom object with a nested Views object.
     module: function(additionalProps) {
       return _.extend({ Views: {} }, additionalProps);
