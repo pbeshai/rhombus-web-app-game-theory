@@ -34,6 +34,8 @@ require.config({
 
     // jQuery plugins
     "plugins/jquery.svg": ["jquery"],
+    "plugins/jquery.psToggleButton": ["jquery"],
+    "plugins/jquery.toggleButton": ["jquery"],
 
     "socketio": [],
 
