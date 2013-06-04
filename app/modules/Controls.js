@@ -98,11 +98,11 @@ function(app) {
     },
 
     nextState: function () {
-      app.participantServer.appNext();
+      app.stateController.appNext();
     },
 
     prevState: function () {
-      app.participantServer.appPrev();
+      app.stateController.appPrev();
     },
 
   	initialize: function () {

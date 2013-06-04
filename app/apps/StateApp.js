@@ -105,11 +105,11 @@ function(app) {
 
 		this.loadState(this.initialState.name);
 		var that = this;
-		app.participantServer.on("app-next", function () {
+		app.stateController.on("app-next", function () {
 			console.log("APP NEXT");
 			that.next();
 		});
-		app.participantServer.on("app-prev", function () {
+		app.stateController.on("app-prev", function () {
 			console.log("APP PREV");
 			that.prev();
 		})

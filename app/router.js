@@ -3,6 +3,8 @@ define([
   "app",
 
   "modules/ParticipantServer",
+  "modules/StateController",
+
   "modules/Participant",
   "modules/Grid",
   "modules/Controls",
@@ -13,7 +15,7 @@ define([
   "apps/GridApp"
 ],
 
-function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendance, Clicker, GridApp) {
+function(app, ParticipantServer, StateController, Participant, Grid, Controls, Register, Attendance, Clicker, GridApp) {
 
   var baseRoute = function(name, logic, views) {
     return function () {
@@ -39,6 +41,7 @@ function(app, ParticipantServer, Participant, Grid, Controls, Register, Attendan
   var Router = Backbone.Router.extend({
     initialize: function() {
       var participantServer = app.participantServer = new ParticipantServer.Model();
+      var stateController = app.stateController = new StateController.Model();
 
       // TODO: remove; for debugging
       console.log("Making ParticipantServer available in window");
