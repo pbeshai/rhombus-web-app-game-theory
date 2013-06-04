@@ -33,7 +33,8 @@ function(app, Participant, StateApp) {
   	serialize: function () {
   		return {
         id: this.options.id,
-        buttons: this.buttons
+        buttons: this.buttons,
+        labels: this.options.labels
       };
   	},
 
