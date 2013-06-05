@@ -19,11 +19,8 @@ function(app, Participant, StateApp) {
   	template: "pd/participant",
     tagName: "div",
     className: "participant",
+    playedClass: "played",
 
-    choiceClass: {
-      A: "choice-a",
-      B: "choice-b",
-    },
 
   	serialize: function () {
   		return { model: this.model };
@@ -33,9 +30,12 @@ function(app, Participant, StateApp) {
       console.log("PD render!");
       var choice = this.model.get("choice");
       // remove old choice classes and set new one
-      this.$el
-        .removeClass(_.values(this.choiceClass).join(" "))
-        .addClass(this.choiceClass[choice]);
+      if (choice) {
+        this.$el.addClass(this.playedClass);
+      } else {
+        this.$el.removeClass(this.playedClass);
+      }
+
     },
 
   	initialize: function () {
@@ -81,7 +81,38 @@ function(app, Participant, StateApp) {
   });
   PrisonersDilemma.Collection = Participant.Collection.extend({
     url: null,
-    model: PrisonersDilemma.Model
+    model: PrisonersDilemma.Model,
+
+    initialize: function (models, options) {
+      this.on("reset", this.pairModels);
+      this.pairModels(models);
+    },
+
+    // put all the models into pairs
+    pairModels: function (models) {
+      if (!_.isArray(models)) {
+        models = this.models;
+      }
+
+      var indices = [];
+      _.each(models, function (model, i) { indices[i] = i; });
+      indices = _.shuffle(indices);
+
+      if (indices.length < 2) {
+        console.log("less than two models");
+      } else {
+        for(var i = 0; i < (indices.length - (indices.length % 2)); i += 2) {
+          models[indices[i]].set("partner", models[indices[i+1]]);
+          models[indices[i+1]].set("partner", models[indices[i]]);
+        }
+
+        if (indices.length % 2 == 1) {
+          console.log("uneven number of models, one model with no partner: " + models[indices[indices.length-1]].get("alias"));
+        }
+      }
+
+      console.log("pairing models", models, indices);
+    },
   })
 
   // To be used in StateApps
