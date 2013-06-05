@@ -68,8 +68,9 @@ function(app, Participant, StateApp) {
       }
     },
 
-    randomChoice: function () {
-      var choice = this.buttons[Math.floor(Math.random() * this.buttons.length)];
+    randomChoice: function (buttons) {
+      buttons = buttons || this.buttons;
+      var choice = buttons[Math.floor(Math.random() * buttons.length)];
       this.choose(choice);
     },
 
@@ -109,23 +110,40 @@ function(app, Participant, StateApp) {
 
   // TODO: add in random votes button.
   Clicker.Views.Clickers = Backbone.View.extend({
+    template: "clicker/clickers",
+    events: {
+      "click .random-votes" : "randomVotes",
+      "click .random-votes-ab" : "randomVotesAB"
+    },
   	serialize: function () {
   		return { collection: this.options.participants };
   	},
 
   	beforeRender: function () {
       this.options.participants.each(function (participant) {
-  			this.insertView(new Clicker.Views.Clicker({ id: participant.get("alias") }));
+  			this.insertView(".clicker-container", new Clicker.Views.Clicker({ id: participant.get("alias") }));
   		}, this);
   	},
-
 
   	initialize: function () {
       app.setTitle("Clickers");
       this.listenTo(this.options.participants, {
         "reset": this.render
       });
-  	}
+  	},
+
+    randomVotes: function () {
+      this.getViews(".clicker-container").each(function(clickerView) {
+        clickerView.randomChoice();
+      });
+    },
+
+    // sends random A or B
+    randomVotesAB: function () {
+      this.getViews(".clicker-container").each(function(clickerView) {
+        clickerView.randomChoice(["A","B"]);
+      });
+    }
   });
 
   return Clicker;

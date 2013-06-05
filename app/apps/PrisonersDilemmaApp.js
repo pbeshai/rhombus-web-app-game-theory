@@ -34,16 +34,18 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 				participants: this.options.participants
 			});
 
-			var playState = new PrisonersDilemma.States.Play({
-				participants: this.options.participants
-			});
+			var playState = new PrisonersDilemma.States.Play();
+
+			var resultsState = new PrisonersDilemma.States.Results();
 
 			this.states = {
 		  	"attendance": attendanceState,
-		  	"play": playState
+		  	"play": playState,
+		  	"results": resultsState
 	  	};
 
 			attendanceState.setNext(playState);
+			playState.setNext(resultsState);
 		},
 
 		initialize: function () {
@@ -60,7 +62,7 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 
 	  		play_attendance: function () {
 				  console.log("going from play to attendance");
-				  this.options.participants.fetch();
+				  this.options.participants.fetch(); // reset the participants that attendance uses
 	  		},
 
 	  		play_results: function () {

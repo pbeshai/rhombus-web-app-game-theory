@@ -48,6 +48,7 @@ function(app) {
 		if (input) {
 			this.input = input;
 		}
+		console.log("entered state", this.name);
 		this.beforeRender();
 		this.render();
 		this.afterRender();
@@ -55,7 +56,7 @@ function(app) {
 
 	// render the view of the state
 	State.prototype.render = function () {
-		console.log("rendering state: ", this.name);
+		console.log("rendering state: ", this.name, this);
 		app.layout.setView("#main-content", new this.view(this.options.viewOptions));
 		app.layout.render();
 	};

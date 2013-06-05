@@ -31,6 +31,7 @@ function(app) {
     aliasMap: {},
 
   	initialize: function (models, options) {
+      options = options || {};
       // initialize alias->model map
       console.log("models = ", models, "this.models = ", this.models)
       this.on("reset", this.initAliasMap);
@@ -44,7 +45,7 @@ function(app) {
 				_.each(data.choices, function (choiceData, i) {
 					var model = this.aliasMap[choiceData.id];
 					if (model) {
-						model.set("choice", choiceData.choice)
+						model.set({"choice": choiceData.choice}, { validate: options.validateOnChoice });
 					}
 				}, this);
 			}, this);
