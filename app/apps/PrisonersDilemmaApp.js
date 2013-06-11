@@ -12,7 +12,7 @@ define([
   "apps/StateApp",
 
   "modules/Participant",
-  "modules/Attendance",
+  "modules/AttendanceOpen",
   "modules/PrisonersDilemma"
 ],
 

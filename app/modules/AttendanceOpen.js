@@ -94,7 +94,7 @@ function(app, Participant, StateApp) {
   Attendance.State.prototype = new StateApp.State(Attendance.Views.Participants);
   _.extend(Attendance.State.prototype, {
     initialize: function () {
-      this.options.viewOptions = { participants: this.options.participants }
+      this.options.viewOptions = { collection: this.options.participants }
     },
 
     getOutput: function () {
