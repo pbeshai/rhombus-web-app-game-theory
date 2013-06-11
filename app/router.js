@@ -10,6 +10,7 @@ define([
   "modules/Controls",
   "modules/Register",
   "modules/Attendance",
+  "modules/AttendanceOpen",
   "modules/Clicker",
 
   "apps/GridApp",
@@ -17,8 +18,8 @@ define([
 
 ],
 
-function(app, ParticipantServer, StateController, Participant, Grid, Controls, Register, Attendance, Clicker, GridApp,
-  PrisonersDilemmaApp) {
+function(app, ParticipantServer, StateController, Participant, Grid, Controls, Register, Attendance, AttendanceOpen,
+  Clicker, GridApp, PrisonersDilemmaApp) {
 
   var baseRoute = function(name, logic, views) {
     return function () {
@@ -73,6 +74,7 @@ function(app, ParticipantServer, StateController, Participant, Grid, Controls, R
       "controls": "controls",
       "register": "register",
       "attendance": "attendance",
+      "attendance-open": "attendanceOpen",
       "clicker": "clicker",
       "apps/:name": "appHandler"
     },
@@ -123,6 +125,16 @@ function(app, ParticipantServer, StateController, Participant, Grid, Controls, R
 
       app.layout.setViews({
         "#main-content": new Attendance.Views.Participants({participants: this.participants})
+      }).render();
+    },
+
+    attendanceOpen: function () {
+      console.log("[router: attendance-open]");
+
+      this.participants.fetch();
+
+      app.layout.setViews({
+        "#main-content": new AttendanceOpen.Views.Participants({participants: this.participants})
       }).render();
     },
 

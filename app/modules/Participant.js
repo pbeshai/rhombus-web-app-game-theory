@@ -29,13 +29,17 @@ function(app) {
     url: "/api/participant/list",
   	model: Participant.Model,
     aliasMap: {},
+    defaults: {
+      acceptNew: true // if true, users when data is received for users not in the collection, they are added
+    },
 
   	initialize: function (models, options) {
-      options = options || {};
+      this.options = options = _.extend({}, this.defaults, options);
       // initialize alias->model map
       console.log("models = ", models, "this.models = ", this.models)
       this.on("reset", this.initAliasMap);
       this.initAliasMap(models);
+      this.on("add", this.addCallback);
 
       this.participantServer = app.participantServer;
 
@@ -46,10 +50,22 @@ function(app) {
 					var model = this.aliasMap[choiceData.id];
 					if (model) {
 						model.set({"choice": choiceData.choice}, { validate: options.validateOnChoice });
-					}
+					} else {
+            this.trigger("new-user", choiceData);
+            if (this.options.acceptNew) {
+              console.log("adding new user");
+              model = new Participant.Model({ alias: choiceData.id, serverId: "test-server-id", choice: choiceData.choice});
+              this.add(model);
+            }
+          }
 				}, this);
 			}, this);
   	},
+
+    addCallback: function (model) {
+      this.aliasMap[model.get("alias")] = model;
+    },
+
 
     initAliasMap: function (models) {
       this.aliasMap = {};
