@@ -74,13 +74,13 @@ function(app, Participant, StateApp) {
   Grid.State.prototype = new StateApp.State(Grid.Views.Participants);
   _.extend(Grid.State.prototype, {
     initialize: function () {
-      this.options.viewOptions = { participants: this.options.participants }
+      this.options.viewOptions = { collection: this.options.participants }
     },
 
     beforeRender: function () {
       console.log("grid before render: ", this.input);
       if (this.input) {
-        this.options.viewOptions = { participants: this.input };
+        this.options.viewOptions = { collection: this.input };
       }
     }
   })

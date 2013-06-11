@@ -41,7 +41,7 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
       app.useLayout("main-layout").setViews({
         ".view-controls": new ViewControls.Views.Controls(),
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
-      });
+      })
     },
 
     routes: {
@@ -126,11 +126,12 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
 
       if (name === "grid") {
         var gridApp = new GridApp({ participants: this.participants });
-
+        app.stateController.set("activeApp", gridApp);
         window.gridApp = gridApp;
         console.log("gridApp in window", gridApp);
       } else if (name === "pd") {
         var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
+        app.stateController.set("activeApp", prisonersDilemmaApp);
 
         window.prisonersDilemmaApp = prisonersDilemmaApp;
         console.log("prisonersDilemmaApp in window", gridApp);
@@ -140,6 +141,7 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
     // reset state
     reset: function () {
       this.participants.fetch({ reset: true });
+      app.stateController.reset();
     }
   });
 

@@ -23,6 +23,26 @@ define([
 			appPrev: "app-prev",
 		},
 
+		reset: function () {
+			this.clear();
+		},
+
+		appNextCallback: function () {
+			var activeApp = this.get("activeApp");
+			if (activeApp) {
+	  		console.log("Next State", activeApp);
+	  		activeApp.next();
+	  	}
+		},
+
+		appPrevCallback: function () {
+			var activeApp = this.get("activeApp");
+			if (activeApp) {
+	  		console.log("Prev State", activeApp);
+	  		activeApp.prev();
+	  	}
+		},
+
 		initialize: function () {
 			// web socket
 		  this.socket = app.socket;

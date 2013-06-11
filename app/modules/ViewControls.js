@@ -33,6 +33,7 @@ function(app) {
     },
 
     initialize: function () {
+      console.log("init zoom model");
       this.set("level", this.startLevel);
     }
   });
@@ -72,14 +73,18 @@ function(app) {
     },
 
     initialize: function () {
-      this.model = new ViewControls.Models.Zoom();
       this.listenTo(this.model, "change", this.render);
     }
   });
 
   ViewControls.Views.Controls = Backbone.View.extend({
+    template: "viewcontrols/viewcontrols",
+
     beforeRender: function () {
-      this.insertView(new ViewControls.Views.Zoom());
+      this.setViews({ ".zoom-controls": new ViewControls.Views.Zoom({ model: this.zoomModel }) });
+    },
+    initialize: function () {
+      this.zoomModel = new ViewControls.Models.Zoom();
     }
   })
 
