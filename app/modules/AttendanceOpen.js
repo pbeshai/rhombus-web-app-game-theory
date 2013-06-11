@@ -55,7 +55,7 @@ function(app, Participant, StateApp) {
   	},
 
   	beforeRender: function () {
-      this.options.participants.each(function (participant) {
+      this.collection.each(function (participant) {
   			this.insertView(new Attendance.Views.Participant({ model: participant }));
   		}, this);
   	},
@@ -68,13 +68,21 @@ function(app, Participant, StateApp) {
     },
 
   	initialize: function () {
-      this.options.participants.options.acceptNew = true; // allow new users to be added when data comes from server
-      this.listenTo(this.options.participants, {
+      this.prevAcceptNew = this.collection.options.acceptNew;
+      this.collection.options.acceptNew = true; // allow new users to be added when data comes from server
+      this.listenTo(this.collection, {
   			"reset": this.render,
         "add": this.add
   		});
+
+      app.participantServer.hookCollection(this.collection, this);
+
       app.setTitle("Attendance");
-  	}
+  	},
+
+    cleanup: function () {
+      this.collection.options.acceptNew = this.prevAcceptNew;
+    }
 
   });
 

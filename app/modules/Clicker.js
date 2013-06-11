@@ -115,19 +115,16 @@ function(app, Participant, StateApp) {
       "click .random-votes" : "randomVotes",
       "click .random-votes-ab" : "randomVotesAB"
     },
-  	serialize: function () {
-  		return { collection: this.options.participants };
-  	},
 
   	beforeRender: function () {
-      this.options.participants.each(function (participant) {
+      this.collection.each(function (participant) {
   			this.insertView(".clicker-container", new Clicker.Views.Clicker({ id: participant.get("alias") }));
   		}, this);
   	},
 
   	initialize: function () {
       app.setTitle("Clickers");
-      this.listenTo(this.options.participants, {
+      this.listenTo(this.collection, {
         "reset": this.render
       });
   	},

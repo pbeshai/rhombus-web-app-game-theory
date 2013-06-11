@@ -77,7 +77,7 @@ function(app, Clicker) {
   	},
 
     beforeRender: function () {
-      this.insertView(".clicker-panel", new Clicker.Views.Clickers({participants: this.options.participants}));
+      this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
     },
 
     afterRender: function () {
@@ -112,13 +112,7 @@ function(app, Clicker) {
     },
 
   	initialize: function () {
-      console.log("controls server: ", app.participantServer);
       app.setTitle("Control Panel");
-      /*
-      this.listenTo(this.options.participants, {
-  			"reset": this.render
-  		});
-      */
   	}
 
   });

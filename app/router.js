@@ -40,8 +40,7 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
       // Use main layout and set Views.
       app.useLayout("main-layout").setViews({
         ".view-controls": new ViewControls.Views.Controls(),
-        ".server-status": new ParticipantServer.Views.Status({ model: participantServer}),
-        "#main-content": new Participant.Views.List(collections),
+        ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
       });
     },
 
@@ -58,26 +57,26 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
 
     index: function () {
       console.log("[router: index]");
-      this.participants.fetch();
+      this.reset();
 
-      app.layout.render();
-      console.log("rendered");
+      app.layout.setViews({
+        "#main-content": new Participant.Views.List({ collection: this.participants}),
+      }).render();
     },
 
     grid: function () {
       console.log("[router: grid]");
-
-      this.participants.fetch();
+      this.reset();
 
       app.layout.setViews({
-        "#main-content": new Grid.Views.Participants({participants: this.participants})
+        "#main-content": new Grid.Views.Participants({collection: this.participants})
       }).render();
     },
 
     controls: function () {
       console.log("[router: controls]");
+      this.reset();
 
-      this.participants.fetch();
       app.layout.setViews({
         "#main-content": new Controls.Views.Controls({participants: this.participants})
       }).render();
@@ -85,8 +84,7 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
 
     register: function () {
       console.log("[router: register]");
-
-      this.participants.fetch();
+      this.reset();
 
       app.layout.setViews({
         "#main-content": new Register.Views.Register({
@@ -97,50 +95,51 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
 
     attendance: function () {
       console.log("[router: attendance]");
-
-      this.participants.fetch();
+      this.reset();
 
       app.layout.setViews({
-        "#main-content": new Attendance.Views.Participants({participants: this.participants})
+        "#main-content": new Attendance.Views.Participants({collection: this.participants})
       }).render();
     },
 
     attendanceOpen: function () {
       console.log("[router: attendance-open]");
-
-      this.participants.fetch();
+      this.reset();
 
       app.layout.setViews({
-        "#main-content": new AttendanceOpen.Views.Participants({participants: this.participants})
+        "#main-content": new AttendanceOpen.Views.Participants({collection: this.participants})
       }).render();
     },
 
     clicker: function () {
       console.log("[router: clicker]");
-
-      this.participants.fetch();
-
+      this.reset();
 
       app.layout.setViews({
-        "#main-content": new Clicker.Views.Clickers({participants: this.participants})
+        "#main-content": new Clicker.Views.Clickers({collection: this.participants})
       }).render();
     },
 
     appHandler: function (name) {
       console.log("[router: app/"+name+"]");
+      this.reset();
+
       if (name === "grid") {
-        this.participants.fetch();
         var gridApp = new GridApp({ participants: this.participants });
 
         window.gridApp = gridApp;
         console.log("gridApp in window", gridApp);
       } else if (name === "pd") {
-        this.participants.fetch();
         var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
 
         window.prisonersDilemmaApp = prisonersDilemmaApp;
         console.log("prisonersDilemmaApp in window", gridApp);
       }
+    },
+
+    // reset state
+    reset: function () {
+      this.participants.fetch({ reset: true });
     }
   });
 

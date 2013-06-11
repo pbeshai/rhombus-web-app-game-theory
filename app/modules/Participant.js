@@ -31,6 +31,8 @@ function(app) {
     },
 
   	initialize: function (models, options) {
+      _.bind(this.updateFromServer, this);
+
       this.options = options = _.extend({}, this.defaults, options);
       // initialize alias->model map
       this.on("reset", this.initAliasMap);
@@ -38,25 +40,24 @@ function(app) {
       this.on("add", this.addCallback);
 
       this.participantServer = app.participantServer;
-
-  		// update models on data received from server.
-      this.listenTo(this.participantServer, "data", function (data) {
-				_.each(data.choices, function (choiceData, i) {
-					var model = this.aliasMap[choiceData.id];
-					if (model) {
-						model.set({"choice": choiceData.choice}, { validate: options.validateOnChoice });
-					} else {
-            console.log("new user. accept new? ", this.options.acceptNew, this.options);
-            this.trigger("new-user", choiceData);
-            if (this.options.acceptNew) {
-              console.log("adding new user");
-              model = new Participant.Model({ alias: choiceData.id, serverId: "test-server-id", choice: choiceData.choice});
-              this.add(model);
-            }
-          }
-				}, this);
-			}, this);
   	},
+
+    updateFromServer: function (data) {
+      _.each(data.choices, function (choiceData, i) {
+        var model = this.aliasMap[choiceData.id];
+        if (model) {
+          model.set({"choice": choiceData.choice}, { validate: this.options.validateOnChoice });
+        } else {
+          console.log("new user. accept new? ", this.options.acceptNew, this.options);
+          this.trigger("new-user", choiceData);
+          if (this.options.acceptNew) {
+            console.log("adding new user");
+            model = new Participant.Model({ alias: choiceData.id, serverId: "test-server-id", choice: choiceData.choice});
+            this.add(model);
+          }
+        }
+      }, this);
+    },
 
     addCallback: function (model) {
       this.aliasMap[model.get("alias")] = model;
@@ -95,18 +96,15 @@ function(app) {
   Participant.Views.List = Backbone.View.extend({
   	template: "participant/list",
 
-  	serialize: function () {
-  		return { collection: this.options.participants };
-  	},
 
   	beforeRender: function () {
-  		this.options.participants.each(function (participant) {
+  		this.collection.each(function (participant) {
   			this.insertView(".participant-list", new Participant.Views.Item({ model: participant }));
   		}, this);
   	},
 
   	initialize: function () {
-  		this.listenTo(this.options.participants, {
+  		this.listenTo(this.collection, {
   			"reset": this.render,
 
   			"fetch": function () {
@@ -138,19 +136,19 @@ function(app) {
 
     serialize: function () {
       return {
-        collection: this.options.participants,
+        collection: this.collection,
         showChoice: this.options.showChoice
       };
     },
 
     beforeRender: function () {
-      this.options.participants.each(function (participant) {
+      this.collection.each(function (participant) {
         this.insertView("tbody", new Participant.Views.TableItem({ model: participant, showChoice: this.options.showChoice }));
       }, this);
     },
 
     initialize: function () {
-      this.listenTo(this.options.participants, {
+      this.listenTo(this.collection, {
         "reset": this.render,
 
         "fetch": function () {

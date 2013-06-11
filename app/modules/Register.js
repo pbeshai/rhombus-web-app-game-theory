@@ -114,7 +114,7 @@ function(app, Participant) {
 
   	beforeRender: function () {
       this.insertViews({
-        ".participants": new Participant.Views.Table({ participants: this.options.participants }),
+        ".participants": new Participant.Views.Table({ collection: this.options.participants }),
         ".register-participant": new Register.Views.FormRegistration({ model: new Participant.Model(), collection: this.options.participants })
       });
   	},

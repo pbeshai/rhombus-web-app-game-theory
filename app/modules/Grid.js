@@ -50,19 +50,15 @@ function(app, Participant, StateApp) {
     tagName: "div",
     className: "participant-grid",
 
-  	serialize: function () {
-  		return { collection: this.options.participants };
-  	},
-
   	beforeRender: function () {
-      this.options.participants.each(function (participant) {
+      this.collection.each(function (participant) {
   			this.insertView(new Grid.Views.Participant({ model: participant }));
   		}, this);
   	},
 
 
   	initialize: function () {
-      this.listenTo(this.options.participants, {
+      this.listenTo(this.collection, {
   			"reset": this.render
   		});
       app.setTitle("Grid");

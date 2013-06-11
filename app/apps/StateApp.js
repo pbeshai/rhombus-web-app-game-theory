@@ -109,6 +109,7 @@ function(app) {
 		this.loadState(this.initialState.name);
 		var that = this;
 		app.stateController.on("app-next", function () {
+			console.log("next", that);
 			that.next();
 		});
 		app.stateController.on("app-prev", function () {
@@ -138,7 +139,10 @@ function(app) {
 	// calls function this.transitions.<currentState>_<destinationState>(currentStateOutput);
 	StateApp.prototype.transition = function (destinationState) {
 		var output = this.currentState.getOutput();
-		this.transitions[this.currentState.name + "_" + destinationState].apply(this, [output]);
+		var transitionFunc = this.transitions[this.currentState.name + "_" + destinationState];
+		if (transitionFunc) {
+			transitionFunc.apply(this, [output]);
+		}
 		this.currentState = this.states[destinationState];
 		this.currentState.enter(output);
 	};

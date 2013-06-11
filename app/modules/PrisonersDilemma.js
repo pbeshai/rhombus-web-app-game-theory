@@ -107,23 +107,21 @@ function(app, Participant, StateApp) {
     tagName: "div",
     className: "participant-grid",
 
-  	serialize: function () {
-  		return { collection: this.options.participants };
-  	},
-
   	beforeRender: function () {
-      this.options.participants.each(function (participant) {
+      this.collection.each(function (participant) {
   			this.insertView(new PrisonersDilemma.Views.Play.Participant({ model: participant }));
   		}, this);
   	},
 
 
   	initialize: function () {
-      this.listenTo(this.options.participants, {
+      app.participantServer.hookCollection(this.collection, this);
+
+      this.listenTo(this.collection, {
   			"reset": this.render
   		});
       app.setTitle("Prisoners Dilemma");
-  	}
+  	},
   });
 
   PrisonersDilemma.Views.Results.Participant = Backbone.View.extend({
@@ -141,12 +139,6 @@ function(app, Participant, StateApp) {
       var pairChoices = this.model.get("pairChoices");
 
       this.$el.addClass("choices-"+pairChoices);
-      // remove old choice classes and set new one
-      // if (choice) {
-      //   this.$el.addClass(this.playedClass);
-      // } else {
-      //   this.$el.removeClass(this.playedClass);
-      // }
     },
 
     initialize: function () {
@@ -158,19 +150,15 @@ function(app, Participant, StateApp) {
     tagName: "div",
     className: "participant-grid",
 
-    serialize: function () {
-      return { collection: this.options.participants };
-    },
-
     beforeRender: function () {
-      this.options.participants.each(function (participant) {
+      this.collection.each(function (participant) {
         this.insertView(new PrisonersDilemma.Views.Results.Participant({ model: participant }));
       }, this);
     },
 
 
     initialize: function () {
-      this.listenTo(this.options.participants, {
+      this.listenTo(this.collection, {
         "reset": this.render
       });
       app.setTitle("Prisoners Dilemma: Results");
@@ -197,9 +185,7 @@ function(app, Participant, StateApp) {
 
       this.participants = new PrisonersDilemma.Collection(pdParticipants);
       if (this.input) {
-        console.log("setting view options");
-        this.options.viewOptions = { participants: this.participants };
-        console.log(this);
+        this.options.viewOptions = { collection: this.participants };
       }
     },
 
@@ -233,7 +219,7 @@ function(app, Participant, StateApp) {
 
     beforeRender: function () {
       // this.input is a PrisonersDilemma.Collection
-      this.options.viewOptions = { participants: this.input };
+      this.options.viewOptions = { collection: this.input };
 
       // calculate the scores
       this.assignScores(this.input);

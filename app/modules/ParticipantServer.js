@@ -43,6 +43,16 @@ define([
 		  SocketUtils.initSendReceive.call(this);
 		},
 
+		// collection must have updateFromServer function
+		// doing it this way allows the event handler to be cleaned up
+		// when the context (typically a view) is cleaned up.
+		// (as opposed to having the collection itself listen for data);
+		hookCollection: function (collection, context) {
+			context.listenTo(this, "data", function (data) {
+	      collection.updateFromServer(data);
+      });
+		},
+
 	  connectCallback: function (data) {
 			this.set("connected", data);
 		},
