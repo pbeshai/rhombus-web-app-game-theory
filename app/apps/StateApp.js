@@ -48,7 +48,6 @@ function(app) {
 		if (input) {
 			this.input = input;
 		}
-		console.log("entered state", this.name);
 		this.beforeRender();
 		this.render();
 		this.afterRender();
@@ -56,7 +55,6 @@ function(app) {
 
 	// render the view of the state
 	State.prototype.render = function () {
-		console.log("rendering state: ", this.name, this);
 		app.layout.setView("#main-content", new this.view(this.options.viewOptions));
 		app.layout.render();
 	};
@@ -81,11 +79,9 @@ function(app) {
 	 * State App - prototype object
 	 */
 	var StateApp = function (options) {
-		console.log("state app constructor");
 		this.options = options;
 	};
 	StateApp.prototype.initialize = function () {
-		console.log("state app initialize")
 
 		if (this.defineStates) {
 			this.defineStates();
@@ -113,11 +109,9 @@ function(app) {
 		this.loadState(this.initialState.name);
 		var that = this;
 		app.stateController.on("app-next", function () {
-			console.log("APP NEXT");
 			that.next();
 		});
 		app.stateController.on("app-prev", function () {
-			console.log("APP PREV");
 			that.prev();
 		})
 	};

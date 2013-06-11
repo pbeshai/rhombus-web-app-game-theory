@@ -4,6 +4,7 @@ define([
 
   "modules/ParticipantServer",
   "modules/StateController",
+  "modules/ViewControls",
 
   "modules/Participant",
   "modules/Grid",
@@ -18,38 +19,14 @@ define([
 
 ],
 
-function(app, ParticipantServer, StateController, Participant, Grid, Controls, Register, Attendance, AttendanceOpen,
+function(app, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance, AttendanceOpen,
   Clicker, GridApp, PrisonersDilemmaApp) {
-
-  var baseRoute = function(name, logic, views) {
-    return function () {
-      console.log("[router: "+name+"]");
-
-      if (!_.isFunction(logic) && _.isObject(logic)) {
-        views = logic;
-      }
-
-      if (_.isFunction(logic)) {
-        logic.call(this);
-      }
-
-      if (views) {
-        app.layout.setViews(views).render();
-      } else {
-        app.layout.render();
-      }
-    };
-  }
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
       var participantServer = app.participantServer = new ParticipantServer.Model();
       var stateController = app.stateController = new StateController.Model();
-
-      // TODO: remove; for debugging
-      console.log("Making ParticipantServer available in window");
-      window.participantServer = participantServer;
 
       var collections = {
         // Set up the users.
@@ -61,8 +38,8 @@ function(app, ParticipantServer, StateController, Participant, Grid, Controls, R
       _.extend(this, collections);
 
       // Use main layout and set Views.
-      console.log("use layout");
       app.useLayout("main-layout").setViews({
+        ".view-controls": new ViewControls.Views.Controls(),
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer}),
         "#main-content": new Participant.Views.List(collections),
       });

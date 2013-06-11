@@ -8,7 +8,7 @@
 
 /** temporary debug nav */
 #debug-nav {
-	position: absolute;
+	position: fixed;
 	bottom: 0;
 	background: #eee;
 	padding: 4px 4px 0 4px;
@@ -23,6 +23,63 @@
 
 #main-content {
 	padding: 20px;
+}
+
+.view-controls {
+	position: relative;
+	float: left;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.view-controls .zoom-out,.view-controls .zoom-in {
+	opacity: .5;
+}
+
+.view-controls .zoom-out:hover,.view-controls .zoom-in:hover {
+	opacity: .7;
+}
+
+.zoom-line {
+	display: inline-block;
+	position: relative;
+	top: 2px;
+}
+
+.zoom-line .zoom-box {
+	width: 4px;
+	height: 2px;
+	background: #ccc;
+	margin: 4px 3px;
+	display: inline-block;
+}
+.zoom-box.active {
+	width: 6px;
+	height: 6px;
+	background: #666;
+	margin: 2px;
+	border-radius 3px
+}
+
+.zoom-0 #main-content {
+	font-size: .5em;
+}
+.zoom-1 #main-content {
+	font-size: 1em;
+}
+.zoom-2 #main-content {
+	font-size: 1.5em;
+}
+.zoom-3 #main-content {
+	font-size: 2em;
+}
+.zoom-4 #main-content {
+	font-size: 2.5em;
+}
+.zoom-5 #main-content {
+	font-size: 3em;
 }
 
 
@@ -62,21 +119,21 @@
 }
 
 
-/** Status bar **/
-.server-status {
+/** Top bar **/
+.top-bar {
 	background: #eee;
 	border: 1px solid #ccc;
 	border-top: 0;
-	padding: 10px;
-}
-
-.server-status.server-status-tiny {
 	padding: 2px;
 	line-height: .75em;
 	font-size: .75em;
 }
 
-.server-status.server-status-tiny li {
+/** server status in top bar **/
+.server-status {
+	margin-top: 2px;
+}
+.server-status li {
 	line-height: .75em;
 }
 

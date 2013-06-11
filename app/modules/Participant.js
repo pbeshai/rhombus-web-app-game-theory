@@ -19,9 +19,6 @@ function(app) {
       if (_.isEmpty(attrs.alias)) {
         return "cannot have empty alias"
       }
-      if (_.isEmpty(attrs.serverId)) {
-        return "cannot have empty serverId"
-      }
     }
   });
 
@@ -30,13 +27,12 @@ function(app) {
   	model: Participant.Model,
     aliasMap: {},
     defaults: {
-      acceptNew: true // if true, users when data is received for users not in the collection, they are added
+      acceptNew: false // if true, users when data is received for users not in the collection, they are added
     },
 
   	initialize: function (models, options) {
       this.options = options = _.extend({}, this.defaults, options);
       // initialize alias->model map
-      console.log("models = ", models, "this.models = ", this.models)
       this.on("reset", this.initAliasMap);
       this.initAliasMap(models);
       this.on("add", this.addCallback);
@@ -44,13 +40,13 @@ function(app) {
       this.participantServer = app.participantServer;
 
   		// update models on data received from server.
-      this.listenTo(participantServer, "data", function (data) {
-        console.log("data received", data);
+      this.listenTo(this.participantServer, "data", function (data) {
 				_.each(data.choices, function (choiceData, i) {
 					var model = this.aliasMap[choiceData.id];
 					if (model) {
 						model.set({"choice": choiceData.choice}, { validate: options.validateOnChoice });
 					} else {
+            console.log("new user. accept new? ", this.options.acceptNew, this.options);
             this.trigger("new-user", choiceData);
             if (this.options.acceptNew) {
               console.log("adding new user");

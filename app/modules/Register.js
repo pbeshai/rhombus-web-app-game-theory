@@ -17,22 +17,21 @@ function(app, Participant) {
 
   var Register = app.module();
 
-  function updateModel(data, alias) {
+  function updateModel(data, name) {
     // check if we already have this guy
     var exists = this.collection.find(function (elem) {
-      return elem.get("serverId") === data.id;
+      return elem.get("alias") === data.id;
     });
 
     if (exists) {
-      var message = data.id + " is already mapped to " + exists.get("alias");
-      console.log(message);
+      var message = data.id + " is already registered.";
       $("<div class='alert fade in'>"+message+"</div>").appendTo(this.$(".alert-container").empty()).alert();
       return false;
     }
 
-    this.model.set("serverId", data.id);
-    if (alias) {
-      this.model.set("alias", alias);
+    this.model.set("alias", data.id);
+    if (name) {
+      this.model.set("name", name);
     }
     return true;
   }
@@ -42,7 +41,7 @@ function(app, Participant) {
 
     events: {
       "click .register-submit" : "register",
-      "change .server-id": "hideAlert"
+      "change #manual-reg-alias": "hideAlert"
     },
 
     hideAlert: function () {
@@ -50,16 +49,16 @@ function(app, Participant) {
     },
 
     listenForId: function (event) {
-      console.log("listen for server id", this);
-      this.model.set("serverId", "");
-      this.$("input.server-id").attr("placeholder", "Listening...").prop("disabled", true);
+      console.log("listen for alias", this);
+      this.model.set("alias", "");
+      this.$("#manual-reg-alias").attr("placeholder", "Listening...").prop("disabled", true);
       // should be listenToOnce
       this.listenTo(app.participantServer, "data", function (data) {
         this.cancelListen();
-        console.log(data[0]);
-        this.$(".listen-server-id").trigger("to-state1");
+        console.log(data.choices[0]);
+        this.$(".listen-alias").trigger("to-state1");
 
-        updateModel.apply(this, [data[0]]);
+        updateModel.apply(this, [data.choices[0]]);
       });
     },
 
@@ -67,25 +66,25 @@ function(app, Participant) {
     cancelListen: function () {
       console.log("cancel");
       this.stopListening(app.participantServer, "data");
-      this.$("input.server-id").removeAttr("placeholder").prop("disabled", false);
+      this.$("#manual-reg-alias").removeAttr("placeholder").prop("disabled", false);
     },
 
     register: function (event) {
       event.preventDefault();
 
-      var serverId = this.$("input.server-id").val();
-      var alias = this.$("input.alias").val();
+      var alias = this.$("#manual-reg-alias").val();
+      var name = this.$("#manual-reg-name").val();
 
       this.model.set({
-        "serverId": serverId,
-        "alias": alias
+        "alias": alias,
+        "name": name
       });
 
       this.trigger("save-registration", this.model);
     },
 
     afterRender: function () {
-      this.$(".listen-server-id").toggleButton({
+      this.$(".listen-alias").toggleButton({
         textState1: "Listen",
         textState2: "Cancel",
         clickState1: this.listenForId,
@@ -98,124 +97,17 @@ function(app, Participant) {
       this.listenTo(this.model, {
         change: function () {
           console.log("model changed!");
-          this.$("input.server-id").val(this.model.get("serverId"));
-          this.$("input.alias").val(this.model.get("alias"));
+
+          this.$("#manual-reg-alias").val(this.model.get("alias"));
+          this.$("#manual-reg-name").val(this.model.get("name"));
         }
        });
-    }
-  });
-
-  Register.Views.AutoRegistration = Backbone.View.extend({
-    template: "register/auto",
-    idPrefix: "Clicker",
-    counter: 1,
-
-    events: {
-      "click .auto-register-submit" : "register",
-      "change .prefix" : "updatePrefix",
-      "change .server-id": "hideAlert"
-    },
-
-    serialize: function () {
-      return {
-        model: this.model,
-        prefix: this.idPrefix
-      }
-    },
-
-    afterRender: function () {
-      this.$(".auto-start-btn").toggleButton({
-        classState1: "btn-success",
-        classState2: "btn-danger",
-        textState1: "Start",
-        textState2: "Stop",
-        clickState1: this.startAuto,
-        clickState2: this.stopAuto
-      });
-    },
-
-    initialize: function () {
-      _.bindAll(this, "startAuto", "stopAuto");
-
-      this.listenTo(this.model, {
-        change: function () {
-          this.$("input.server-id").val(this.model.get("serverId"));
-          this.$("input.alias").val(this.model.get("alias"));
-        }
-       });
-    },
-
-    generateAlias: function () {
-      return this.idPrefix+this.counter.toString();
-    },
-
-    updatePrefix: function () {
-      var prefixVal = this.$("input.prefix").val();
-
-      if (this.idPrefix !== prefixVal) {
-        this.idPrefix = prefixVal; // update the value to match the textfield
-
-        // update alias to use new prefix
-        if (!_.isEmpty(this.model.get("alias"))) {
-          this.model.set("alias", this.generateAlias());
-        }
-
-        return true; // updated
-      }
-
-      return false; // no update
-    },
-
-    hideAlert: function () {
-      this.$(".alert").alert('close');
-    },
-
-    startAuto: function () {
-      this.listenTo(app.participantServer, "data", function (data) {
-        // ensure the prefix is up to date
-        var prefixChanged = this.updatePrefix();
-
-        if (!prefixChanged && this.model.get("serverId") === data[0].id) {
-          // no prefix change, but same ID came in => save
-          this.register();
-        } else {
-          updateModel.apply(this, [data[0], this.generateAlias()]);
-        }
-      });
-    },
-
-    stopAuto: function () {
-      this.stopListening(app.participantServer, "data");
-    },
-
-    register: function (event) {
-      if (event) {
-        event.preventDefault();
-      }
-
-      var serverId = this.$("input.server-id").val();
-      var alias = this.$("input.alias").val();
-
-      this.model.set({
-        "serverId": serverId,
-        "alias": alias
-      });
-
-      this.counter += 1;
-
-      this.trigger("save-registration", this.model);
     }
   });
 
   Register.Views.Register = Backbone.View.extend({
     tagName: "div",
     template: "register/register",
-    registrationViews: {},
-
-    events: {
-      "click .manual-reg-btn" : "manualRegistration",
-      "click .auto-reg-btn" : "autoRegistration",
-    },
 
   	serialize: function () {
   	},
@@ -223,20 +115,18 @@ function(app, Participant) {
   	beforeRender: function () {
       this.insertViews({
         ".participants": new Participant.Views.Table({ participants: this.options.participants }),
-        ".register-participant": this.currentView
+        ".register-participant": new Register.Views.FormRegistration({ model: new Participant.Model(), collection: this.options.participants })
       });
   	},
 
   	initialize: function () {
       app.setTitle("Register Participant");
 
-      this.currentView = new Register.Views.FormRegistration({ model: new Participant.Model(), collection: this.options.participants });
-
       this.on("save-registration", this.register);
   	},
 
     register: function (participant) {
-      console.log("registering ", participant.get("serverId"), participant.get("alias"));
+      console.log("registering ", participant.get("alias"), participant.get("name"));
 
       var participants = this.options.participants;
       var saved = participant.save(null, {
@@ -252,25 +142,6 @@ function(app, Participant) {
 
       if (!saved) {
         console.log("didn't save: " +participant.validationError);
-      }
-    },
-
-    updateRegistrationView: function () {
-      this.setView(".register-participant", this.currentView);
-      this.currentView.render();
-    },
-
-    manualRegistration: function () {
-      if (!(this.currentView instanceof Register.Views.FormRegistration)) {
-        this.currentView = new Register.Views.FormRegistration({ model: new Participant.Model(), collection: this.options.participants });
-        this.updateRegistrationView();
-      }
-    },
-
-    autoRegistration: function () {
-      if (!(this.currentView instanceof Register.Views.AutoRegistration)) {
-        this.currentView = new Register.Views.AutoRegistration({ model: new Participant.Model(), collection: this.options.participants });
-        this.updateRegistrationView();
       }
     }
   });

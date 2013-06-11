@@ -21,7 +21,6 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 	/**
 	 *  Prisoner's Dilemma App
 	 */
-	 console.log("PD?", PrisonersDilemma)
 	var PrisonersDilemmaApp = function (options) {
 		this.options = options;
 		this.initialize();

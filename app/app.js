@@ -1,11 +1,12 @@
 define([
   "socketio",
+  "base/BaseView",
   "jquery",
   "backbone.layoutmanager",
-  "plugins/backbone.iobind"
+  "plugins/backbone.iobind",
 //  "plugins/jquery.svg"
 
-], function(io) {
+], function(io, BaseView) {
   var socketUrl = "http://localhost";
 
   // Provide a global location to place configuration settings and module
@@ -13,12 +14,14 @@ define([
   var app = {
     // The root path to run the application.
     root: "/",
-
+    BaseView: BaseView, // shortcut to BaseView class
     socket: io.connect(socketUrl) // websocket
   };
 
   // Localize or create a new JavaScript Template object.
   var JST = window.JST = window.JST || {};
+
+
 
   // Configure LayoutManager with Backbone Boilerplate defaults.
   Backbone.Layout.configure({

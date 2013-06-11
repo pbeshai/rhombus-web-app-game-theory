@@ -16,44 +16,28 @@ function(app, Participant, StateApp) {
 
   var Attendance = app.module();
 
-  Attendance.Views.Participant = Backbone.View.extend({
+  Attendance.Views.Participant = app.BaseView.extend({
   	template: "attendance/participant",
     tagName: "div",
     className: "participant",
     hereClass: "participant-here",
-    initialRender: true,
 
   	serialize: function () {
   		return { model: this.model };
   	},
 
-    initialBeforeRender: function () {
-      this.$el.hide();
-    },
+    rendering: {
+      fadeIn: true,
 
-    initialAfterRender: function () {
-      this.$el.fadeIn(200);
-      this.initialRender = false;
-    },
+      before: function () {
+        var choice = this.model.get("choice");
 
-    beforeRender: function () {
-      var choice = this.model.get("choice");
-
-      if (this.initialRender) {
-        this.initialBeforeRender();
-      }
-
-      // remove old choice classes and set new one
-      if (choice !== undefined) {
-        this.$el.addClass(this.hereClass);
-      } else {
-        this.$el.removeClass(this.hereClass);
-      }
-    },
-
-    afterRender: function ()  {
-      if (this.initialRender) {
-        this.initialAfterRender();
+        // remove old choice classes and set new one
+        if (choice !== undefined) {
+          this.$el.addClass(this.hereClass);
+        } else {
+          this.$el.removeClass(this.hereClass);
+        }
       }
     },
 
@@ -84,6 +68,7 @@ function(app, Participant, StateApp) {
     },
 
   	initialize: function () {
+      this.options.participants.options.acceptNew = true; // allow new users to be added when data comes from server
       this.listenTo(this.options.participants, {
   			"reset": this.render,
         "add": this.add
