@@ -36,6 +36,47 @@ function(app, Participant, StateApp) {
       }
     }
   });
+
+
+  PrisonersDilemma.Bot = PrisonersDilemma.Model.extend({
+    bot: true,
+
+    initialize: function () {
+      PrisonersDilemma.Model.prototype.initialize.call(this);
+      if (this.get("alias") === undefined) {
+        this.set("alias", "bot");
+      }
+
+      // random delay before playing
+      setTimeout(_.bind(this.play, this), Math.floor(Math.random()*500)+200);
+    },
+
+    save: function () {
+      console.log("trying to save bot");
+      return false;
+    },
+
+    sync: function () {
+      console.log("trying to sync bot");
+      return false;
+    },
+
+    fetch: function () {
+      console.log("trying to fetch bot");
+      return false;
+    },
+
+    destroy: function () {
+      console.log("trying to destroy bot");
+      return false;
+    },
+
+    play: function () {
+      var choice = Math.floor(Math.random() * 2) === 0 ? "A" : "B";
+      this.set("choice", choice);
+    }
+  });
+
   PrisonersDilemma.Collection = Participant.Collection.extend({
     url: null,
     model: PrisonersDilemma.Model,
@@ -169,11 +210,16 @@ function(app, Participant, StateApp) {
   // To be used in StateApps
   PrisonersDilemma.States = {};
   PrisonersDilemma.States.Play = function (options) {
-    this.options = options || {};
+    this.options = _.defaults({}, options, this.defaults);
+
     this.initialize();
   }
   PrisonersDilemma.States.Play.prototype = new StateApp.State(PrisonersDilemma.Views.Play.Participants);
   _.extend(PrisonersDilemma.States.Play.prototype, {
+    defaults: {
+      defaultChoice: "A" // choice made when a player does not play
+    },
+
     initialize: function () {
     },
 
@@ -182,38 +228,50 @@ function(app, Participant, StateApp) {
       var pdParticipants = this.input.map(function (participant) {
         return new PrisonersDilemma.Model({ alias: participant.get("alias") });
       });
+      // ensure we have even number of participants by adding a bot
+      if (pdParticipants.length % 2 === 1) {
+        pdParticipants.push(new PrisonersDilemma.Bot());
+      }
 
       this.participants = new PrisonersDilemma.Collection(pdParticipants);
-      if (this.input) {
-        this.options.viewOptions = { collection: this.participants };
-      }
+
+      this.options.viewOptions = { collection: this.participants };
     },
 
     // outputs a PrisonersDilemma.Collection
     getOutput: function () {
+      // if you haven't played, then you played "A".
+      this.participants.each(function (participant) {
+        if (participant.get("choice") === undefined) {
+          participant.set("choice", this.options.defaultChoice);
+        }
+      }, this);
+
       return this.participants;
     }
   });
   PrisonersDilemma.States.Results = function (options) {
-    this.options = options || {};
+    this.options = _.defaults({}, options, this.defaults);
     this.initialize();
   }
   PrisonersDilemma.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Participants);
   _.extend(PrisonersDilemma.States.Results.prototype, {
-    initialize: function () {
-      // scoring matrix (TODO read from option)
-      this.scoringMatrix = {
-        AA: [ 50, 50 ],
-        AB: [ 30, 100 ],
-        BA: [ 100, 30 ],
+    defaults: {
+      scoringMatrix: {
+        AA: [ 70, 70 ],
+        AB: [ 20, 100 ],
+        BA: [ 100, 20 ],
         BB: [ 0, 0 ]
-      };
+      }
+    },
+
+    initialize: function () {
     },
 
     assignScores: function (models) {
       models.each(function (model) {
         var pairChoices = model.get("choice") + model.get("partner").get("choice");
-        model.set({"score": this.scoringMatrix[pairChoices][0], "pairChoices": pairChoices});
+        model.set({"score": this.options.scoringMatrix[pairChoices][0], "pairChoices": pairChoices});
       }, this);
     },
 
