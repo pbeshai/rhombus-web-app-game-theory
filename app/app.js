@@ -15,7 +15,13 @@ define([
     // The root path to run the application.
     root: "/",
     BaseView: BaseView, // shortcut to BaseView class
-    socket: io.connect(socketUrl) // websocket
+    getSocket: function () {
+      // lazy load the socket so that handlers can be ready to accept initial events on socket connect.
+      if (this.socket == null) {
+        this.socket = io.connect(socketUrl); // websocket
+      }
+      return this.socket;
+    }
   };
 
   // Localize or create a new JavaScript Template object.

@@ -41,7 +41,7 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
       app.useLayout("main-layout").setViews({
         ".view-controls": new ViewControls.Views.Controls(),
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
-      })
+      });
     },
 
     routes: {

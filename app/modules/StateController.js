@@ -45,7 +45,7 @@ define([
 
 		initialize: function () {
 			// web socket
-		  this.socket = app.socket;
+		  this.socket = app.getSocket();
 		  SocketUtils.initSendReceive.call(this);
 		},
 	});
