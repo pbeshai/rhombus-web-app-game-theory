@@ -188,13 +188,62 @@ function(app, Participant, StateApp) {
   });
 
   PrisonersDilemma.Views.Results.Participants = Backbone.View.extend({
-    tagName: "div",
     className: "participant-grid",
 
     beforeRender: function () {
       this.collection.each(function (participant) {
         this.insertView(new PrisonersDilemma.Views.Results.Participant({ model: participant }));
       }, this);
+    },
+
+
+    initialize: function () {
+      this.listenTo(this.collection, {
+        "reset": this.render
+      });
+    }
+  });
+
+  PrisonersDilemma.Views.Results.Stats = Backbone.View.extend({
+    template: "pd/results/stats",
+
+    serialize: function () {
+
+      // models partitioned by choice
+      var groups = this.collection.groupBy(function (model) { return model.get("choice"); });
+      groups.A || (groups.A = []);
+      groups.B || (groups.B = []);
+
+      function average(modelsArray) {
+        if (modelsArray.length === 0) return 0;
+        return _.reduce(modelsArray, function(memo, model) { return memo + model.get("score"); }, 0) / modelsArray.length;
+      }
+
+      return {
+        A: {
+          count: groups.A.length,
+          average: average(groups.A).toFixed(1)
+        },
+        B: {
+          count: groups.B.length,
+          average: average(groups.B).toFixed(1)
+        },
+        total: {
+          count: this.collection.length,
+          average: average(this.collection.models).toFixed(1)
+        }
+      }
+    }
+  });
+
+  PrisonersDilemma.Views.Results.Layout = Backbone.View.extend({
+    template: "pd/results/results",
+
+    beforeRender: function () {
+      this.setViews({
+        ".results-participants": new PrisonersDilemma.Views.Results.Participants({ collection: this.collection }),
+        ".results-stats": new PrisonersDilemma.Views.Results.Stats({ collection: this.collection })
+      });
     },
 
 
@@ -254,7 +303,7 @@ function(app, Participant, StateApp) {
     this.options = _.defaults({}, options, this.defaults);
     this.initialize();
   }
-  PrisonersDilemma.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Participants);
+  PrisonersDilemma.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Layout);
   _.extend(PrisonersDilemma.States.Results.prototype, {
     defaults: {
       scoringMatrix: {
