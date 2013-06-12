@@ -12,7 +12,7 @@ define([
   "apps/StateApp",
 
   "modules/Participant",
-  "modules/AttendanceOpen",
+  "modules/Attendance",
   "modules/PrisonersDilemma"
 ],
 
@@ -30,7 +30,8 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 	_.extend(PrisonersDilemmaApp.prototype, {
 		defineStates: function () {
 			var attendanceState = new Attendance.State({
-				participants: this.options.participants
+				participants: this.options.participants,
+				acceptNew: true
 			});
 
 			var playState = new PrisonersDilemma.States.Play();

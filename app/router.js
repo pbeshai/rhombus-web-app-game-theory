@@ -11,7 +11,6 @@ define([
   "modules/Controls",
   "modules/Register",
   "modules/Attendance",
-  "modules/AttendanceOpen",
   "modules/Clicker",
 
   "apps/GridApp",
@@ -19,7 +18,7 @@ define([
 
 ],
 
-function(app, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance, AttendanceOpen,
+function(app, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance,
   Clicker, GridApp, PrisonersDilemmaApp) {
 
   // Defining the application router, you can attach sub routers here.
@@ -50,7 +49,6 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
       "controls": "controls",
       "register": "register",
       "attendance": "attendance",
-      "attendance-open": "attendanceOpen",
       "clicker": "clicker",
       "apps/:name": "appHandler"
     },
@@ -99,15 +97,6 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
 
       app.layout.setViews({
         "#main-content": new Attendance.Views.Participants({collection: this.participants})
-      }).render();
-    },
-
-    attendanceOpen: function () {
-      console.log("[router: attendance-open]");
-      this.reset();
-
-      app.layout.setViews({
-        "#main-content": new AttendanceOpen.Views.Participants({collection: this.participants})
       }).render();
     },
 

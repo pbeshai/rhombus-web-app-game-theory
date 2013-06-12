@@ -13,7 +13,7 @@ function(app) {
   var Participant = app.module();
 
   Participant.Model = Backbone.Model.extend({
-    url: "/api/participant",
+    urlRoot: "/api/participants",
 
     validate: function (attrs, options) {
       if (_.isEmpty(attrs.alias)) {
@@ -23,7 +23,7 @@ function(app) {
   });
 
   Participant.Collection = Backbone.Collection.extend({
-    url: "/api/participant/list",
+    url: "/api/participants",
   	model: Participant.Model,
     aliasMap: {},
     defaults: {
@@ -52,11 +52,29 @@ function(app) {
           this.trigger("new-user", choiceData);
           if (this.options.acceptNew) {
             console.log("adding new user");
-            model = new Participant.Model({ alias: choiceData.id, serverId: "test-server-id", choice: choiceData.choice});
+            model = new Participant.Model({ alias: choiceData.id, choice: choiceData.choice });
             this.add(model);
           }
         }
       }, this);
+    },
+
+    // saves models without ids to database
+    saveNew: function () {
+      var newParticipants = this.filter(function (participant) {
+        return participant.get("id") === undefined;
+      });
+
+      if (newParticipants.length) {
+        var newToSave = new Participant.Collection(newParticipants);
+
+        console.log("saving new participants", newParticipants);
+        return Backbone.sync("create", newToSave, {
+          url: this.url,
+          success: function () { newToSave.reset(); },
+          error: function () { newToSave.reset(); }
+         });
+      }
     },
 
     addCallback: function (model) {

@@ -61,6 +61,10 @@ function(app, Participant, StateApp) {
       this.listenTo(this.collection, {
   			"reset": this.render
   		});
+
+      // listen for data changes
+      app.participantServer.hookCollection(this.collection, this);
+
       app.setTitle("Grid");
   	}
 
