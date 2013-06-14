@@ -9,9 +9,11 @@ define([
 
   "modules/Participant",
 
-  "apps/StateApp"
+  "apps/StateApp",
+
+  "util/d3/variableWidthBarChart"
 ],
-function(app, Participant, StateApp) {
+function(app, Participant, StateApp, variableWidthBarChart) {
 
   var PrisonersDilemma = app.module();
   PrisonersDilemma.Views.Play = {};
@@ -207,8 +209,7 @@ function(app, Participant, StateApp) {
   PrisonersDilemma.Views.Results.Stats = Backbone.View.extend({
     template: "pd/results/stats",
 
-    serialize: function () {
-
+    calculateStats: function () {
       // models partitioned by choice
       var groups = this.collection.groupBy(function (model) { return model.get("choice"); });
       groups.A || (groups.A = []);
@@ -222,17 +223,49 @@ function(app, Participant, StateApp) {
       return {
         A: {
           count: groups.A.length,
-          average: average(groups.A).toFixed(1)
+          average: average(groups.A)
         },
         B: {
           count: groups.B.length,
-          average: average(groups.B).toFixed(1)
+          average: average(groups.B)
         },
         total: {
           count: this.collection.length,
-          average: average(this.collection.models).toFixed(1)
+          average: average(this.collection.models)
         }
       }
+    },
+
+    beforeRender: function () {
+      this.stats = this.calculateStats();
+    },
+
+    serialize: function () {
+      return this.stats;
+    },
+
+    afterRender: function () {
+
+      var chartData = [ {
+          label: "A - Silent",
+          value: this.stats.A.average,
+          count: this.stats.A.count
+        }, {
+          label: "B - Talked",
+          value: this.stats.B.average,
+          count: this.stats.B.count
+        }
+      ];
+
+      var chart = variableWidthBarChart();
+
+      d3.select(".results-chart").datum(chartData).call(chart);
+
+    },
+
+
+    initialize: function () {
+
     }
   });
 

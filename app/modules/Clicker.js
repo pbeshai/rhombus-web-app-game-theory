@@ -104,7 +104,7 @@ function(app, Participant, StateApp) {
       }, this));
 
       participantServer.on("disconnect", $.proxy(this.disable, this));
-      this.enabled = participantServer.get("connected");
+      this.enabled = participantServer.get("connected") && participantServer.get("acceptingChoices");
   	}
   });
 

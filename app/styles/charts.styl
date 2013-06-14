@@ -1,0 +1,44 @@
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis path {
+  display: none;
+}
+
+line {
+  shape-rendering: crispEdges;
+}
+
+rect {
+  opacity: .75;
+  -webkit-transition: .5s opacity;
+}
+
+rect:hover {
+  opacity: 1;
+}
+
+/* value label in bar */
+.bar-value {
+	font-weight normal
+	font-size 3em
+}
+
+.bar-value.inside-bar {
+	fill #fff
+
+}
+
+.bar-value.inside-bar.outline {
+	stroke: #000
+	stroke-width: 4px
+	stroke-opacity: .8
+}
+
+.bar-value.outside-bar {
+	fill #333
+}

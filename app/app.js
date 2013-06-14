@@ -3,9 +3,7 @@ define([
   "base/BaseView",
   "jquery",
   "backbone.layoutmanager",
-  "plugins/backbone.iobind",
-//  "plugins/jquery.svg"
-
+  "d3"
 ], function(io, BaseView) {
   var socketUrl = "http://localhost";
 

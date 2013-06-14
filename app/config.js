@@ -13,7 +13,9 @@ require.config({
 
     // JavaScript folders.
     plugins: "../vendor/js/plugins",
-    vendor: "../vendor"
+    vendor: "../vendor",
+
+    d3: "../vendor/d3/d3.v2"
 
   },
 
@@ -39,9 +41,18 @@ require.config({
 
     "socketio": [],
 
-    // Backbone.ioBind
-    "plugins/backbone.iobind": ["socketio", "backbone"],
-    "plugins/backbone.iosync": ["socketio", "backbone"]
+    "d3": {
+      exports: 'd3'
+    },
+
+    "plugins/d3/nv.d3.js": {
+      deps: ['d3'],
+      exports: 'nv'
+    }
+
+    // // Backbone.ioBind
+    // "plugins/backbone.iobind": ["socketio", "backbone"],
+    // "plugins/backbone.iosync": ["socketio", "backbone"]
   }
 
 });

@@ -2,6 +2,8 @@ define([
   // Application.
   "app",
 
+  "modules/Sandbox", // for testing
+
   "modules/ParticipantServer",
   "modules/StateController",
   "modules/ViewControls",
@@ -18,7 +20,7 @@ define([
 
 ],
 
-function(app, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance,
+function(app, Sandbox, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance,
   Clicker, GridApp, PrisonersDilemmaApp) {
 
   // Defining the application router, you can attach sub routers here.
@@ -50,7 +52,8 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
       "register": "register",
       "attendance": "attendance",
       "clicker": "clicker",
-      "apps/:name": "appHandler"
+      "apps/:name": "appHandler",
+      "sandbox": "sandbox"
     },
 
     index: function () {
@@ -125,6 +128,15 @@ function(app, ParticipantServer, StateController, ViewControls, Participant, Gri
         window.prisonersDilemmaApp = prisonersDilemmaApp;
         console.log("prisonersDilemmaApp in window", gridApp);
       }
+    },
+
+    sandbox: function () {
+      console.log("[router: sandbox]");
+      this.reset();
+
+      app.layout.setViews({
+        "#main-content": new Sandbox.Views.Sandbox(),
+      }).render();
     },
 
     // reset state
