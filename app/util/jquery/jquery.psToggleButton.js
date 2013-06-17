@@ -1,10 +1,11 @@
 // simple jQuery function for buttons that toggle between two states and wait for participant server (ps) events in between
 // @author pbeshai
-
-(function () {
+define(["jquery"],
+function (jQuery) {
 	"use strict"
 	if (typeof jQuery === 'undefined')
 		return;
+	var $ = jQuery;
 
 	jQuery.fn.psToggleButton = function(settings) {
 		var defaults = {
@@ -72,4 +73,4 @@
 		});
 	};
 
-})();
+});

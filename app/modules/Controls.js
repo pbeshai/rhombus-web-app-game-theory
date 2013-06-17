@@ -9,7 +9,7 @@ define([
 
   "modules/Clicker",
 
-  "plugins/jQuery.psToggleButton"
+  "util/jquery/jQuery.psToggleButton"
 ],
 
 function(app, Clicker) {

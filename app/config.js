@@ -34,11 +34,6 @@ require.config({
     // Twitter Bootstrap depends on jQuery.
     "vendor/bootstrap/js/bootstrap": ["jquery"],
 
-    // jQuery plugins
-    "plugins/jquery.svg": ["jquery"],
-    "plugins/jquery.psToggleButton": ["jquery"],
-    "plugins/jquery.toggleButton": ["jquery"],
-
     "socketio": [],
 
     "d3": {

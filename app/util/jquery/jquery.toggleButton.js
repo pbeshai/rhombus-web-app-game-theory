@@ -1,11 +1,12 @@
 // simple jQuery function for buttons that toggle between two states
 // @author pbeshai
-
-(function () {
+define(["jquery"],
+function (jQuery) {
 	"use strict"
 	if (typeof jQuery === 'undefined')
 		return;
 
+	var $ = jQuery;
 	jQuery.fn.toggleButton = function(settings) {
 		var defaults = {
 			classState1: "state-1",
@@ -61,4 +62,4 @@
 		});
 	};
 
-})();
+});
