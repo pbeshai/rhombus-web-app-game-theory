@@ -31,7 +31,8 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 		defineStates: function () {
 			var attendanceState = new Attendance.State({
 				participants: this.options.participants,
-				acceptNew: true
+				acceptNew: true,
+				saveNew: false
 			});
 
 			var playState = new PrisonersDilemma.States.Play();

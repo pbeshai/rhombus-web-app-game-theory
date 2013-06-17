@@ -29,7 +29,8 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		defineStates: function () {
 			console.log("define states");
 			var attendanceState = new Attendance.State({
-				participants: this.options.participants
+				participants: this.options.participants,
+				acceptNew: true
 			});
 			var gridState = new Grid.State({
 				participants: this.options.participants

@@ -65,7 +65,7 @@ function(app, Participant, StateApp) {
     add: function (participant) {
       console.log("register view add", arguments);
       var newView = new Attendance.Views.Participant({ model: participant })
-      this.insertView(newView);
+      this.insertView(".participant-grid", newView);
       newView.render();
     },
 
@@ -118,7 +118,7 @@ function(app, Participant, StateApp) {
       presentParticipants.remove(notHere);
 
       // register new guys (those without id attr)
-      if (this.options.acceptNew) {
+      if (this.options.acceptNew && this.options.saveNew) {
         presentParticipants.saveNew();
       }
 
