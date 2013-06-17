@@ -20,7 +20,6 @@ function () {
       selection.each(function(data) {
         // Convert data to standard representation greedily;
         // this is needed for nondeterministic accessors.
-        console.log(data);
         data = data.map(function(d, i) {
           return [xValue.call(data, d, i), yValue.call(data, d, i), barWidth.call(data, d, i)];
         });
@@ -31,7 +30,6 @@ function () {
             .domain(data.map(function(d) { return d[0]; }))
             .rangeRoundBands([0, innerWidth()], .1);
 
-        console.log(data);
         // Update the y-scale.
         yScale
             .domain([0, d3.max(data, function (d) { return d[1]; })])
