@@ -25,22 +25,34 @@ function(app, variableWidthBarChart, xLine) {
       var chartData = [ {
           label: "A",
           value: 32,
-          count: 1
+          count: 4
         }, {
           label: "B",
-          value: 0,
+          value: 15,
           count: 10
         }
       ];
 
-      var chart = variableWidthBarChart();
+/*
+<div>
+  <span class="value"><%= value %></span>
+  <span class="total-value">(<span class="<%= (value < totalAverage) ? "below" : "above" %>"><%= (value - totalAverage) %></span>)</span>
+</div>
+<div class="count"><%= count %> people</div>
+*/
+
+      var chart = variableWidthBarChart()
+        .tooltip(_.template('<h3><%= label %></h3><div class="value"><span class="value"><%= value.toFixed(1) %></span> <span class="total-value">(<span class="<%= (value < totalAverage) ? "below" : "above" %>"><%= (value - totalAverage).toFixed(1) %></span>)</span></div><div class="count"><%= count %> people</div>'), {
+          totalAverage: 25
+        });
+
       d3.select(".my-chart").datum(chartData).call(chart);
 
       var xline = xLine()
         .y(function (d) { return chart.yScale(d); })
         .width(chart.innerWidth());
 
-      d3.select(".my-chart .chart-data").datum([5]).call(xline);
+      d3.select(".my-chart .chart-data").datum([25]).call(xline);
 
 
 

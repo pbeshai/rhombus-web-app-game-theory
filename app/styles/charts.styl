@@ -1,3 +1,5 @@
+@import "nib"
+
 .axis path,
 .axis line {
   fill: none;
@@ -56,4 +58,52 @@ g.x-line text {
 g.x-line line {
   stroke: rgba(0,0,0,.3);
   stroke-width: 5px;
+}
+
+/** Tooltip */
+.chart-tooltip {
+  position: absolute;
+  text-align: center;
+  width: 150px;
+  min-height: 30px;
+  padding: 10px;
+  background: rgba(255,255,255,.95);
+  box-shadow 4px 4px 1px rgba(0,0,0,.3);
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.chart-tooltip div.value {
+  font-size: 1.4em;
+  margin-bottom: 6px;
+}
+
+.chart-tooltip div.value span.value {
+  font-weight: bold;
+}
+
+.chart-tooltip .total-value span.above {
+  color: #0a0;
+}
+
+.chart-tooltip .total-value span.above:before {
+  content: "+";
+}
+
+.chart-tooltip .total-value span.below {
+  color: #c00;
+}
+
+.chart-tooltip .count {
+  font-size: 1.2em;
+}
+
+.chart-tooltip h3 {
+  line-height: 1em;
+  margin: 0 0 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
 }

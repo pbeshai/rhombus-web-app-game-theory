@@ -14,7 +14,9 @@ function () {
         yScale = d3.scale.linear(),
         xAxis = d3.svg.axis().scale(xScale).orient("bottom"),
         yTicks = 5,
-        yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(yTicks);
+        yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(yTicks),
+        tooltipTemplate = _.template("<%= value %>"),
+        tooltipData;
 
     function chart(selection) {
       selection.each(function(data) {
@@ -97,7 +99,32 @@ function () {
             .attr("x", function(d) { return xScale(d[0]) + (xScale.rangeBand() * (1 - scaleFactor(d)))/2; })
             .attr("y", function(d) { return yScale(d[1]); })
             .attr("width", function (d) { return xScale.rangeBand() * scaleFactor(d); })
-            .attr("height", function(d) { return innerHeight() - yScale(d[1]); });
+            .attr("height", function(d) { return innerHeight() - yScale(d[1]); })
+            .on("mouseover", showTooltip)
+            .on("mouseout", hideTooltip);
+
+
+        var tooltip = d3.select("body").append("div")
+          .attr("class", "chart-tooltip")
+          .style("opacity", 0);
+
+        function showTooltip(d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          tooltip.html(tooltipTemplate(_.extend({ label: d[0], value: d[1], count: d[2] }, tooltipData)));
+          tooltip.style("left", (d3.event.pageX) + "px");
+          tooltip.style("top", (d3.event.pageY) + "px");
+        }
+
+        function hideTooltip() {
+          tooltip.transition()
+            .duration(350)
+            .style("opacity", 0);
+        }
+
+
+
 
         var textInBar = function (d) {
           var barHeight = innerHeight() - yScale(d[1]);
@@ -183,6 +210,13 @@ function () {
     chart.barWidth = function(_) {
       if (!arguments.length) return barWidth;
       barWidth = _;
+      return chart;
+    };
+
+    chart.tooltip = function(_, data) {
+      if (!arguments.length) return tooltipTemplate;
+      tooltipTemplate = _;
+      tooltipData = data;
       return chart;
     };
 

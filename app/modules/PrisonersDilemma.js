@@ -258,7 +258,10 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
         }
       ];
 
-      var chart = variableWidthBarChart();
+      var chart = variableWidthBarChart()
+        .tooltip(_.template('<h3><%= label %></h3><div class="value"><span class="value"><%= value.toFixed(1) %></span> <span class="total-value">(<span class="<%= (value < totalAverage) ? "below" : "above" %>"><%= (value - totalAverage).toFixed(1) %></span>)</span></div><div class="count"><%= count %> people</div>'), {
+          totalAverage: this.stats.total.average
+        });
 
       d3.select(".results-chart").datum(chartData).call(chart);
 
