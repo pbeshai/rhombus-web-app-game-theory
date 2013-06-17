@@ -4,9 +4,10 @@ function () {
   "use strict";
 
   var variableWidthBarChart = function () {
-    var margin = {top: 20, right: 20, bottom: 20, left: 40},
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 760,
         height = 400,
+        yScalePadding = 1.05,
         xValue = function(d) { return d.label; },
         yValue = function(d) { return d.value; },
         barWidth = function (d) { return d.count; },
@@ -34,7 +35,7 @@ function () {
 
         // Update the y-scale.
         yScale
-            .domain([0, d3.max(data, function (d) { return d[1]; })])
+            .domain([0, yScalePadding*d3.max(data, function (d) { return d[1]; })])
             .range([innerHeight(), 0]);
 
         // Select the svg element, if it exists.
