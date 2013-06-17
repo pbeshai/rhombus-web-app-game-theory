@@ -36,19 +36,13 @@ function () {
         yScale
             .domain([0, d3.max(data, function (d) { return d[1]; })])
             .range([innerHeight(), 0]);
-        console.log("innerHeight: ", innerHeight());
-        console.log("domain max: ", d3.max(data, function (d) { return d[1]; }));
-        console.log("yScale", yScale);
 
         // Select the svg element, if it exists.
         var svg = d3.select(this).selectAll("svg").data([data]);
 
 
         // Otherwise, create the skeletal chart.
-        var gEnter = svg.enter().append("svg").append("g");
-        gEnter.append("path").attr("class", "area");
-        gEnter.append("path").attr("class", "line");
-        gEnter.append("g").attr("class", "x axis");
+        var gEnter = svg.enter().append("svg").append("g").attr("class", "chart-inner");
 
         // Update the outer dimensions.
         svg .attr("width", width)
@@ -58,22 +52,18 @@ function () {
         var g = svg.select("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Update the x-axis.
-        g.select(".x.axis")
-            .attr("transform", "translate(0," + yScale.range()[0] + ")")
-            .call(xAxis);
-
         // draw y-axis grid lines
-        g.selectAll("line.y")
+        g.append("g")
+          .attr("class", "y grid-lines")
+          .selectAll("line.y")
           .data(yScale.ticks(yTicks))
           .enter().append("line")
-          .attr("class", "y")
-          .attr("x1", 0)
-          .attr("x2", innerWidth())
-          .attr("y1", yScale)
-          .attr("y2", yScale)
-          .style("stroke", "#ccc");
-
+              .attr("class", "y")
+              .attr("x1", 0)
+              .attr("x2", innerWidth())
+              .attr("y1", yScale)
+              .attr("y2", yScale)
+              .style("stroke", "#ccc");
 
         // draw x-axis
         g.append("g")
@@ -98,9 +88,11 @@ function () {
         }
 
         // draw bars (width depends on frequency)
-        var gBarEnter = g.selectAll(".bar")
-            .data(data)
-            .enter();
+        var gBarEnter = g.append("g")
+          .attr("class", "chart-data")
+          .selectAll(".bar")
+          .data(data)
+          .enter();
 
         gBarEnter.append("rect")
             .attr("class", function (d) { return "bar bar-"+ d[0]; })
@@ -148,6 +140,17 @@ function () {
     function innerWidth() {
       return width - margin.left - margin.right;
     }
+
+    chart.xScale = function (x) {
+      return xScale(x);
+    };
+
+    chart.yScale = function (y) {
+      return yScale(y);
+    };
+
+    chart.innerWidth = innerWidth;
+    chart.innerHeight = innerHeight;
 
     chart.margin = function(_) {
       if (!arguments.length) return margin;

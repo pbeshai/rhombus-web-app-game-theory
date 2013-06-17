@@ -11,9 +11,10 @@ define([
 
   "apps/StateApp",
 
-  "util/d3/variableWidthBarChart"
+  "util/d3/variableWidthBarChart",
+  "util/d3/xLine"
 ],
-function(app, Participant, StateApp, variableWidthBarChart) {
+function(app, Participant, StateApp, variableWidthBarChart, xLine) {
 
   var PrisonersDilemma = app.module();
   PrisonersDilemma.Views.Play = {};
@@ -261,6 +262,12 @@ function(app, Participant, StateApp, variableWidthBarChart) {
 
       d3.select(".results-chart").datum(chartData).call(chart);
 
+      // add in average line
+      var avgLine = xLine()
+        .y(function (d) { return chart.yScale(d); })
+        .width(chart.innerWidth());
+
+      d3.select(".results-chart .chart-data").datum([this.stats.total.average]).call(avgLine);
     },
 
 

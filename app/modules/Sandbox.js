@@ -6,10 +6,11 @@
 define([
   // Application.
   "app",
-  "util/d3/variableWidthBarChart"
+  "util/d3/variableWidthBarChart",
+  "util/d3/xLine",
 ],
 
-function(app, variableWidthBarChart) {
+function(app, variableWidthBarChart, xLine) {
 
   var Sandbox = app.module();
 
@@ -33,8 +34,15 @@ function(app, variableWidthBarChart) {
       ];
 
       var chart = variableWidthBarChart();
-
       d3.select(".my-chart").datum(chartData).call(chart);
+
+      var xline = xLine()
+        .y(function (d) { return chart.yScale(d); })
+        .width(chart.innerWidth());
+
+      d3.select(".my-chart .chart-data").datum([5]).call(xline);
+
+
 
     },
   	initialize: function () {

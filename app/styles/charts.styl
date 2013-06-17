@@ -1,7 +1,7 @@
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: #333;
   shape-rendering: crispEdges;
 }
 
@@ -11,6 +11,11 @@
 
 line {
   shape-rendering: crispEdges;
+  stroke: #333;
+}
+
+text {
+  fill: #333;
 }
 
 rect {
@@ -41,4 +46,14 @@ rect:hover {
 
 .bar-value.outside-bar {
 	fill #333
+}
+
+g.x-line text {
+  font-size: 1.4em;
+  text-anchor: end;
+}
+
+g.x-line line {
+  stroke: rgba(0,0,0,.3);
+  stroke-width: 5px;
 }
