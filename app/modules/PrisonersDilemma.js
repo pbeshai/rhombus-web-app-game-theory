@@ -148,12 +148,15 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   });
 
   PrisonersDilemma.Views.Play.Participants = Backbone.View.extend({
-    tagName: "div",
-    className: "participant-grid",
+    template: "pd/play/layout",
+
+    serialize: function () {
+      return { hasPlayers: (this.collection.length > 0) };
+    },
 
   	beforeRender: function () {
       this.collection.each(function (participant) {
-  			this.insertView(new PrisonersDilemma.Views.Play.Participant({ model: participant }));
+  			this.insertView(".participant-grid", new PrisonersDilemma.Views.Play.Participant({ model: participant }));
   		}, this);
   	},
 
@@ -210,6 +213,12 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   PrisonersDilemma.Views.Results.Stats = Backbone.View.extend({
     template: "pd/results/stats",
 
+    tooltipTemplate: '<h3><%= label %></h3>'
+      + '<div class="value"><span class="value"><%= value.toFixed(1) %></span> '
+      + '<span class="total-value">(<span class="<%= (value < totalAverage) ? "below" : "above" %>"><%= (value - totalAverage).toFixed(1) %></span>)</span>'
+      + '</div>'
+      + '<div class="count"><%= count %> <% if (count === 1) { print("person") } else { print("people") } %></div>',
+
     calculateStats: function () {
       // models partitioned by choice
       var groups = this.collection.groupBy(function (model) { return model.get("choice"); });
@@ -258,8 +267,9 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
         }
       ];
 
+
       var chart = variableWidthBarChart()
-        .tooltip(_.template('<h3><%= label %></h3><div class="value"><span class="value"><%= value.toFixed(1) %></span> <span class="total-value">(<span class="<%= (value < totalAverage) ? "below" : "above" %>"><%= (value - totalAverage).toFixed(1) %></span>)</span></div><div class="count"><%= count %> people</div>'), {
+        .tooltip(_.template(this.tooltipTemplate), {
           totalAverage: this.stats.total.average
         });
 
@@ -282,11 +292,17 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   PrisonersDilemma.Views.Results.Layout = Backbone.View.extend({
     template: "pd/results/results",
 
+    serialize: function () {
+      return { hasPlayers: (this.collection.length > 0) };
+    },
+
     beforeRender: function () {
-      this.setViews({
-        ".results-participants": new PrisonersDilemma.Views.Results.Participants({ collection: this.collection }),
-        ".results-stats": new PrisonersDilemma.Views.Results.Stats({ collection: this.collection })
-      });
+      if (this.collection.length) {
+        this.setViews({
+          ".results-participants": new PrisonersDilemma.Views.Results.Participants({ collection: this.collection }),
+          ".results-stats": new PrisonersDilemma.Views.Results.Stats({ collection: this.collection })
+        });
+      }
     },
 
 

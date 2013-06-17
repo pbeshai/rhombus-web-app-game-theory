@@ -47,8 +47,7 @@ function(app, Participant, StateApp) {
   });
 
   Attendance.Views.Participants = Backbone.View.extend({
-    tagName: "div",
-    className: "participant-grid",
+    template: "attendance/layout",
     options: {
       acceptNew: false,
     },
@@ -59,7 +58,7 @@ function(app, Participant, StateApp) {
 
   	beforeRender: function () {
       this.collection.each(function (participant) {
-  			this.insertView(new Attendance.Views.Participant({ model: participant }));
+  			this.insertView(".participant-grid", new Attendance.Views.Participant({ model: participant }));
   		}, this);
   	},
 
