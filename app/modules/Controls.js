@@ -91,7 +91,7 @@ function(app, Clicker) {
       if (verify) {
         console.log("clearing database");
         app.api({
-          call: "participant",
+          call: "participants",
           type: "DELETE",
           success: function () {
             console.log("successful deletion of participants");
