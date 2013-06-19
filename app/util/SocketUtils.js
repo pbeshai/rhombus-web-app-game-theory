@@ -53,7 +53,10 @@ define(["app"],
 
 				// run the existing callback function
 				if (callback !== undefined) {
-					callback.apply(this, [data]);
+					var trigger = callback.apply(this, [data]);
+					if (trigger === false) {
+						return;
+					}
 				}
 
 				this.trigger(clientEvent, data);

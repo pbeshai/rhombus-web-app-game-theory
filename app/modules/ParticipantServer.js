@@ -23,7 +23,8 @@ define([
 			disconnect: "disconnect",
 			enableChoices: "enable-choices",
 			disableChoices: "disable-choices",
-			status: "status"
+			status: "status",
+			instructor: "instructor"
 		},
 
 		// events we send across the websocket
@@ -51,6 +52,21 @@ define([
 			context.listenTo(this, "data", function (data) {
 	      collection.updateFromServer(data);
       });
+		},
+
+		// separate the instructor
+		choiceDataCallback: function (data) {
+			var groupedData = _.groupBy(data.choices, function (elem) { return elem.instructor === true ? "instructor" : "choices" });
+
+			if (groupedData.instructor) {
+				this.trigger(this.clientEvents.instructor, groupedData.instructor);
+			}
+			if (groupedData.choices) {
+				this.trigger(this.clientEvents.choiceData, { choices: groupedData.choices });
+			}
+
+			// we handle the trigger here, so abort
+			return false;
 		},
 
 	  connectCallback: function (data) {

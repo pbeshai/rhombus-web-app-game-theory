@@ -32,7 +32,6 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
       var collections = {
         // Set up the users.
         participants: new Participant.Collection(),
-
       };
 
       // Ensure the router has references to the collections.
@@ -42,6 +41,42 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
       app.useLayout("main-layout").setViews({
         ".view-controls": new ViewControls.Views.Controls(),
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
+      });
+
+
+      // setup instructor handling
+      participantServer.on("instructor", function (data) {
+        // only accept instructor commands when the window has focus. this may be a bad idea
+        // but it prevents the instructor commands from being sent multiple times if multiple
+        // windows are open.
+        if (!document.hasFocus()) return;
+
+        // for now, only use the first item in the data array (highly unusual to have more than one)
+        var choice = data[0].choice;
+        switch (choice) {
+          case "A":
+            console.log("instructor A: toggle polling");
+            if (participantServer.get("acceptingChoices")) {
+              participantServer.disableChoices();
+            } else {
+              participantServer.enableChoices();
+            }
+            break;
+          case "B":
+            console.log("instructor B (unused)");
+            break;
+          case "C":
+            console.log("instructor C: next state");
+            stateController.appNext();
+            break;
+          case "D":
+            console.log("instructor D: prev state");
+            stateController.appPrev();
+            break;
+          case "E":
+            console.log("instructor E (unused)");
+            break;
+        }
       });
     },
 
