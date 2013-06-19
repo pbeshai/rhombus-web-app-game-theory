@@ -34,8 +34,8 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     },
 
     validate: function (attrs, options) {
-      if (attrs.choice !== "A" && attrs.choice !== "B") {
-        return "invalid choice " + attrs.choice + ". valid choices are A or B.";
+      if (attrs.choice !== "C" && attrs.choice !== "D") {
+        return "invalid choice " + attrs.choice + ". valid choices are C or D.";
       }
     }
   });
@@ -50,8 +50,8 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
         this.set("alias", "bot");
       }
 
-      // random delay before playing
-      setTimeout(_.bind(this.play, this), Math.floor(Math.random()*500)+200);
+      // short delay before playing
+      setTimeout(_.bind(this.play, this), 50);
     },
 
     save: function () {
@@ -75,7 +75,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     },
 
     play: function () {
-      var choice = Math.floor(Math.random() * 2) === 0 ? "A" : "B";
+      var choice = Math.floor(Math.random() * 2) === 0 ? "C" : "D";
       this.set("choice", choice);
     }
   });
@@ -221,9 +221,9 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
 
     calculateStats: function () {
       // models partitioned by choice
-      var groups = this.collection.groupBy(function (model) { return model.get("choice"); });
-      groups.A || (groups.A = []);
-      groups.B || (groups.B = []);
+      var groups = this.collection.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
+      groups.cooperate || (groups.cooperate = []);
+      groups.defect || (groups.defect = []);
 
       function average(modelsArray) {
         if (modelsArray.length === 0) return 0;
@@ -231,13 +231,13 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       }
 
       return {
-        A: {
-          count: groups.A.length,
-          average: average(groups.A)
+        cooperate: {
+          count: groups.cooperate.length,
+          average: average(groups.cooperate)
         },
-        B: {
-          count: groups.B.length,
-          average: average(groups.B)
+        defect: {
+          count: groups.defect.length,
+          average: average(groups.defect)
         },
         total: {
           count: this.collection.length,
@@ -257,13 +257,13 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     afterRender: function () {
 
       var chartData = [ {
-          label: "A - Silent",
-          value: this.stats.A.average,
-          count: this.stats.A.count
+          label: "C - Cooperated",
+          value: this.stats.cooperate.average,
+          count: this.stats.cooperate.count
         }, {
-          label: "B - Talked",
-          value: this.stats.B.average,
-          count: this.stats.B.count
+          label: "D - Defected",
+          value: this.stats.defect.average,
+          count: this.stats.defect.count
         }
       ];
 
@@ -325,7 +325,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   PrisonersDilemma.States.Play.prototype = new StateApp.State(PrisonersDilemma.Views.Play.Participants);
   _.extend(PrisonersDilemma.States.Play.prototype, {
     defaults: {
-      defaultChoice: "A" // choice made when a player does not play
+      defaultChoice: "C" // choice made when a player does not play
     },
 
     initialize: function () {
@@ -366,10 +366,10 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   _.extend(PrisonersDilemma.States.Results.prototype, {
     defaults: {
       scoringMatrix: {
-        AA: [ 70, 70 ],
-        AB: [ 20, 100 ],
-        BA: [ 100, 20 ],
-        BB: [ 0, 0 ]
+        CC: [ 3, 3 ],
+        CD: [ 0, 5 ],
+        DC: [ 5, 0 ],
+        DD: [ 1, 1 ]
       }
     },
 

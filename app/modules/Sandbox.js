@@ -23,11 +23,11 @@ function(app, variableWidthBarChart, xLine) {
     afterRender: function () {
 
       var chartData = [ {
-          label: "A",
-          value: 32,
+          label: "C",
+          value: 0,
           count: 4
         }, {
-          label: "B",
+          label: "D",
           value: 15,
           count: 10
         }

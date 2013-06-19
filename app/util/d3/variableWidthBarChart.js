@@ -89,20 +89,22 @@ function () {
         }
 
         // draw bars (width depends on frequency)
-        var gBarEnter = g.append("g")
+        var gBarsEnter = g.append("g")
           .attr("class", "chart-data")
           .selectAll(".bar")
           .data(data)
           .enter();
+
+        var gBarEnter = gBarsEnter.append("g")
+            .on("mouseover", showTooltip)
+            .on("mouseout", hideTooltip);
 
         gBarEnter.append("rect")
             .attr("class", function (d) { return "bar bar-"+ d[0]; })
             .attr("x", function(d) { return xScale(d[0]) + (xScale.rangeBand() * (1 - scaleFactor(d)))/2; })
             .attr("y", function(d) { return yScale(d[1]); })
             .attr("width", function (d) { return xScale.rangeBand() * scaleFactor(d); })
-            .attr("height", function(d) { return innerHeight() - yScale(d[1]); })
-            .on("mouseover", showTooltip)
-            .on("mouseout", hideTooltip);
+            .attr("height", function(d) { return innerHeight() - yScale(d[1]); });
 
 
         var tooltip = d3.select("body").append("div")

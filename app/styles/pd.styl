@@ -1,22 +1,22 @@
-no-talk-colour = #1f77b4 //blue
-talked-colour = #ff7f0e //orange
+cooperated-colour = #1f77b4 //blue
+defected-colour = #ff7f0e //orange
 
-rect.bar-A {
-  fill: no-talk-colour
+rect.bar-C {
+  fill: cooperated-colour
 }
 
-rect.bar-B {
-  fill: talked-colour
+rect.bar-D {
+  fill: defected-colour
 }
 
-.participant.results.choices-AA
-	background-color no-talk-colour
+.participant.results.choices-CC
+	background-color cooperated-colour
 
-.participant.results.choices-AB
-	background-color darken(no-talk-colour, 30%)
+.participant.results.choices-CD
+	background-color darken(cooperated-colour, 30%)
 
-.participant.results.choices-BA
-	background-color talked-colour
+.participant.results.choices-DC
+	background-color defected-colour
 
-.participant.results.choices-BB
-	background-color darken(talked-colour, 30%)
+.participant.results.choices-DD
+	background-color darken(defected-colour, 30%)
