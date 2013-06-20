@@ -5,8 +5,8 @@
 	position relative
 
 .participant
-	width 7.6em
-	height 7.6em
+	width 5.5em
+	height 5.5em
 	border 1px solid #ddd
 	background-color #888
 	margin 1px
@@ -16,28 +16,6 @@
 	display inline-block
 	transition 1s background-color
 	border-radius .5em
-
-.brief .participant
-	width 7em
-	height 5em
-
-.brief .participant.results .score
-	top auto
-	font-size 2em
-
-.brief .participant.results .partner-result
-	display none
-
-.brief .participant .medium-text
-	top auto
-	bottom 15%
-	font-size 1.8em
-
-
-.brief .participant .choice-text
-	bottom 6%
-	top auto
-	font-size 2.8em
 
 .participant.choice-a
 	background-color #03588C
@@ -58,12 +36,12 @@
 	background-color rgb(51, 141, 23)
 
 .participant .id-text
-	font-size 1.4em
+	font-size 1.3em
 	text-align center
-	margin-top: .3em
+	margin-top: .2em
 
 .participant .choice-text
-	font-size 4em
+	font-size 3.5em
 	position absolute
 	top 60%
 	line-height 1em
@@ -72,10 +50,14 @@
 	right 0
 	text-align center
 
+.participant .medium-text.score
+	font-size 1.8em
+	top 50%
+
 .participant .medium-text
-	font-size 2em
+	font-size 1.5em
 	position absolute
-	top 55%
+	top 57%
 	line-height 1em
 	margin-top -.5em
 	left 0
@@ -85,10 +67,6 @@
 
 .participant.played
 	background-color #333
-
-
-.participant.results .score
-	top 43%
 
 .participant.results .partner-result
 	position absolute
@@ -100,10 +78,12 @@
 	border-radius 4px
 
 .participant.results .partner-id
-	line-height 1em
-	margin-top .3em
+	line-height 1.4em
 	font-size .9em
+	display inline
+	margin-right 4px
 
 .participant.results .partner-score
-	font-size 1.2em
-	line-height: 1.2em
+	font-size .9em
+	line-height: 1.4em
+	display inline

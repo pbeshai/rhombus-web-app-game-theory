@@ -113,7 +113,8 @@ function(app, Participant, StateApp) {
     template: "clicker/clickers",
     events: {
       "click .random-votes" : "randomVotes",
-      "click .random-votes-ab" : "randomVotesAB"
+      "click .random-votes-ab" : "randomVotesAB",
+      "click .random-votes-cd" : "randomVotesCD"
     },
 
   	beforeRender: function () {
@@ -140,7 +141,16 @@ function(app, Participant, StateApp) {
       this.getViews(".clicker-container").each(function(clickerView) {
         clickerView.randomChoice(["A","B"]);
       });
-    }
+    },
+
+    // sends random C or D
+    randomVotesCD: function () {
+      this.getViews(".clicker-container").each(function(clickerView) {
+        clickerView.randomChoice(["C","D"]);
+      });
+    },
+
+
   });
 
   return Clicker;

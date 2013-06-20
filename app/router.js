@@ -46,11 +46,6 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
 
       // setup instructor handling
       participantServer.on("instructor", function (data) {
-        // only accept instructor commands when the window has focus. this may be a bad idea
-        // but it prevents the instructor commands from being sent multiple times if multiple
-        // windows are open.
-        if (!document.hasFocus()) return;
-
         // for now, only use the first item in the data array (highly unusual to have more than one)
         var choice = data[0].choice;
         switch (choice) {
