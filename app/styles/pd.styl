@@ -20,3 +20,22 @@ rect.bar-D {
 
 .participant.results.choices-DD
 	background-color darken(defected-colour, 30%)
+
+.legend
+  font-size: 1.3em;
+  line-height: 1.4em;
+  float: right;
+  margin-right: 30px;
+
+.legend .defected > span,
+.legend .cooperated > span
+  display: inline-block;
+  width:  1em;
+  height: 1em;
+  border-radius: 4px;
+
+.legend .defected > span
+	background: defected-colour;
+
+.legend .cooperated > span
+	background: cooperated-colour;

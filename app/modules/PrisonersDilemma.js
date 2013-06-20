@@ -390,7 +390,24 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       // calculate the scores
       this.assignScores(this.input);
 
+      this.logResults(this.input);
+    },
 
+    logResults: function (models) {
+      var results = models.map(function (model) {
+        return {
+          alias: model.get("alias"),
+          choice: model.get("choice"),
+          score: model.get("score"),
+          partner: {
+            alias: model.get("partner").get("alias"),
+            choice: model.get("partner").get("choice"),
+            score: model.get("partner").get("score"),
+          }
+        };
+      });
+      console.log("PD RESULTS = ", results);
+      app.api({ call: "apps/pd/results", type: "post", data: { results: results } });
     },
 
     getOutput: function () { }
