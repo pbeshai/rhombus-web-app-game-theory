@@ -139,7 +139,13 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       } else {
         this.$el.removeClass(this.playedClass);
       }
+    },
 
+    afterRender: function () {
+      var played = this.model.get("played");
+      if (played) {
+        this.$(".medium-text").hide().delay(200).fadeIn(400);
+      }
     },
 
   	initialize: function () {
