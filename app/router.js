@@ -43,9 +43,11 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
       });
 
-      // as the window focus
+      // get instructor focus when the window gains focus.
       $(window).on("focus", function () {
-        stateController.instructorFocus();
+        if (!app.instructorFocus) {
+          stateController.instructorFocus();
+        }
       });
 
       stateController.on("instructor-focus", function (hasFocus) {
