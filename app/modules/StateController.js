@@ -15,12 +15,14 @@ define([
 		clientEvents: {
 			appNext: "app-next",
 			appPrev: "app-prev",
+			instructorFocus: "instructor-focus"
 		},
 
 		// events we send across the websocket
 		socketEvents:  {
 			appNext: "app-next",
 			appPrev: "app-prev",
+			instructorFocus: "instructor-focus"
 		},
 
 		reset: function () {

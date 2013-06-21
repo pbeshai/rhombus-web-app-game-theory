@@ -43,9 +43,26 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
       });
 
+      // as the window focus
+      $(window).on("focus", function () {
+        stateController.instructorFocus();
+      });
+
+      stateController.on("instructor-focus", function (hasFocus) {
+        app.instructorFocus = hasFocus;
+        if (hasFocus) {
+          $(document.body).addClass("instructor-focus");
+        } else {
+          $(document.body).removeClass("instructor-focus");
+        }
+      });
 
       // setup instructor handling
       participantServer.on("instructor", function (data) {
+        if (!app.instructorFocus) {
+          return;
+        }
+
         // for now, only use the first item in the data array (highly unusual to have more than one)
         var choice = data[0].choice;
         switch (choice) {

@@ -13,6 +13,9 @@ define([
     // The root path to run the application.
     root: "/",
     BaseView: BaseView, // shortcut to BaseView class
+
+    instructorFocus: false,
+
     getSocket: function () {
       // lazy load the socket so that handlers can be ready to accept initial events on socket connect.
       if (this.socket == null) {
