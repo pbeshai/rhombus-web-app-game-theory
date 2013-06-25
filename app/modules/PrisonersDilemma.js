@@ -29,7 +29,11 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     initialize: function () {
       // assumes choice is set with validate:true option
       this.on("change:choice", function (model, choice) {
-        this.set("played", true);
+        this.set("played", choice != null);
+
+        if (this.get("complete")) { // only update choice if it isn't complete.
+          this.attributes.choice = this.previous("choice");
+        }
       });
     },
 
@@ -37,7 +41,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       if (attrs.choice !== "C" && attrs.choice !== "D") {
         return "invalid choice " + attrs.choice + ". valid choices are C or D.";
       }
-    }
+    },
   });
 
 
@@ -51,7 +55,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       }
 
       // short delay before playing
-      setTimeout(_.bind(this.play, this), 50);
+      this.delayedPlay();
     },
 
     save: function () {
@@ -72,6 +76,10 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     destroy: function () {
       console.log("trying to destroy bot");
       return false;
+    },
+
+    delayedPlay: function () {
+      setTimeout(_.bind(this.play, this), 50);
     },
 
     play: function () {
@@ -142,8 +150,8 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     },
 
     afterRender: function () {
-      var played = this.model.get("played");
-      if (played) {
+      var played = this.model.get("played"), complete = this.model.get("complete");
+      if (played && !complete) {
         this.$(".medium-text").hide().delay(200).fadeIn(400);
       }
     },

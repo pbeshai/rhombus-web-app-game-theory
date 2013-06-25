@@ -16,12 +16,12 @@ define([
   "modules/Clicker",
 
   "apps/GridApp",
-  "apps/PrisonersDilemmaApp"
-
+  "apps/PrisonersDilemmaApp",
+  "apps/PrisonersDilemmaMultiApp"
 ],
 
 function(app, Sandbox, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance,
-  Clicker, GridApp, PrisonersDilemmaApp) {
+  Clicker, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
@@ -165,17 +165,21 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
       console.log("[router: app/"+name+"]");
       this.reset();
 
-      if (name === "grid") {
-        var gridApp = new GridApp({ participants: this.participants });
-        app.stateController.set("activeApp", gridApp);
-        window.gridApp = gridApp;
-        console.log("gridApp in window", gridApp);
-      } else if (name === "pd") {
-        var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
-        app.stateController.set("activeApp", prisonersDilemmaApp);
+      switch (name) {
+        case "grid":
+          var gridApp = new GridApp({ participants: this.participants });
+          app.stateController.set("activeApp", gridApp);
+          break;
 
-        window.prisonersDilemmaApp = prisonersDilemmaApp;
-        console.log("prisonersDilemmaApp in window", gridApp);
+        case "pd":
+          var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
+          app.stateController.set("activeApp", prisonersDilemmaApp);
+          break;
+
+        case "pdm":
+          var prisonersDilemmaMultiApp = new PrisonersDilemmaMultiApp({ participants: this.participants });
+          app.stateController.set("activeApp", prisonersDilemmaMultiApp);
+          break;
       }
     },
 

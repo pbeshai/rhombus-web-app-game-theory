@@ -141,7 +141,11 @@ function(app) {
 		var output = this.currentState.getOutput();
 		var transitionFunc = this.transitions[this.currentState.name + "_" + destinationState];
 		if (transitionFunc) {
-			transitionFunc.apply(this, [output]);
+			// allow updating the output via returning a value from a transition function
+			var result = transitionFunc.apply(this, [output]);
+			if (result !== undefined) {
+				output = result;
+			}
 		}
 		this.currentState = this.states[destinationState];
 		this.currentState.enter(output);
