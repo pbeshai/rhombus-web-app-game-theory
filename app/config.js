@@ -40,9 +40,11 @@ require.config({
       exports: 'd3'
     },
 
-    "plugins/d3/nv.d3.js": {
-      deps: ['d3'],
-      exports: 'nv'
+    "plugins/d3/d3.layout": ["d3"],
+
+    "plugins/d3/rickshaw": {
+      deps: ['d3', 'plugins/d3/d3.layout'],
+      exports: 'Rickshaw'
     }
 
     // // Backbone.ioBind

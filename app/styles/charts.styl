@@ -1,5 +1,79 @@
 @import "nib"
 
+/****** Rickshaw Timeseries chart */
+.chart-container {
+  position: relative;
+}
+
+.chart-container .chart {
+  position: relative;
+  left: 40px;
+}
+
+.chart-container .x-axis {
+  position: relative;
+  left: 40px;
+}
+
+.chart-container .y-axis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+}
+.chart-container .detail.inactive {
+  opacity: 1;
+}
+
+
+.chart-container .detail .swatch {
+  display: inline-block;
+  margin-right: 3px;
+  border-radius: 2px;
+  width: .7em;
+  height: .7em;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.chart-container .detail .name {
+  display: inline-block;
+  font-weight: 200;
+}
+
+.chart-container .detail .y-value {
+  display: inline-block;
+}
+.chart-container .detail .item.multi {
+  margin-top: 0;
+  margin-left: 12px;
+  font-size: 2em;
+  line-height: 1.3em;
+  border-radius: 4px;
+}
+
+.chart-container .detail .item.multi:before {
+  content: "";
+  display: none;
+}
+
+.chart-container .detail .item.multi .x-value {
+  padding-bottom: .1em;
+  margin-bottom: .3em;
+  border-bottom: 1px solid #555;
+}
+
+.chart-container .detail .item.multi .line {
+  margin-bottom: .3em;
+  clear: both;
+}
+
+.chart-container .detail .item.multi .y-value {
+  float: right;
+  margin-left: 1em;
+}
+
+
+/**** Custom D3 Bar chart *****/
 .axis path,
 .axis line {
   fill: none;

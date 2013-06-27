@@ -7,6 +7,10 @@
 
 @import "../../vendor/bootstrap/css/bootstrap.css";
 
+/*-- Rickshaw charts. -------------------------------------------------------------*/
+
+@import "../../vendor/js/plugins/d3/rickshaw.css";
+
 /*-- Application stylesheets. -----------------------------------------------*/
 
 @import "app.styl";

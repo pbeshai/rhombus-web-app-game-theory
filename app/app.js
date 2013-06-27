@@ -92,7 +92,7 @@ define([
     setTitle: function (subtitle) {
       var title = "Clicker Testing"
       if (!_.isEmpty(subtitle)) {
-        title += " - " + subtitle;
+        title = subtitle + " - " + title;
       }
       document.title = title;
     },

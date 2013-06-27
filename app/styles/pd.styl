@@ -1,6 +1,23 @@
 cooperated-colour = #1f77b4 //blue
 defected-colour = #ff7f0e //orange
 
+
+.line.cooperated .swatch {
+  background-color: cooperated-colour;
+}
+
+.line.defected .swatch {
+  background-color: defected-colour;
+}
+
+path.cooperated {
+  stroke: cooperated-colour;
+}
+
+path.defected {
+  stroke: defected-colour;
+}
+
 rect.bar-C {
   fill: cooperated-colour
 }
@@ -10,16 +27,16 @@ rect.bar-D {
 }
 
 .participant.results.choices-CC
-	background-color cooperated-colour
+  background-color cooperated-colour
 
 .participant.results.choices-CD
-	background-color darken(cooperated-colour, 30%)
+  background-color darken(cooperated-colour, 30%)
 
 .participant.results.choices-DC
-	background-color defected-colour
+  background-color defected-colour
 
 .participant.results.choices-DD
-	background-color darken(defected-colour, 30%)
+  background-color darken(defected-colour, 30%)
 
 .legend
   font-size: 1.3em;
@@ -35,25 +52,25 @@ rect.bar-D {
   border-radius: 4px;
 
 .legend .defected > span
-	background: defected-colour;
+  background: defected-colour;
 
 .legend .cooperated > span
-	background: cooperated-colour;
+  background: cooperated-colour;
 
 .partner-choice {
-	width: 6px;
-	height: 6px;
-	display: inline-block;
-	border-radius: 3px;
-	margin-bottom: 2px;
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+  border-radius: 3px;
+  margin-bottom: 2px;
 }
 
 .choices-CC .partner-choice,
 .choices-DC .partner-choice {
-	background-color: cooperated-colour;
+  background-color: cooperated-colour;
 }
 
 .choices-CD .partner-choice,
 .choices-DD .partner-choice {
-	background-color: defected-colour;
+  background-color: defected-colour;
 }
