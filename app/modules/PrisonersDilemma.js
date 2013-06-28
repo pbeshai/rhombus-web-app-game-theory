@@ -328,6 +328,10 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     }
   });
 
+  PrisonersDilemma.Views.Controls = Backbone.View.extend({
+    template: "pd/controls"
+  });
+
 
   // To be used in StateApps
   PrisonersDilemma.States = {};

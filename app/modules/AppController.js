@@ -14,6 +14,7 @@ define([
 	AppController.Model = Backbone.Model.extend({
 		// events we trigger to clients
 		clientEvents: {
+			appConfig: "app-config",
 			appNext: "app-next",
 			appPrev: "app-prev",
 			instructorFocus: "instructor-focus"
@@ -21,6 +22,7 @@ define([
 
 		// events we send across the websocket
 		socketEvents:  {
+			appConfig: "app-config",
 			appNext: "app-next",
 			appPrev: "app-prev",
 			instructorFocus: "instructor-focus"
@@ -44,6 +46,10 @@ define([
 	  		console.log("Prev State", activeApp);
 	  		activeApp.prev();
 	  	}
+		},
+
+		appConfig: function () {
+			console.log("appConfig callback.", arguments);
 		},
 
 		initialize: function () {

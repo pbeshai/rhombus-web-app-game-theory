@@ -61,6 +61,37 @@ function(app, Clicker) {
       }
     }
 
+
+  Controls.Views.AppControls = Backbone.View.extend({
+    tagName: "div",
+    className: "controls",
+    template: "controls/app_controls",
+
+    events: {
+      "click .next-state" : "nextState",
+      "click .prev-state" : "prevState"
+    },
+
+    beforeRender: function () {
+      if (this.options.appView) {
+        this.insertView(".app-view", this.options.appView);
+      }
+      console.log(this);
+    },
+
+    afterRender: function () {
+      enableChoicesButton(this.$(".enable-choices-button"), app.participantServer);
+    },
+
+    nextState: function () {
+      app.appController.appNext();
+    },
+
+    prevState: function () {
+      app.appController.appPrev();
+    }
+  });
+
   Controls.Views.Controls = Backbone.View.extend({
     tagName: "div",
     className: "controls",
@@ -68,20 +99,11 @@ function(app, Clicker) {
 
     events: {
       "click .clear-database": "clearDatabase",
-      "click .next-state" : "nextState",
-      "click .prev-state" : "prevState"
     },
-
-  	serialize: function () {
-  		return { participantServer: app.participantServer };
-  	},
 
     beforeRender: function () {
+      this.insertView(".app-controls", new Controls.Views.AppControls());
       this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
-    },
-
-    afterRender: function () {
-      enableChoicesButton(this.$(".enable-choices-button"), app.participantServer);
     },
 
     clearDatabase: function () {
@@ -101,20 +123,7 @@ function(app, Clicker) {
           }
         });
       }
-    },
-
-    nextState: function () {
-      app.appController.appNext();
-    },
-
-    prevState: function () {
-      app.appController.appPrev();
-    },
-
-  	initialize: function () {
-      app.setTitle("Control Panel");
-  	}
-
+    }
   });
 
   return Controls;

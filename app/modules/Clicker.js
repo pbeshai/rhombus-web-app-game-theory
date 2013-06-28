@@ -124,7 +124,6 @@ function(app, Participant, StateApp) {
   	},
 
   	initialize: function () {
-      app.setTitle("Clickers");
       this.listenTo(this.collection, {
         "reset": this.render
       });

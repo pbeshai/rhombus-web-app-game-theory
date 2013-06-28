@@ -14,6 +14,7 @@ define([
   "modules/Register",
   "modules/Attendance",
   "modules/Clicker",
+  "modules/PrisonersDilemma",
 
   "apps/GridApp",
   "apps/PrisonersDilemmaApp",
@@ -21,7 +22,7 @@ define([
 ],
 
 function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participant, Grid, Controls, Register, Attendance,
-  Clicker, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp) {
+  Clicker, PrisonersDilemma, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
@@ -102,6 +103,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       "attendance": "attendance",
       "clicker": "clicker",
       "apps/:name": "appHandler",
+      "apps/:name/controls" : "appControlsHandler",
       "sandbox": "sandbox"
     },
 
@@ -127,6 +129,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: controls]");
       this.reset();
 
+      app.setTitle("Controls");
       app.layout.setViews({
         "#main-content": new Controls.Views.Controls({participants: this.participants})
       }).render();
@@ -155,14 +158,14 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
     clicker: function () {
       console.log("[router: clicker]");
       this.reset();
-
+      app.setTitle("Clickers");
       app.layout.setViews({
         "#main-content": new Clicker.Views.Clickers({collection: this.participants})
       }).render();
     },
 
     appHandler: function (name) {
-      console.log("[router: app/"+name+"]");
+      console.log("[router: apps/"+name+"]");
       this.reset();
 
       switch (name) {
@@ -181,6 +184,22 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
           app.appController.set("activeApp", prisonersDilemmaMultiApp);
           break;
       }
+    },
+
+    appControlsHandler: function (name) {
+      console.log("[router: apps/"+name+"/controls]");
+      this.reset();
+      var view;
+      switch (name) {
+        case "pd":
+          view = new PrisonersDilemma.Views.Controls();
+          break;
+      }
+
+      app.setTitle(name + " App Controls");
+      app.layout.setViews({
+        "#main-content": new Controls.Views.AppControls({ appView: view })
+      }).render();
     },
 
     sandbox: function () {
