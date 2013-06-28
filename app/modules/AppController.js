@@ -1,4 +1,5 @@
-/** Module for interfacing with the participant server over websocket
+/**
+	Module for interfacing with the running app via websocket
  */
 define([
 	"app",
@@ -8,9 +9,9 @@ define([
 	function (app, SocketUtils) {
 	"use strict"
 
-	var StateController = app.module();
+	var AppController = app.module();
 
-	StateController.Model = Backbone.Model.extend({
+	AppController.Model = Backbone.Model.extend({
 		// events we trigger to clients
 		clientEvents: {
 			appNext: "app-next",
@@ -52,5 +53,5 @@ define([
 		},
 	});
 
-	return StateController;
+	return AppController;
 });

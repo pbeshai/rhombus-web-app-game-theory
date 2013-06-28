@@ -5,7 +5,7 @@ define([
   "modules/Sandbox", // for testing
 
   "modules/ParticipantServer",
-  "modules/StateController",
+  "modules/AppController",
   "modules/ViewControls",
 
   "modules/Participant",
@@ -20,14 +20,14 @@ define([
   "apps/PrisonersDilemmaMultiApp"
 ],
 
-function(app, Sandbox, ParticipantServer, StateController, ViewControls, Participant, Grid, Controls, Register, Attendance,
+function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participant, Grid, Controls, Register, Attendance,
   Clicker, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
       var participantServer = app.participantServer = new ParticipantServer.Model();
-      var stateController = app.stateController = new StateController.Model();
+      var appController = app.appController = new AppController.Model();
 
       var collections = {
         // Set up the users.
@@ -46,11 +46,11 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
       // get instructor focus when the window gains focus.
       $(window).on("focus", function () {
         if (!app.instructorFocus) {
-          stateController.instructorFocus();
+          appController.instructorFocus();
         }
       });
 
-      stateController.on("instructor-focus", function (hasFocus) {
+      appController.on("instructor-focus", function (hasFocus) {
         app.instructorFocus = hasFocus;
         if (hasFocus) {
           $(document.body).addClass("instructor-focus");
@@ -81,11 +81,11 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
             break;
           case "C":
             console.log("instructor C: next state");
-            stateController.appNext();
+            appController.appNext();
             break;
           case "D":
             console.log("instructor D: prev state");
-            stateController.appPrev();
+            appController.appPrev();
             break;
           case "E":
             console.log("instructor E (unused)");
@@ -168,17 +168,17 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
       switch (name) {
         case "grid":
           var gridApp = new GridApp({ participants: this.participants });
-          app.stateController.set("activeApp", gridApp);
+          app.appController.set("activeApp", gridApp);
           break;
 
         case "pd":
           var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
-          app.stateController.set("activeApp", prisonersDilemmaApp);
+          app.appController.set("activeApp", prisonersDilemmaApp);
           break;
 
         case "pdm":
           var prisonersDilemmaMultiApp = new PrisonersDilemmaMultiApp({ participants: this.participants });
-          app.stateController.set("activeApp", prisonersDilemmaMultiApp);
+          app.appController.set("activeApp", prisonersDilemmaMultiApp);
           break;
       }
     },
@@ -195,7 +195,7 @@ function(app, Sandbox, ParticipantServer, StateController, ViewControls, Partici
     // reset state
     reset: function () {
       this.participants.fetch({ reset: true });
-      app.stateController.reset();
+      app.appController.reset();
     }
   });
 

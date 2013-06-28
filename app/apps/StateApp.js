@@ -108,13 +108,6 @@ function(app) {
 
 		this.loadState(this.initialState.name);
 		var that = this;
-		// app.stateController.on("app-next", function () {
-		// 	console.log("next", that);
-		// 	that.next();
-		// });
-		// app.stateController.on("app-prev", function () {
-		// 	that.prev();
-		// })0
 	};
 	StateApp.prototype.loadState = function (name) {
 		var state = this.states[name];

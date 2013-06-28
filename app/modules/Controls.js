@@ -104,11 +104,11 @@ function(app, Clicker) {
     },
 
     nextState: function () {
-      app.stateController.appNext();
+      app.appController.appNext();
     },
 
     prevState: function () {
-      app.stateController.appPrev();
+      app.appController.appPrev();
     },
 
   	initialize: function () {
