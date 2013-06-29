@@ -48,8 +48,12 @@ define([
 	  	}
 		},
 
-		appConfig: function () {
-			console.log("appConfig callback.", arguments);
+		appConfigCallback: function (config) {
+			var activeApp = this.get("activeApp");
+			if (activeApp) {
+	  		console.log("App Config", config, activeApp);
+	  		activeApp.configure(config);
+	  	}
 		},
 
 		initialize: function () {

@@ -111,10 +111,10 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
   _.extend(PrisonersDilemmaMulti.States.Results.prototype, {
     defaults: {
       scoringMatrix: {
-        CC: [ 3, 3 ],
-        CD: [ 0, 5 ],
-        DC: [ 5, 0 ],
-        DD: [ 1, 1 ]
+        CC: 3,
+        CD: 0,
+        DC: 5,
+        DD: 1
       }
     },
 
@@ -124,7 +124,7 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
     assignScores: function (models) {
       models.each(function (model) {
         var pairChoices = model.get("choice") + model.get("partner").get("choice");
-        model.set({"score": this.options.scoringMatrix[pairChoices][0], "pairChoices": pairChoices});
+        model.set({"score": this.options.scoringMatrix[pairChoices], "pairChoices": pairChoices});
       }, this);
     },
 

@@ -329,7 +329,50 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   });
 
   PrisonersDilemma.Views.Controls = Backbone.View.extend({
-    template: "pd/controls"
+    template: "pd/controls",
+
+    events: {
+      "change .pay-off-matrix input": "updateMatrix",
+      "click .update" : "submit"
+    },
+
+    updateMatrix: function (evt) {
+      this.model.set("changed", true);
+      this.model.get("scoringMatrix")[$(evt.target).data("quadrant")] = parseFloat(evt.target.value);
+      this.$(".update").removeClass("disabled").prop("disabled", false).addClass("btn-primary");
+    },
+
+    serialize: function () {
+      return {
+        changed: this.model.get("changed"),
+        scoringMatrix: this.model.get("scoringMatrix")
+      }
+    },
+
+    submit: function () {
+      this.model.set("changed", false);
+
+      // TODO: submit data to server
+      var data = {
+        scoringMatrix: this.model.get("scoringMatrix")
+      };
+      app.appController.appConfig(data);
+
+      this.render();
+    },
+
+    initialize: function () {
+      this.model = new Backbone.Model({
+        changed: false,
+        scoringMatrix: {
+          CC: 3,
+          CD: 0,
+          DC: 5,
+          DD: 1
+        }
+      });
+    }
+
   });
 
 
@@ -384,10 +427,10 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   _.extend(PrisonersDilemma.States.Results.prototype, {
     defaults: {
       scoringMatrix: {
-        CC: [ 3, 3 ],
-        CD: [ 0, 5 ],
-        DC: [ 5, 0 ],
-        DD: [ 1, 1 ]
+        CC: 3,
+        CD: 0,
+        DC: 5,
+        DD: 1
       }
     },
 
@@ -397,7 +440,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     assignScores: function (models) {
       models.each(function (model) {
         var pairChoices = model.get("choice") + model.get("partner").get("choice");
-        model.set({"score": this.options.scoringMatrix[pairChoices][0], "pairChoices": pairChoices});
+        model.set({"score": this.options.scoringMatrix[pairChoices], "pairChoices": pairChoices});
       }, this);
     },
 

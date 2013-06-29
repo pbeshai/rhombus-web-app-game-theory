@@ -80,6 +80,7 @@ function(app) {
 	 */
 	var StateApp = function (options) {
 		this.options = options;
+		this.config = {};
 	};
 	StateApp.prototype.initialize = function () {
 
@@ -127,6 +128,9 @@ function(app) {
 		if (this.currentState.flow.prev) {
 			this.transition(this.currentState.flow.prev.name);
 		}
+	};
+	StateApp.prototype.configure = function (config) {
+		this.config = config;
 	};
 
 	// calls function this.transitions.<currentState>_<destinationState>(currentStateOutput);
