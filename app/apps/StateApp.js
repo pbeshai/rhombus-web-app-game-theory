@@ -48,14 +48,20 @@ function(app) {
 		if (input) {
 			this.input = input;
 		}
-		this.beforeRender();
+
 		this.render();
+	};
+
+	State.prototype.render = function () {
+		this.beforeRender();
+		this._render();
 		this.afterRender();
 	};
 
 	// render the view of the state
-	State.prototype.render = function () {
-		app.layout.setView("#main-content", new this.view(this.options.viewOptions));
+	State.prototype._render = function () {
+		this.viewInstance = new this.view(this.options.viewOptions);
+		app.layout.setView("#main-content", this.viewInstance);
 		app.layout.render();
 	};
 
@@ -80,7 +86,6 @@ function(app) {
 	 */
 	var StateApp = function (options) {
 		this.options = options;
-		this.config = {};
 	};
 	StateApp.prototype.initialize = function () {
 
@@ -131,7 +136,9 @@ function(app) {
 	};
 	StateApp.prototype.configure = function (config) {
 		this.config = config;
+		this.handleConfigure();
 	};
+	StateApp.prototype.handleConfigure = function () {} // no-op, to be overridden
 
 	// calls function this.transitions.<currentState>_<destinationState>(currentStateOutput);
 	StateApp.prototype.transition = function (destinationState) {

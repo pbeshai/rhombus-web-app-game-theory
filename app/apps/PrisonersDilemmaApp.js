@@ -54,6 +54,16 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 			console.log("pd app initialize");
 		},
 
+		handleConfigure: function () {
+			// set new scoring matrix and redraw if results are active
+			var resultsState = this.states.results;
+			resultsState.options.scoringMatrix = this.config.scoringMatrix;
+
+			if (this.currentState === resultsState) {
+				resultsState.render();
+			}
+		},
+
 		transitions: {
 	  		attendance_play: function () {
 	  			// take output from attendance and use it in grid
