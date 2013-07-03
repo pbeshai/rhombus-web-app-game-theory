@@ -206,6 +206,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: sandbox]");
       this.reset();
 
+      app.setTitle("Sandbox");
       app.layout.setViews({
         "#main-content": new Sandbox.Views.Sandbox(),
       }).render();

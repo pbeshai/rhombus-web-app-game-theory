@@ -464,11 +464,19 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
             alias: model.get("partner").get("alias"),
             choice: model.get("partner").get("choice"),
             score: model.get("partner").get("score"),
-          }
+          },
         };
       });
       console.log("PD RESULTS = ", results);
-      app.api({ call: "apps/pd/results", type: "post", data: { results: results } });
+
+      var logData = {
+        results: results,
+        config: {
+          scoringMatrix: this.options.scoringMatrix
+        }
+      };
+
+      app.api({ call: "apps/pd/results", type: "post", data: logData });
     },
 
     getOutput: function () { }
