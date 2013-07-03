@@ -120,6 +120,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: grid]");
       this.reset();
 
+      app.setTitle("Grid");
       app.layout.setViews({
         "#main-content": new Grid.Views.Participants({collection: this.participants})
       }).render();
@@ -139,6 +140,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: register]");
       this.reset();
 
+      app.setTitle("Register");
       app.layout.setViews({
         "#main-content": new Register.Views.Register({
           participants: this.participants
@@ -150,6 +152,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: attendance]");
       this.reset();
 
+      app.setTitle("Attendance");
       app.layout.setViews({
         "#main-content": new Attendance.Views.Participants({collection: this.participants})
       }).render();
@@ -168,21 +171,23 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: apps/"+name+"]");
       this.reset();
 
+      var activeApp;
       switch (name) {
         case "grid":
-          var gridApp = new GridApp({ participants: this.participants });
-          app.appController.set("activeApp", gridApp);
+          activeApp = new GridApp({ participants: this.participants });
           break;
 
         case "pd":
-          var prisonersDilemmaApp = new PrisonersDilemmaApp({ participants: this.participants });
-          app.appController.set("activeApp", prisonersDilemmaApp);
+          activeApp = new PrisonersDilemmaApp({ participants: this.participants });
           break;
 
         case "pdm":
-          var prisonersDilemmaMultiApp = new PrisonersDilemmaMultiApp({ participants: this.participants });
-          app.appController.set("activeApp", prisonersDilemmaMultiApp);
+          activeApp = new PrisonersDilemmaMultiApp({ participants: this.participants });
           break;
+      }
+
+      if (activeApp) {
+        app.appController.set("activeApp", gridApp);
       }
     },
 

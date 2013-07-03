@@ -120,8 +120,6 @@ function(app, Participant) {
   	},
 
   	initialize: function () {
-      app.setTitle("Register Participant");
-
       this.on("save-registration", this.register);
   	},
 

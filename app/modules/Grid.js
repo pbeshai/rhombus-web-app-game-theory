@@ -64,8 +64,6 @@ function(app, Participant, StateApp) {
 
       // listen for data changes
       app.participantServer.hookCollection(this.collection, this);
-
-      app.setTitle("Grid");
   	}
 
   });
