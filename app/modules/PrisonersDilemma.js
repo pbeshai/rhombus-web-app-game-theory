@@ -443,7 +443,6 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
         };
       });
       console.log("PD RESULTS = ", results);
-
       var logData = {
         results: results,
         config: this.config
