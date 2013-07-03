@@ -345,6 +345,8 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     },
 
     updateMatrix: function (evt) {
+      // I guess ideally we would use a model for the scoring matrix to handle the lack of change notification
+      // and ugly setting with a .get... but seems like too much hassle.
       this.model.get("scoringMatrix")[$(evt.target).data("quadrant")] = parseFloat(evt.target.value);
       this.model.trigger("change");
     },
