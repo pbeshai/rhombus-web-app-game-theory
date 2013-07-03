@@ -79,7 +79,9 @@ function(app, Clicker) {
     },
 
     beforeRender: function () {
-      this.insertView(".configure", new Controls.Views.Configure({ appConfigView: this.options.appConfigView }));
+      if (this.options.appConfigView) {
+        this.insertView(".configure", new Controls.Views.Configure({ appConfigView: this.options.appConfigView }));
+      }
     },
 
     afterRender: function () {
@@ -116,10 +118,6 @@ function(app, Clicker) {
       }
     },
 
-    onChange: function () {
-      this.$(".update-config").removeClass("disabled").prop("disabled", false).addClass("btn-primary");
-    },
-
     updateMessage: function (evt) {
       this.model.set("message", $(evt.target).val());
     },
@@ -143,7 +141,6 @@ function(app, Clicker) {
         modelOptions = _.extend(modelOptions, this.options.appConfigView.prototype.modelOptions);
       }
       this.model = new Controls.ConfigurationModel(modelOptions);
-      this.listenTo(this.model, "change", this.onChange);
     }
   });
 

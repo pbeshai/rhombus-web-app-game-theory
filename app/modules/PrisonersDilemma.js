@@ -407,22 +407,15 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
   }
   PrisonersDilemma.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Layout);
   _.extend(PrisonersDilemma.States.Results.prototype, {
-    defaults: {
-      scoringMatrix: {
-        CC: 3,
-        CD: 0,
-        DC: 5,
-        DD: 1
-      }
-    },
-
     initialize: function () {
+      this.config = this.options.config;
     },
 
     assignScores: function (models) {
+      var scoringMatrix = this.config.scoringMatrix;
       models.each(function (model) {
         var pairChoices = model.get("choice") + model.get("partner").get("choice");
-        model.set({"score": this.options.scoringMatrix[pairChoices], "pairChoices": pairChoices});
+        model.set({"score": scoringMatrix[pairChoices], "pairChoices": pairChoices});
       }, this);
     },
 
@@ -453,9 +446,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
 
       var logData = {
         results: results,
-        config: {
-          scoringMatrix: this.options.scoringMatrix
-        }
+        config: this.config
       };
 
       app.api({ call: "apps/pd/results", type: "post", data: logData });

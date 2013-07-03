@@ -187,7 +187,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       }
 
       if (activeApp) {
-        app.appController.set("activeApp", gridApp);
+        app.appController.set("activeApp", activeApp);
       }
     },
 

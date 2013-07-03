@@ -22,7 +22,15 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 	 *  Prisoner's Dilemma App
 	 */
 	var PrisonersDilemmaApp = function (options) {
-		this.options = options;
+		this.options = options || {};
+		this.config = _.extend({
+			scoringMatrix: {
+        CC: 3,
+        CD: 0,
+        DC: 5,
+        DD: 1
+      }
+		}, this.options.config);
 		this.initialize();
 	};
 
@@ -37,7 +45,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 
 			var playState = new PrisonersDilemma.States.Play();
 
-			var resultsState = new PrisonersDilemma.States.Results();
+			var resultsState = new PrisonersDilemma.States.Results({
+				config: this.config
+			});
 
 			this.states = {
 		  	"attendance": attendanceState,
@@ -55,12 +65,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 		},
 
 		handleConfigure: function () {
-			// set new scoring matrix and redraw if results are active
-			var resultsState = this.states.results;
-			resultsState.options.scoringMatrix = this.config.scoringMatrix;
-
-			if (this.currentState === resultsState) {
-				resultsState.render();
+			// redraw if results are active
+			if (this.currentState === this.states.results) {
+				this.currentState.render();
 			}
 		},
 
