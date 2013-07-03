@@ -328,53 +328,33 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     }
   });
 
-  PrisonersDilemma.Views.Controls = Backbone.View.extend({
-    template: "pd/controls",
+
+  PrisonersDilemma.Views.Configure = Backbone.View.extend({
+    template: "pd/configure",
+    modelOptions: {
+      scoringMatrix: {
+        CC: 3,
+        CD: 0,
+        DC: 5,
+        DD: 1
+      }
+    },
 
     events: {
       "change .pay-off-matrix input": "updateMatrix",
-      "click .update" : "submit"
     },
 
     updateMatrix: function (evt) {
-      this.model.set("changed", true);
       this.model.get("scoringMatrix")[$(evt.target).data("quadrant")] = parseFloat(evt.target.value);
-      this.$(".update").removeClass("disabled").prop("disabled", false).addClass("btn-primary");
+      this.model.trigger("change");
     },
 
     serialize: function () {
       return {
-        changed: this.model.get("changed"),
-        scoringMatrix: this.model.get("scoringMatrix")
+        scoringMatrix: this.model.get("scoringMatrix"),
       }
     },
-
-    submit: function () {
-      this.model.set("changed", false);
-
-      // TODO: submit data to server
-      var data = {
-        scoringMatrix: this.model.get("scoringMatrix")
-      };
-      app.appController.appConfig(data);
-
-      this.render();
-    },
-
-    initialize: function () {
-      this.model = new Backbone.Model({
-        changed: false,
-        scoringMatrix: {
-          CC: 3,
-          CD: 0,
-          DC: 5,
-          DD: 1
-        }
-      });
-    }
-
   });
-
 
   // To be used in StateApps
   PrisonersDilemma.States = {};

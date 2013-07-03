@@ -7,11 +7,10 @@ define([
   // Application.
   "app",
   "plugins/d3/rickshaw",
-  "util/d3/rickshaw/timeseriesTooltip",
   "util/d3/rickshaw/graphs"
 ],
 
-function (app, Rickshaw, TimeseriesTooltip, Graphs) {
+function (app, Rickshaw, Graphs) {
 
   var Sandbox = app.module();
 
@@ -47,12 +46,11 @@ function (app, Rickshaw, TimeseriesTooltip, Graphs) {
         },
         xAxis: {
           ticks: numRounds
-        }
-      });
+        },
 
-      var hover = new TimeseriesTooltip({
-        graph: timeSeries.graph,
-        xFormatter: function (n) { return "Round " + n; }
+        hover: {
+          xFormatter: function (n) { return "Round " + n; }
+        }
       });
     },
 

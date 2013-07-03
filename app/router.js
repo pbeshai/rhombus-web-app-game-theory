@@ -194,16 +194,20 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
     appControlsHandler: function (name) {
       console.log("[router: apps/"+name+"/controls]");
       this.reset();
-      var view;
+      var configView, title;
       switch (name) {
         case "pd":
-          view = new PrisonersDilemma.Views.Controls();
+          configView = PrisonersDilemma.Views.Configure;
+          title = "Prisoner's Dilemma Controls";
           break;
       }
 
-      app.setTitle(name + " App Controls");
+      app.setTitle(title);
       app.layout.setViews({
-        "#main-content": new Controls.Views.AppControls({ appView: view })
+        "#main-content": new Controls.Views.AppControls({
+          title: title,
+          appConfigView: configView
+        })
       }).render();
     },
 

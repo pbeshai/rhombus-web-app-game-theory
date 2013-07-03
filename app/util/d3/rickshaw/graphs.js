@@ -1,8 +1,10 @@
 define([
-  "plugins/d3/rickshaw"
+  "plugins/d3/rickshaw",
+
+  "util/d3/rickshaw/timeseriesTooltip"
 ],
 
-function (Rickshaw) {
+function (Rickshaw, TimeseriesTooltip) {
   var Graphs = {};
 
   Graphs.createTimeSeries = function (view, options) {
@@ -39,7 +41,12 @@ function (Rickshaw) {
     var yAxis = new Rickshaw.Graph.Axis.Y(_.extend(yAxisDefaults, options.yAxis));
     yAxis.render();
 
-    return { graph: graph, xAxis: xAxis, yAxis: yAxis };
+    var hoverDefaults = {
+      graph: graph
+    };
+    var hover = new TimeseriesTooltip(_.extend(hoverDefaults, options.hover));
+
+    return { graph: graph, xAxis: xAxis, yAxis: yAxis, hover: hover };
   }
 
   return Graphs;

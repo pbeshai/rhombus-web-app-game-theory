@@ -1,0 +1,10 @@
+<h3>Configuration</h3>
+<div class="form-inline">
+<input placeholder="Message" type="text" value="<%= model.get('message') %>" class="config-message input-xlarge"/>
+<% if (model.hasChanged()) { %>
+	<button class="btn update-config btn-primary">Update Configuration</button>
+<% } else { %>
+	<button class="btn update-config disabled" disabled>Update Configuration</button>
+<% } %>
+</div>
+<div class="app-config-view"></div>

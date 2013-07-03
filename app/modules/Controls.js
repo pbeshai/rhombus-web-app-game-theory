@@ -72,11 +72,14 @@ function(app, Clicker) {
       "click .prev-state" : "prevState"
     },
 
-    beforeRender: function () {
-      if (this.options.appView) {
-        this.insertView(".app-view", this.options.appView);
+    serialize: function () {
+      return {
+        title: this.options.title
       }
-      console.log(this);
+    },
+
+    beforeRender: function () {
+      this.insertView(".configure", new Controls.Views.Configure({ appConfigView: this.options.appConfigView }));
     },
 
     afterRender: function () {
@@ -89,6 +92,58 @@ function(app, Clicker) {
 
     prevState: function () {
       app.appController.appPrev();
+    }
+  });
+
+  Controls.ConfigurationModel = Backbone.Model.extend({
+    sync: function () {
+      app.appController.appConfig(this.attributes);
+      this.changed = {};
+    }
+  });
+
+  Controls.Views.Configure = Backbone.View.extend({
+    template: "controls/configure",
+
+    events: {
+      "change .config-message": "updateMessage",
+      "click .update-config": "submit"
+    },
+
+    beforeRender: function () {
+      if (this.options.appConfigView) {
+        this.insertView(".app-config-view", new this.options.appConfigView({ model: this.model }));
+      }
+    },
+
+    onChange: function () {
+      this.$(".update-config").removeClass("disabled").prop("disabled", false).addClass("btn-primary");
+    },
+
+    updateMessage: function (evt) {
+      this.model.set("message", $(evt.target).val());
+    },
+
+    serialize: function () {
+      return {
+        model: this.model
+      }
+    },
+
+    submit: function () {
+      this.model.save();
+      this.render();
+    },
+
+    initialize: function () {
+      var modelOptions = {};
+
+      // read defaults specified by the app view if available
+      if (this.options.appConfigView) {
+        modelOptions = _.extend(modelOptions, this.options.appConfigView.prototype.modelOptions);
+      }
+      this.model = new Controls.ConfigurationModel(modelOptions);
+      this.listenTo(this.model, "change", this.onChange);
     }
   });
 
@@ -107,7 +162,6 @@ function(app, Clicker) {
     },
 
     clearDatabase: function () {
-      // TODO: make confirm prettier
       var verify = confirm("Are you sure you want to clear the participant database?");
 
       if (verify) {
