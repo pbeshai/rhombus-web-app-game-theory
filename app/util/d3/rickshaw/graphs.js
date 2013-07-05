@@ -15,6 +15,7 @@ function (Rickshaw, TimeseriesTooltip) {
       width: 960,
       height: 300,
       renderer: 'line',
+      padding: { top: 0.1 }
       /* series: [] */
     };
 

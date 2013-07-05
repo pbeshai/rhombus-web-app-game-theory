@@ -29,6 +29,9 @@ function (app, Rickshaw, Graphs) {
           seriesData[j].push({x: i+1, y: Math.random()*5});
         }
       }
+      seriesData[0][2]={x: 3, y: 5};
+
+
 
       var timeSeries = Graphs.createTimeSeries(this, {
         graph: {
@@ -46,6 +49,9 @@ function (app, Rickshaw, Graphs) {
         },
         xAxis: {
           ticks: numRounds
+        },
+        yAxis: {
+          ticks: 5
         },
 
         hover: {
