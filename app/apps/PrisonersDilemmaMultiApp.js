@@ -21,17 +21,22 @@ define([
 
 function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDilemmaMulti) {
 	var PrisonersDilemmaMultiApp = function (options) {
-		this.options = _.defaults({}, options, this.defaults);
+		this.options = options || {};
+		this.config = _.extend({
+			scoringMatrix: {
+        CC: 3,
+        CD: 0,
+        DC: 5,
+        DD: 1
+      },
+      minRounds: 2,
+      maxRounds: 5
+		}, this.options.config);
 		this.initialize();
 	};
 
 	PrisonersDilemmaMultiApp.prototype = new StateApp.App();
 	_.extend(PrisonersDilemmaMultiApp.prototype, {
-		defaults: {
-			minRounds: 2,
-			maxRounds: 5
-		},
-
 		defineStates: function () {
 			var attendanceState = new Attendance.State({
 				participants: this.options.participants,
@@ -40,7 +45,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 			});
 
 			var playState = new PrisonersDilemmaMulti.States.Play();
-			var resultsState = new PrisonersDilemmaMulti.States.Results();
+			var resultsState = new PrisonersDilemmaMulti.States.Results({
+				config: this.config
+			});
 
 			this.states = {
 		  	"attendance": attendanceState,
@@ -55,6 +62,13 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 		initialize: function () {
 			StateApp.App.prototype.initialize.call(this);
 			console.log("pdm app initialize");
+		},
+
+		handleConfigure: function () {
+			// redraw if results are active
+			if (this.currentState === this.states.results) {
+				this.currentState.render();
+			}
 		},
 
 		transitions: {
@@ -72,10 +86,12 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 
 		      var participants = new PrisonersDilemma.Collection(pdParticipants);
 
+		      this.config.numRounds = Math.round(Math.random() * (this.config.maxRounds - this.config.minRounds)) + this.config.minRounds;
+
 					// for each participant, set the number of rounds left.
 					participants.each(function (participant) {
 						if (participant.get("roundsLeft") === undefined) {
-							var roundsLeft = Math.round(Math.random() * (this.options.maxRounds - this.options.minRounds)) + this.options.minRounds;
+							var roundsLeft = this.config.numRounds;
 							participant.set("roundsLeft", roundsLeft);
 							participant.get("partner").set("roundsLeft", roundsLeft);
 						}
@@ -102,7 +118,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 	  					participant.delayedPlay();
 	  				}
 	  			});
-	  			this.round += 1;
+	  			if (this.config.numRounds > this.round) {
+	  				this.round += 1;
+	  			}
 	  		}
 		}
 	});

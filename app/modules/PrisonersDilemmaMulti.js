@@ -104,27 +104,31 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
   });
 
   PrisonersDilemmaMulti.States.Results = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
+    this.options = _.defaults({}, options);
     this.initialize();
   }
   PrisonersDilemmaMulti.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Layout);
   _.extend(PrisonersDilemmaMulti.States.Results.prototype, {
-    defaults: {
-      scoringMatrix: {
-        CC: 3,
-        CD: 0,
-        DC: 5,
-        DD: 1
-      }
-    },
-
     initialize: function () {
+      this.config = this.options.config;
     },
 
     assignScores: function (models) {
+      var scoringMatrix = this.config.scoringMatrix;
       models.each(function (model) {
         var pairChoices = model.get("choice") + model.get("partner").get("choice");
-        model.set({"score": this.options.scoringMatrix[pairChoices], "pairChoices": pairChoices});
+        var data = { "score": scoringMatrix[pairChoices], "pairChoices": pairChoices };
+        model.set(data);
+
+        // store the score in the participant's history
+        var history = model.get("history");
+        data.round = this.stateApp.round;
+
+        if (history == null) {
+          model.set("history", [ data ]);
+        } else {
+          history.push(data);
+        }
       }, this);
     },
 
@@ -154,8 +158,13 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
           }
         };
       });
-      console.log("PD RESULTS = ", results);
-      app.api({ call: "apps/pd/results", type: "post", data: { results: results } });
+      console.log("PDM RESULTS = ", results);
+      var logData = {
+        results: results,
+        config: this.config
+      };
+
+      app.api({ call: "apps/pd/results", type: "post", data: logData });
     },
 
     getOutput: function () {

@@ -144,8 +144,6 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       // remove old choice classes and set new one
       if (played) {
         this.$el.addClass(this.playedClass);
-      } else {
-        this.$el.removeClass(this.playedClass);
       }
     },
 
@@ -233,6 +231,55 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       + '</div>'
       + '<div class="count"><%= count %> <% if (count === 1) { print("person") } else { print("people") } %></div>',
 
+    calculateHistory: function () {
+      if (this.collection.at(0).get("history") == null) return null;
+
+      var histories = this.collection.map(function (model) { return model.get("history"); });
+      var historySize = (histories[0] == null) ? 0 : histories[0].length;
+      console.log("calulateHistory");
+      var byRound = _.zip.apply(this, histories);
+      console.log(byRound);
+
+      var stats = _.map(byRound, function (roundData) {
+        // pairChoices, score, round
+        // return { round: roundData[0].round}
+        var groups = group(roundData);
+        var count = roundData.length;
+        var round = roundData[0].round;
+
+        return {
+          round: round,
+          cooperate: {
+            count: groups.cooperate.length,
+            average: average(groups.cooperate)
+          },
+          defect: {
+            count: groups.defect.length,
+            average: average(groups.defect)
+          },
+          total: {
+            count: roundData.length,
+            average: average(roundData)
+          }
+        };
+      });
+
+      function group(roundData) {
+        var groups = _.groupBy(roundData, function (data) { return data.pairChoices[0] === "D" ? "defect" : "cooperate"; });
+        groups.cooperate || (groups.cooperate = []);
+        groups.defect || (groups.defect = []);
+
+        return groups;
+      }
+
+      function average(roundData) {
+        if (roundData.length === 0) return 0; // avoid division by 0
+        return _.reduce(roundData, function (memo, data) { return memo + data.score; }, 0) / roundData.length;
+      }
+
+      return stats;
+    },
+
     calculateStats: function () {
       // models partitioned by choice
       var groups = this.collection.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
@@ -240,7 +287,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
       groups.defect || (groups.defect = []);
 
       function average(modelsArray) {
-        if (modelsArray.length === 0) return 0;
+        if (modelsArray.length === 0) return 0; // avoid division by 0
         return _.reduce(modelsArray, function(memo, model) { return memo + model.get("score"); }, 0) / modelsArray.length;
       }
 
@@ -256,7 +303,9 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
         total: {
           count: this.collection.length,
           average: average(this.collection.models)
-        }
+        },
+
+        historic: this.calculateHistory()
       }
     },
 
@@ -269,6 +318,11 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     },
 
     afterRender: function () {
+      if (this.stats.historic) {
+        console.log("HISTORIC", this.stats.historic);
+      } else {
+        console.log("NO HISTORIC DATA", this.stats);
+      }
 
       var chartData = [ {
           label: "C - Cooperated",
@@ -402,7 +456,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     }
   });
   PrisonersDilemma.States.Results = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
+    this.options = _.defaults({}, options);
     this.initialize();
   }
   PrisonersDilemma.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Layout);
