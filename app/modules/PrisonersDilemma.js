@@ -233,18 +233,14 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       + '</div>'
       + '<div class="count"><%= count %> <% if (count === 1) { print("person") } else { print("people") } %></div>',
 
-    calculateHistory: function () {
+    calculateStatsFromHistory: function () {
       if (this.collection.at(0).get("history") == null) return null;
 
       var histories = this.collection.map(function (model) { return model.get("history"); });
       var historySize = (histories[0] == null) ? 0 : histories[0].length;
-      console.log("calulateHistory");
       var byRound = _.zip.apply(this, histories);
-      console.log(byRound);
 
       var stats = _.map(byRound, function (roundData) {
-        // pairChoices, score, round
-        // return { round: roundData[0].round}
         var groups = group(roundData);
         var count = roundData.length;
         var round = roundData[0].round;
@@ -282,7 +278,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       return stats;
     },
 
-    calculateStats: function () {
+    calculateStatsFromChoice: function () {
       // models partitioned by choice
       var groups = this.collection.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
       groups.cooperate || (groups.cooperate = []);
@@ -305,10 +301,16 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
         total: {
           count: this.collection.length,
           average: average(this.collection.models)
-        },
-
-        historic: this.calculateHistory()
+        }
       }
+    },
+
+    calculateStats: function () {
+      var stats = this.calculateStatsFromHistory();
+      if (stats == null) { // backwards compatibility
+        stats = [this.calculateStatsFromChoice()];
+      }
+      return stats;
     },
 
     beforeRender: function () {
@@ -320,7 +322,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     },
 
     afterRender: function () {
-      if (this.stats.historic && this.stats.historic.length > 1) {
+      if (this.stats.length > 1) {
         this.renderTimeSeries();
       } else {
         this.renderBarChart();
@@ -328,21 +330,22 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     },
 
     renderBarChart: function () {
+      var stats = this.stats[0];
       var chartData = [ {
           label: "C - Cooperated",
-          value: this.stats.cooperate.average,
-          count: this.stats.cooperate.count
+          value: stats.cooperate.average,
+          count: stats.cooperate.count
         }, {
           label: "D - Defected",
-          value: this.stats.defect.average,
-          count: this.stats.defect.count
+          value: stats.defect.average,
+          count: stats.defect.count
         }
       ];
 
 
       var chart = variableWidthBarChart()
         .tooltip(_.template(this.tooltipTemplate), {
-          totalAverage: this.stats.total.average
+          totalAverage: stats.total.average
         });
 
       d3.select(".chart").datum(chartData).call(chart);
@@ -352,13 +355,13 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
         .y(function (d) { return chart.yScale(d); })
         .width(chart.innerWidth());
 
-      d3.select(".chart .chart-data").datum([this.stats.total.average]).call(avgLine);
+      d3.select(".chart .chart-data").datum([stats.total.average]).call(avgLine);
     },
 
     renderTimeSeries: function () {
-      var numRounds = this.stats.historic.length;
-      var cooperateData = _.pluck(this.stats.historic, "cooperate");
-      var defectData = _.pluck(this.stats.historic, "defect");
+      var numRounds = this.stats.length;
+      var cooperateData = _.pluck(this.stats, "cooperate");
+      var defectData = _.pluck(this.stats, "defect");
 
       function formatData(data) {
         return _.map(data, function (elem, i) {

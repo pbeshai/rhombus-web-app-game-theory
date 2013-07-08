@@ -47,6 +47,9 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
       this.collection.each(function (participant) {
         this.insertView(".participant-grid", new PrisonersDilemmaMulti.Views.Play.Participant({ model: participant }));
       }, this);
+      if (this.options.round > 1) {
+        this.setView(".results-stats", new PrisonersDilemma.Views.Results.Stats({ collection: this.collection }));
+      }
     },
 
 
