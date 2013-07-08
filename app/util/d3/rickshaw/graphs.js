@@ -27,8 +27,13 @@ function (Rickshaw, TimeseriesTooltip) {
       graph: graph,
       orientation: "bottom",
       element: view.$(".x-axis")[0],
+      tickFormat: function(n) {
+        if (Math.floor(n) === n) {
+          return n;
+        }
+      }
     };
-
+    console.log("configuring with ", _.extend(xAxisDefaults, options.xAxis));
     var xAxis = new Rickshaw.Graph.Axis.X(_.extend(xAxisDefaults, options.xAxis));
     xAxis.render();
 

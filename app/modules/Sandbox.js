@@ -23,13 +23,13 @@ function (app, Rickshaw, Graphs) {
     afterRender: function () {
 
       var seriesData = [ [], [] ];
-      var numRounds = 5;
+      var numRounds = 2;
       for (var i = 0; i < numRounds; i++) {
         for (var j = 0; j < seriesData.length; j++) {
-          seriesData[j].push({x: i+1, y: Math.random()*5});
+          seriesData[j].push({x: i+1, y: Math.random()*5, aux: j+i*100 + " people"});
         }
       }
-      seriesData[0][2]={x: 3, y: 5};
+
 
 
 

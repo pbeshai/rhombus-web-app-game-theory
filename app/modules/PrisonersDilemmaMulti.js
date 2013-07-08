@@ -127,7 +127,12 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
         if (history == null) {
           model.set("history", [ data ]);
         } else {
-          history.push(data);
+          // if we do not already have data for this round, add it:
+          var roundData = _.find(history, function (item) { return item.round === data.round });
+          if (roundData === undefined) {
+            history.push(data);
+          }
+
         }
       }, this);
     },

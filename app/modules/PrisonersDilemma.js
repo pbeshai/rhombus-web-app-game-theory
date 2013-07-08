@@ -12,9 +12,11 @@ define([
   "apps/StateApp",
 
   "util/d3/variableWidthBarChart",
-  "util/d3/xLine"
+  "util/d3/xLine",
+
+  "util/d3/rickshaw/graphs"
 ],
-function(app, Participant, StateApp, variableWidthBarChart, xLine) {
+function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
 
   var PrisonersDilemma = app.module();
   PrisonersDilemma.Views.Play = {};
@@ -318,12 +320,14 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
     },
 
     afterRender: function () {
-      if (this.stats.historic) {
-        console.log("HISTORIC", this.stats.historic);
+      if (this.stats.historic && this.stats.historic.length > 1) {
+        this.renderTimeSeries();
       } else {
-        console.log("NO HISTORIC DATA", this.stats);
+        this.renderBarChart();
       }
+    },
 
+    renderBarChart: function () {
       var chartData = [ {
           label: "C - Cooperated",
           value: this.stats.cooperate.average,
@@ -341,16 +345,59 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine) {
           totalAverage: this.stats.total.average
         });
 
-      d3.select(".results-chart").datum(chartData).call(chart);
+      d3.select(".chart").datum(chartData).call(chart);
 
       // add in average line
       var avgLine = xLine()
         .y(function (d) { return chart.yScale(d); })
         .width(chart.innerWidth());
 
-      d3.select(".results-chart .chart-data").datum([this.stats.total.average]).call(avgLine);
+      d3.select(".chart .chart-data").datum([this.stats.total.average]).call(avgLine);
     },
 
+    renderTimeSeries: function () {
+      var numRounds = this.stats.historic.length;
+      var cooperateData = _.pluck(this.stats.historic, "cooperate");
+      var defectData = _.pluck(this.stats.historic, "defect");
+
+      function formatData(data) {
+        return _.map(data, function (elem, i) {
+          return {
+            x: i+1,
+            y: elem.average,
+            aux: elem.count + " people",
+          };
+        });
+      }
+
+      var timeSeries = Graphs.createTimeSeries(this, {
+        graph: {
+          element: this.$(".chart")[0],
+          interpolation: "linear",
+          series: [
+            {
+              data: formatData(cooperateData),
+              name: 'Cooperated',
+              className: "cooperated"
+            }, {
+              data: formatData(defectData),
+              name: 'Defected',
+              className: "defected"
+            },
+          ]
+        },
+        xAxis: {
+          ticks: numRounds
+        },
+        yAxis: {
+          ticks: 5
+        },
+
+        hover: {
+          xFormatter: function (n) { return "Round " + n; }
+        }
+      });
+    },
 
     initialize: function () {
 

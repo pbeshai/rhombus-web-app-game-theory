@@ -10,7 +10,9 @@ function (Rickshaw) {
       + '  <div class="x-value"><%= x %></div>'
       + '  <% _.each(lines, function (line) { %>'
       + '  <div class="line <%= line.series.className %>">'
-      + '    <div class="y-value"><%= line.formattedYValue %></div>'
+      + '    <div class="y-value"><%= line.formattedYValue %>'
+      + '<% if (line.value.aux !== undefined) { %> <span class="aux-value">(<%= line.value.aux %>)</span><% } %>'
+      +     '</div>'
       + '    <div class="swatch"></div>'
       + '    <div class="name"><%= line.name %></div>'
       + '  </div>'
@@ -42,24 +44,12 @@ function (Rickshaw) {
         lines: args.detail,
         x: formattedXValue
       };
+      // render the hover detail box
       var $lineDetail = $(this.hoverTemplate(data)).appendTo(this.element);
 
-      // for each series
+      // for each series, draw the dots
       args.detail.sort(function(a, b) { return a.order - b.order }).forEach( function(d) {
         if (d.value.y === null) return;
-
-        var formattedXValue = d.formattedXValue;
-        var formattedYValue = d.formattedYValue;
-
-        var item = document.createElement('div');
-
-        item.className = 'item active';
-
-        // invert the scale if this series displays using a scale
-        var series = d.series;
-        var actualY = series.scale ? series.scale.invert(d.value.y) : d.value.y;
-
-        item.innerHTML = this.formatter(series, d.value.x, actualY, formattedXValue, formattedYValue, d);
 
         var dot = document.createElement('div');
         dot.className = 'dot';
@@ -69,7 +59,6 @@ function (Rickshaw) {
         this.element.appendChild(dot);
 
         dot.className = 'dot active';
-
       }, this);
 
       this.show();
