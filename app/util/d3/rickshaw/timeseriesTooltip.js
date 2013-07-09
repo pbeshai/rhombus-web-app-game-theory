@@ -6,7 +6,7 @@ function (Rickshaw) {
 	/**
 		template can use x for the formattedXValue and lines obj which is the args.detail
 	*/
-	var hoverTemplateCode = '<div class="item multi active">'
+	var hoverTemplateCode = '<div class="item multi">'
       + '  <div class="x-value"><%= x %></div>'
       + '  <% _.each(lines, function (line) { %>'
       + '  <div class="line <%= line.series.className %>">'
@@ -58,7 +58,7 @@ function (Rickshaw) {
 
         this.element.appendChild(dot);
 
-        dot.className = 'dot active';
+        dot.className = 'dot';
       }, this);
 
       this.show();
