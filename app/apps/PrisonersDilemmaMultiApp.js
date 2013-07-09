@@ -30,13 +30,16 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
         DD: 1
       },
       minRounds: 2,
-      maxRounds: 5
+      maxRounds: 5,
+      gameOver: false, // set to false when the game is over
 		}, this.options.config);
 		this.initialize();
 	};
 
 	PrisonersDilemmaMultiApp.prototype = new StateApp.App();
 	_.extend(PrisonersDilemmaMultiApp.prototype, {
+		version: "1.0",
+
 		defineStates: function () {
 			var attendanceState = new Attendance.State({
 				participants: this.options.participants,
@@ -44,7 +47,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 				saveNew: false
 			});
 
-			var playState = new PrisonersDilemmaMulti.States.Play();
+			var playState = new PrisonersDilemmaMulti.States.Play({
+				config: this.config
+			});
 			var resultsState = new PrisonersDilemmaMulti.States.Results({
 				config: this.config
 			});
@@ -74,7 +79,7 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 		transitions: {
 	  		attendance_play: function (output) {
 	  			// take output from attendance and use it in grid
-					console.log("going from attendance to play");
+
 					// create PD Participants from these Participant Models
 		      var pdParticipants = output.map(function (participant) {
 		        return new PrisonersDilemma.Model({ alias: participant.get("alias") });
@@ -98,17 +103,17 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 					}, this);
 
 					this.round = 1;
+					this.config.gameOver = false;
 
 		      return participants;
 	  		},
 
 	  		play_attendance: function () {
-				  console.log("going from play to attendance");
 				  this.options.participants.fetch(); // reset the participants that attendance uses
 	  		},
 
 	  		play_results: function () {
-	  			console.log("going from play to results");
+
 	  		},
 
 	  		results_play: function (output) {
@@ -120,6 +125,8 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 	  			});
 	  			if (this.config.numRounds > this.round) {
 	  				this.round += 1;
+	  			} else {
+	  				this.config.gameOver = true;
 	  			}
 	  		}
 		}

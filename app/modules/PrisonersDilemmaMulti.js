@@ -39,7 +39,8 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
     serialize: function () {
       return {
         hasPlayers: (this.collection.length > 0),
-        round: this.options.round
+        round: this.options.round,
+        gameOver: this.options.gameOver
       };
     },
 
@@ -79,13 +80,14 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
     },
 
     initialize: function () {
+      this.config = this.options.config;
     },
 
     beforeRender: function () {
       // input is a PrisonersDilemma.Collection
       this.participants = this.input;
 
-      this.options.viewOptions = { collection: this.participants, round: this.stateApp.round };
+      this.options.viewOptions = { collection: this.participants, round: this.stateApp.round, gameOver: this.config.gameOver };
     },
 
     // outputs a PrisonersDilemma.Collection
@@ -146,14 +148,17 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
       // this.input is a PrisonersDilemma.Collection
       this.options.viewOptions = { collection: this.participants };
 
-      // calculate the scores
-      this.assignScores(this.participants);
+      if (!this.config.gameOver) {
+        // calculate the scores
+        this.assignScores(this.participants);
 
-      // TODO: log results?
-      //this.logResults(this.participants);
+        // log results
+        this.logResults(this.participants);
+      }
     },
 
     logResults: function (models) {
+      console.log(models);
       var results = models.map(function (model) {
         return {
           alias: model.get("alias"),
@@ -163,16 +168,19 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
             alias: model.get("partner").get("alias"),
             choice: model.get("partner").get("choice"),
             score: model.get("partner").get("score"),
-          }
+          },
+          history: model.get("history")
         };
       });
       console.log("PDM RESULTS = ", results);
       var logData = {
         results: results,
-        config: this.config
+        config: this.config,
+        round: this.stateApp.round,
+        version: this.stateApp.version
       };
 
-      app.api({ call: "apps/pd/results", type: "post", data: logData });
+      app.api({ call: "apps/pdm/results", type: "post", data: logData });
     },
 
     getOutput: function () {

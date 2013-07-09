@@ -36,6 +36,8 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 
 	PrisonersDilemmaApp.prototype = new StateApp.App();
 	_.extend(PrisonersDilemmaApp.prototype, {
+		version: "1.0",
+
 		defineStates: function () {
 			var attendanceState = new Attendance.State({
 				participants: this.options.participants,

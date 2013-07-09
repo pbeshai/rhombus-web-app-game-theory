@@ -549,7 +549,8 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       console.log("PD RESULTS = ", results);
       var logData = {
         results: results,
-        config: this.config
+        config: this.config,
+        version: this.stateApp.version
       };
 
       app.api({ call: "apps/pd/results", type: "post", data: logData });

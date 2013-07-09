@@ -107,8 +107,6 @@ function(app, Participant, StateApp) {
     },
 
     getOutput: function () {
-      console.log("open attendance output");
-
       var presentParticipants = this.options.participants;
       var notHere = presentParticipants.filter(function (participant) {
         return participant.get("choice") === undefined;
