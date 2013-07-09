@@ -48,7 +48,12 @@ function (app, Rickshaw, Graphs) {
           ]
         },
         xAxis: {
-          ticks: numRounds
+          ticks: numRounds,
+          tickFormat: function(n) {
+            if (Math.floor(n) === n) {
+              return "Round " + n;
+            }
+          }
         },
         yAxis: {
           ticks: 5

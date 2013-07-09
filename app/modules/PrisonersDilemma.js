@@ -390,7 +390,12 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
           ]
         },
         xAxis: {
-          ticks: numRounds
+          ticks: numRounds,
+          tickFormat: function(n) {
+            if (Math.floor(n) === n) {
+              return "Round " + n;
+            }
+          }
         },
         yAxis: {
           ticks: 5
