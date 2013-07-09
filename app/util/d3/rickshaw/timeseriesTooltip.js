@@ -66,7 +66,14 @@ function (Rickshaw) {
 
       // place the tooltip at the average y value.
       var avgY = _.reduce(points, function (memo, point) { return memo+point.value.y; }, 0) / points.length;
-      $lineDetail.css("top", (graph.y(point.value.y0 + avgY) - ($lineDetail.height()/2)) + 'px');
+      $lineDetail.css("top", (graph.y(point.value.y0 + avgY) - ($lineDetail.outerHeight()/2)) + 'px');
+
+      // place the tooltip on the left side of the dots if too far right
+      if (window.innerWidth > $lineDetail.offset().left + $lineDetail.outerWidth()) {
+        $lineDetail.css("right", "");
+      } else {
+        $lineDetail.css("right", "12px");
+      }
 
       if (typeof this.onRender == 'function') {
         this.onRender(args);
