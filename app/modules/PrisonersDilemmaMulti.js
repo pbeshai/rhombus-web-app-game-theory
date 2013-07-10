@@ -61,6 +61,35 @@ function(app, PrisonersDilemma, Participant, StateApp) {
   });
 
 
+  PrisonersDilemmaMulti.Views.Configure = Backbone.View.extend({
+    template: "pdm/configure",
+    modelOptions: {
+      scoringMatrix: {
+        CC: 3,
+        CD: 0,
+        DC: 5,
+        DD: 1
+      }
+    },
+
+    events: {
+      "change .pay-off-matrix input": "updateMatrix",
+    },
+
+    updateMatrix: function (evt) {
+      // I guess ideally we would use a model for the scoring matrix to handle the lack of change notification
+      // and ugly setting with a .get... but seems like too much hassle.
+      this.model.get("scoringMatrix")[$(evt.target).data("quadrant")] = parseFloat(evt.target.value);
+      this.model.trigger("change");
+    },
+
+    serialize: function () {
+      return {
+        scoringMatrix: this.model.get("scoringMatrix"),
+      }
+    },
+  });
+
   // To be used in StateApps
   PrisonersDilemmaMulti.States = {};
   PrisonersDilemmaMulti.States.Play = function (options) {

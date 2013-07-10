@@ -32,6 +32,14 @@ function(app, StateApp, Participant, Attendance, NPrisonersDilemma) {
 		}, this.options.config);
 		this.initialize();
 	};
+	// description for use in router
+	NPrisonersDilemmaApp.app = {
+		instantiate: function (router) {
+			return new NPrisonersDilemmaApp({ participants: router.participants });
+		},
+		configView: NPrisonersDilemma.Views.Configure,
+		title: "N-Person Prisoner's Dilemma"
+	};
 
 	NPrisonersDilemmaApp.prototype = new StateApp.App();
 	_.extend(NPrisonersDilemmaApp.prototype, {

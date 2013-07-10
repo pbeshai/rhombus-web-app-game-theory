@@ -156,6 +156,15 @@ function(app) {
 		this.currentState.enter(output);
 	};
 
+	// register the app in the router. sets up controls and general nav
+	StateApp.prototype.register = function (router) {
+		router.registerApp({
+			id: "no-id",
+			instantiate: function () { },
+			controls: null
+		});
+	};
+
 	return {
 		State: State,
 		App: StateApp

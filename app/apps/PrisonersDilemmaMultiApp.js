@@ -35,6 +35,14 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 		}, this.options.config);
 		this.initialize();
 	};
+	// description for use in router
+	PrisonersDilemmaMultiApp.app = {
+		instantiate: function (router) {
+			return new PrisonersDilemmaMultiApp({ participants: router.participants });
+		},
+		configView: PrisonersDilemmaMulti.Views.Configure,
+		title: "Multiround Prisoner's Dilemma"
+	};
 
 	PrisonersDilemmaMultiApp.prototype = new StateApp.App();
 	_.extend(PrisonersDilemmaMultiApp.prototype, {

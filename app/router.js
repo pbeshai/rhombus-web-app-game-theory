@@ -14,20 +14,17 @@ define([
   "modules/Register",
   "modules/Attendance",
   "modules/Clicker",
-  "modules/PrisonersDilemma",
 
-  "apps/GridApp",
-  "apps/PrisonersDilemmaApp",
-  "apps/PrisonersDilemmaMultiApp",
-  "apps/NPrisonersDilemmaApp"
+  "apps/Apps",
 ],
 
 function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participant, Grid, Controls, Register, Attendance,
-  Clicker, PrisonersDilemma, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDilemmaApp) {
+  Clicker, Apps) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
+
       var participantServer = app.participantServer = new ParticipantServer.Model();
       var appController = app.appController = new AppController.Model();
 
@@ -95,6 +92,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
         }
       });
     },
+    apps: Apps,
 
     routes: {
       "": "index",
@@ -172,27 +170,13 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: apps/"+name+"]");
       this.reset();
 
-      var activeApp;
-      switch (name) {
-        case "grid":
-          activeApp = new GridApp({ participants: this.participants });
-          break;
-
-        case "pd":
-          activeApp = new PrisonersDilemmaApp({ participants: this.participants });
-          break;
-
-        case "pdm":
-          activeApp = new PrisonersDilemmaMultiApp({ participants: this.participants });
-          break;
-
-        case "npd":
-          activeApp = new NPrisonersDilemmaApp({ participants: this.participants });
-          break;
-      }
+      var activeApp = this.apps[name];
 
       if (activeApp) {
-        app.appController.set("activeApp", activeApp);
+        app.setTitle(activeApp.title);
+        app.appController.set("activeApp", activeApp.instantiate(this));
+      } else {
+        console.log("no app found matching " + name);
       }
     },
 
@@ -200,11 +184,11 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       console.log("[router: apps/"+name+"/controls]");
       this.reset();
       var configView, title;
-      switch (name) {
-        case "pd":
-          configView = PrisonersDilemma.Views.Configure;
-          title = "Prisoner's Dilemma Controls";
-          break;
+
+      var activeApp = this.apps[name];
+      if (activeApp) {
+        configView = activeApp.configView
+        title = activeApp.title + " Controls";
       }
 
       app.setTitle(title);
