@@ -11,11 +11,8 @@ define([
   "modules/Participant",
 
   "apps/StateApp",
-
-  "util/d3/variableWidthBarChart",
-  "util/d3/xLine"
 ],
-function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xLine) {
+function(app, PrisonersDilemma, Participant, StateApp) {
 
   var PrisonersDilemmaMulti = app.module();
   PrisonersDilemmaMulti.Views.Play = {};
@@ -60,8 +57,6 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
       this.listenTo(this.collection, {
         "reset": this.render
       });
-
-      app.setTitle("Prisoners Dilemma Multiround");
     },
   });
 
@@ -158,7 +153,6 @@ function(app, PrisonersDilemma, Participant, StateApp, variableWidthBarChart, xL
     },
 
     logResults: function (models) {
-      console.log(models);
       var results = models.map(function (model) {
         return {
           alias: model.get("alias"),

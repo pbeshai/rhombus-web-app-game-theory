@@ -408,7 +408,6 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     },
 
     initialize: function () {
-
     }
   });
 
@@ -484,6 +483,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     },
 
     beforeRender: function () {
+      console.log(this.input);
       // create PD Participants from these Participant Models
       var pdParticipants = this.input.map(function (participant) {
         return new PrisonersDilemma.Model({ alias: participant.get("alias") });

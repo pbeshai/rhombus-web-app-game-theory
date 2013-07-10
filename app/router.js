@@ -18,11 +18,12 @@ define([
 
   "apps/GridApp",
   "apps/PrisonersDilemmaApp",
-  "apps/PrisonersDilemmaMultiApp"
+  "apps/PrisonersDilemmaMultiApp",
+  "apps/NPrisonersDilemmaApp"
 ],
 
 function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participant, Grid, Controls, Register, Attendance,
-  Clicker, PrisonersDilemma, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp) {
+  Clicker, PrisonersDilemma, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDilemmaApp) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
@@ -183,6 +184,10 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
 
         case "pdm":
           activeApp = new PrisonersDilemmaMultiApp({ participants: this.participants });
+          break;
+
+        case "npd":
+          activeApp = new NPrisonersDilemmaApp({ participants: this.participants });
           break;
       }
 
