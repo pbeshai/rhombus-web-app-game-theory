@@ -86,6 +86,9 @@ function(app, Clicker) {
 
     afterRender: function () {
       enableChoicesButton(this.$(".enable-choices-button"), app.participantServer);
+      if (this.options.appConfigView == null) {
+        this.$(".configure").hide();
+      }
     },
 
     nextState: function () {
