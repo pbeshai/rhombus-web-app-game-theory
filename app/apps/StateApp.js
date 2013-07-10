@@ -135,7 +135,8 @@ function(app) {
 		}
 	};
 	StateApp.prototype.configure = function (config) {
-		// don't just set = to config in case states are referencing the existing object.
+		// don't just set = to config in case states are referencing the existing object,
+		// and in the event the full config isn't being overwritten
 		this.config = _.extend(this.config, config);
 		this.handleConfigure();
 	};

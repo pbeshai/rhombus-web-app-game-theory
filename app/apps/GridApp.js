@@ -23,6 +23,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		this.options = options;
 		this.initialize();
 	};
+	// description for use in router
 	GridApp.app = {
 		instantiate: function (router) {
 			return new GridApp({ participants: router.participants });
@@ -30,6 +31,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		configView: undefined,
 		title: "Grid App"
 	}
+
 	GridApp.prototype = new StateApp.App();
 	_.extend(GridApp.prototype, {
 		defineStates: function () {

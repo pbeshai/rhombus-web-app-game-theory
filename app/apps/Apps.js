@@ -1,5 +1,5 @@
 /**
-	collection of all apps
+	collection of all apps. Used by the router.
 */
 define([
 	"apps/GridApp",

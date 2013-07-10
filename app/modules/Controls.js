@@ -134,13 +134,7 @@ function(app, Clicker) {
     },
 
     initialize: function () {
-      var modelOptions = {};
-
-      // read defaults specified by the app view if available
-      if (this.options.appConfigView) {
-        modelOptions = _.extend(modelOptions, this.options.appConfigView.prototype.modelOptions);
-      }
-      this.model = new Controls.ConfigurationModel(modelOptions);
+      this.model = new Controls.ConfigurationModel();
     }
   });
 

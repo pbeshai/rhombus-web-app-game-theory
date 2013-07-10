@@ -64,30 +64,40 @@ function(app, PrisonersDilemma, Participant, StateApp) {
   PrisonersDilemmaMulti.Views.Configure = Backbone.View.extend({
     template: "pdm/configure",
     modelOptions: {
-      scoringMatrix: {
-        CC: 3,
-        CD: 0,
-        DC: 5,
-        DD: 1
-      }
+      minRounds: 2,
+      maxRounds: 5
     },
 
     events: {
-      "change .pay-off-matrix input": "updateMatrix",
-    },
-
-    updateMatrix: function (evt) {
-      // I guess ideally we would use a model for the scoring matrix to handle the lack of change notification
-      // and ugly setting with a .get... but seems like too much hassle.
-      this.model.get("scoringMatrix")[$(evt.target).data("quadrant")] = parseFloat(evt.target.value);
-      this.model.trigger("change");
+      "change .min-rounds" : "updateMinRounds",
+      "change .max-rounds" : "updateMaxRounds"
     },
 
     serialize: function () {
       return {
-        scoringMatrix: this.model.get("scoringMatrix"),
+        minRounds: this.model.get("minRounds"),
+        maxRounds: this.model.get("maxRounds")
       }
     },
+
+    updateMinRounds: function (evt) {
+      var minRounds = parseInt(this.$(".min-rounds").val());
+      this.model.set("minRounds", minRounds)
+    },
+
+    updateMaxRounds: function (evt) {
+      var maxRounds = parseInt(this.$(".max-rounds").val());
+      this.model.set("maxRounds", maxRounds)
+    },
+
+    beforeRender: function () {
+      this.setView(".pd-configure", new PrisonersDilemma.Views.Configure({ model: this.model }));
+    },
+
+    initialize: function () {
+      // use defaults so we don't overwrite if already there
+      _.defaults(this.model.attributes, this.modelOptions);
+    }
   });
 
   // To be used in StateApps

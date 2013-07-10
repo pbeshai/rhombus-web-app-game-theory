@@ -464,6 +464,11 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
         scoringMatrix: this.model.get("scoringMatrix"),
       }
     },
+
+    initialize: function () {
+      // use defaults so we don't overwrite if already there
+      _.defaults(this.model.attributes, this.modelOptions);
+    }
   });
 
   // To be used in StateApps
