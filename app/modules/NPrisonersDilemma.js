@@ -56,6 +56,41 @@ function(app, PrisonersDilemma, Participant, StateApp) {
   });
 
 
+
+
+  NPrisonersDilemma.Views.Configure = Backbone.View.extend({
+    template: "npd/configure",
+    modelOptions: {
+      Rratio: .10,
+      H: 10
+    },
+
+    events: {
+      "change #r-ratio-input": "updateRratio",
+      "change #h-input": "updateH"
+    },
+
+    updateRratio: function (evt) {
+      this.model.set("Rratio", $(evt.target).val());
+    },
+
+    updateH: function(evt) {
+      this.model.set("H", $(evt.target).val());
+    },
+
+    serialize: function () {
+      return {
+        Rratio: this.model.get("Rratio"),
+        H: this.model.get("H")
+      }
+    },
+
+    initialize: function () {
+      // use defaults so we don't overwrite if already there
+      _.defaults(this.model.attributes, this.modelOptions);
+    }
+  });
+
   // To be used in StateApps
   NPrisonersDilemma.States = {};
   NPrisonersDilemma.States.Play = function (options) {
@@ -114,18 +149,17 @@ function(app, PrisonersDilemma, Participant, StateApp) {
 
     assignScores: function (models) {
       // See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
-
-      var R = this.config.payoff.Rratio*models.length; // 0 < R < N-1, closer to 1 means more incentive for cooperation
-      var H = this.config.payoff.H; // score increment when gaining 1 more cooperator
+      var R = this.config.Rratio*(models.length - 1); // 0 < R < N-1, closer to 1 means more incentive for cooperation
+      var H = this.config.H; // score increment when gaining 1 more cooperator
       var I = R*H;
       var groups = this.participants.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
       var numCooperators = (groups.cooperate === undefined) ? 0 : groups.cooperate.length;
       var numDefectors = (groups.defect === undefined) ? 0 : groups.defect.length;
 
-      var cooperatorPayoff = numCooperators * H;
-      var defectorPayoff = (numCooperators + 1) * H + I;
+      var cooperatorPayoff = Math.round(numCooperators * H);
+      var defectorPayoff = Math.round((numCooperators + 1) * H + I);
       var totalPayoff = cooperatorPayoff * numCooperators + defectorPayoff * numDefectors;
-      var maxPayoff = (models.length * H) * models.length; // everyone cooperates
+      var maxPayoff = Math.round((models.length * H) * models.length); // everyone cooperates
 
       models.each(function (model) {
         var choice = model.get("choice");

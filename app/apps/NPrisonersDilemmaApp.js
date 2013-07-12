@@ -24,11 +24,9 @@ function(app, StateApp, Participant, Attendance, NPrisonersDilemma) {
 	var NPrisonersDilemmaApp = function (options) {
 		this.options = options || {};
 		this.config = _.extend({
-			payoff: {
-				// See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
-				Rratio: .10, // Rratio = R*(n-1). 0 < R < n-1, closer to 1 means more incentive for cooperation
-				H: 10 // score increment when gaining 1 more cooperator
-			}
+			// See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
+			Rratio: .10, // Rratio = R*(n-1). 0 < R < n-1, closer to 1 means more incentive for cooperation
+			H: 10 // score increment when gaining 1 more cooperator
 		}, this.options.config);
 		this.initialize();
 	};
