@@ -29,8 +29,8 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
         DC: 5,
         DD: 1
       },
-      minRounds: 2,
-      maxRounds: 5,
+      minRounds: 4,
+      maxRounds: 8,
       gameOver: false, // set to false when the game is over
 		}, this.options.config);
 		this.initialize();
@@ -74,7 +74,6 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 
 		initialize: function () {
 			StateApp.App.prototype.initialize.call(this);
-			console.log("pdm app initialize");
 		},
 
 		handleConfigure: function () {
@@ -86,6 +85,11 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 
 		transitions: {
 	  		attendance_play: function (output) {
+	  			if (output.length === 0) {
+	  				this.options.participants.fetch();
+	  				throw "Playing requires at least one participant.";
+	  			}
+
 	  			// take output from attendance and use it in grid
 
 					// create PD Participants from these Participant Models
@@ -112,6 +116,7 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 
 					this.round = 1;
 					this.config.gameOver = false;
+					this.config.newRound = true;
 
 		      return participants;
 	  		},
@@ -121,7 +126,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 	  		},
 
 	  		play_results: function () {
-
+	  			if (this.config.numRounds === this.round) { // if we've reached the final round
+	  				this.config.gameOver = true;
+	  			}
 	  		},
 
 	  		results_play: function (output) {
@@ -130,11 +137,17 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 	  				if (participant.bot) {
 	  					participant.delayedPlay();
 	  				}
+  					var roundsLeft = Math.max(0, participant.get("roundsLeft") - 1);
+		        participant.set("roundsLeft", roundsLeft);
+		        if (roundsLeft === 0) {
+		          participant.set("complete", true);
+		        }
 	  			});
 	  			if (this.config.numRounds > this.round) {
 	  				this.round += 1;
+	  				this.config.newRound = true;
 	  			} else {
-	  				this.config.gameOver = true;
+	  				this.config.newRound = false;
 	  			}
 	  		}
 		}

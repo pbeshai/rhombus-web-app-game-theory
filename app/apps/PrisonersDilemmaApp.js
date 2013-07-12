@@ -71,7 +71,6 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 
 		initialize: function () {
 			StateApp.App.prototype.initialize.call(this);
-			console.log("pd app initialize");
 		},
 
 		handleConfigure: function () {
@@ -84,17 +83,13 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 		transitions: {
 	  		attendance_play: function () {
 	  			// take output from attendance and use it in grid
-					console.log("going from attendance to play");
-
 	  		},
 
 	  		play_attendance: function () {
-				  console.log("going from play to attendance");
 				  this.options.participants.fetch(); // reset the participants that attendance uses
 	  		},
 
 	  		play_results: function () {
-	  			console.log("going from play to results");
 	  		}
 		}
 	});

@@ -67,14 +67,26 @@ function(app) {
 
 	// go to the next state
 	State.prototype.next = function () {
+		if (!this.validateNext()) {
+			return false;
+		}
+
 		if (this.flow.next) {
 			this.flow.next.enter(this.getOutput());
 		}
 		return this.flow.next;
 	};
 
+	State.prototype.validateNext = function () { return true; }
+	State.prototype.validatePrev = function () { return true; }
+
 	// go to the previous state
 	State.prototype.prev = function () {
+		if (!this.validatePrev()) {
+			return false;
+		}
+
+
 		if (this.flow.prev) {
 			this.flow.prev.enter();
 		}
@@ -147,10 +159,15 @@ function(app) {
 		var output = this.currentState.getOutput();
 		var transitionFunc = this.transitions[this.currentState.name + "_" + destinationState];
 		if (transitionFunc) {
-			// allow updating the output via returning a value from a transition function
-			var result = transitionFunc.apply(this, [output]);
-			if (result !== undefined) {
-				output = result;
+			try {
+				// allow updating the output via returning a value from a transition function
+				var result = transitionFunc.apply(this, [output]);
+				if (result !== undefined) {
+					output = result;
+				}
+			} catch (e) {
+				console.log("error transitioning " + e);
+				return;
 			}
 		}
 		this.currentState = this.states[destinationState];

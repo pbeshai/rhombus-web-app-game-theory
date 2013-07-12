@@ -64,8 +64,8 @@ function(app, PrisonersDilemma, Participant, StateApp) {
   PrisonersDilemmaMulti.Views.Configure = Backbone.View.extend({
     template: "pdm/configure",
     modelOptions: {
-      minRounds: 2,
-      maxRounds: 5
+      minRounds: 4,
+      maxRounds: 8
     },
 
     events: {
@@ -100,6 +100,16 @@ function(app, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
+  PrisonersDilemmaMulti.Views.Results.Layout = PrisonersDilemma.Views.Results.Layout.extend({
+    template: "pdm/results/results",
+    serialize: function () {
+      return _.extend(PrisonersDilemma.Views.Results.Layout.prototype.serialize.call(this), {
+        round: this.options.round,
+        gameOver: this.options.gameOver
+      });
+    }
+  })
+
   // To be used in StateApps
   PrisonersDilemmaMulti.States = {};
   PrisonersDilemmaMulti.States.Play = function (options) {
@@ -131,11 +141,6 @@ function(app, PrisonersDilemma, Participant, StateApp) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
-        var roundsLeft = Math.max(0, participant.get("roundsLeft") - 1);
-        participant.set("roundsLeft", roundsLeft);
-        if (roundsLeft === 0) {
-          participant.set("complete", true);
-        }
       }, this);
 
       return this.participants;
@@ -146,7 +151,7 @@ function(app, PrisonersDilemma, Participant, StateApp) {
     this.options = _.defaults({}, options);
     this.initialize();
   }
-  PrisonersDilemmaMulti.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Layout);
+  PrisonersDilemmaMulti.States.Results.prototype = new StateApp.State(PrisonersDilemmaMulti.Views.Results.Layout);
   _.extend(PrisonersDilemmaMulti.States.Results.prototype, {
     initialize: function () {
       this.config = this.options.config;
@@ -171,18 +176,17 @@ function(app, PrisonersDilemma, Participant, StateApp) {
           if (roundData === undefined) {
             history.push(data);
           }
-
         }
       }, this);
     },
 
     beforeRender: function () {
+      // this.input is a PrisonersDilemma.Collection
       this.participants = this.input;
 
-      // this.input is a PrisonersDilemma.Collection
-      this.options.viewOptions = { collection: this.participants };
+      this.options.viewOptions = { collection: this.participants, round: this.stateApp.round, gameOver: this.config.gameOver };
 
-      if (!this.config.gameOver) {
+      if (this.config.newRound) { // is this a new round that needs to have score calculated? (false if game over and accidentally reshowing results)
         // calculate the scores
         this.assignScores(this.participants);
 

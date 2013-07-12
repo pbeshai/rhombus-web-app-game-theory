@@ -33,7 +33,6 @@ function(app) {
     },
 
     initialize: function () {
-      console.log("init zoom model");
       this.set("level", this.startLevel);
     }
   });
