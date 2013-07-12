@@ -181,7 +181,6 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       this.listenTo(this.collection, {
   			"reset": this.render
   		});
-      app.setTitle("Prisoners Dilemma");
   	},
   });
 
@@ -432,7 +431,6 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       this.listenTo(this.collection, {
         "reset": this.render
       });
-      app.setTitle("Prisoners Dilemma: Results");
     }
   });
 
