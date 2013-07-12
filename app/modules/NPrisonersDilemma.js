@@ -115,10 +115,7 @@ function(app, PrisonersDilemma, Participant, StateApp) {
     assignScores: function (models) {
       // See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
 
-      var R = this.config.payoff.R; // 0 < R < N-1, closer to 1 means more incentive for cooperation
-      if (_.isFunction(R)) { // R can be a value or a function R(n)
-        R = R(models.length);
-      }
+      var R = this.config.payoff.Rratio*models.length; // 0 < R < N-1, closer to 1 means more incentive for cooperation
       var H = this.config.payoff.H; // score increment when gaining 1 more cooperator
       var I = R*H;
       var groups = this.participants.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
@@ -141,7 +138,9 @@ function(app, PrisonersDilemma, Participant, StateApp) {
 
       return {
         cooperatorPayoff: cooperatorPayoff,
+        numCooperators: numCooperators,
         defectorPayoff: defectorPayoff,
+        numDefectors: numDefectors,
         totalPayoff: totalPayoff,
         maxPayoff: maxPayoff
       }
@@ -157,10 +156,10 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       this.options.viewOptions = { collection: this.participants, payoff: payoff };
 
       // TODO: log results
-      // this.logResults(this.participants);
+      this.logResults(this.participants, payoff);
     },
 
-    logResults: function (models) {
+    logResults: function (models, payoff) {
       var results = models.map(function (model) {
         return {
           alias: model.get("alias"),
@@ -171,6 +170,7 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       console.log("NPD RESULTS = ", results);
       var logData = {
         results: results,
+        payoff: payoff,
         config: this.config,
         version: this.stateApp.version
       };
