@@ -52,8 +52,14 @@ function(app) {
 		this.render();
 	};
 
+	// called at the start of _render, and renderView (to be overridden by subclasses)
+	State.prototype.setViewOptions = function () {
+		/* this.options.viewOptions = { } */
+	}
+
 	State.prototype.render = function () {
 		this.beforeRender();
+		this.setViewOptions();
 		this._render();
 		this.afterRender();
 	};
@@ -64,6 +70,18 @@ function(app) {
 		app.layout.setView("#main-content", this.viewInstance);
 		app.layout.render();
 	};
+
+	State.prototype.renderView = function () {
+		if (this.viewInstance) {
+			// update options
+			this.setViewOptions();
+			_.extend(this.viewInstance.options, this.options.viewOptions);
+			console.log("VIEW OPTIONS", this.viewInstance.options, this.options.viewOptions);
+			this.viewInstance.render();
+		} else {
+			throw "render view with no view instance";
+		}
+	},
 
 	// go to the next state
 	State.prototype.next = function () {

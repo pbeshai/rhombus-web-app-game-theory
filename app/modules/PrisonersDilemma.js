@@ -95,8 +95,9 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     model: PrisonersDilemma.Model,
 
     initialize: function (models, options) {
-      options = options || {};
-      options.validateOnChoice = true;
+      options = _.defaults(options || {}, {
+        validateOnChoice: true
+      });
       Participant.Collection.prototype.initialize.apply(this, [models, options]);
       this.on("reset", this.pairModels);
       this.pairModels(models);
@@ -124,8 +125,6 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
           console.log("uneven number of models, one model with no partner: " + models[indices[indices.length-1]].get("alias"));
         }
       }
-
-      console.log("pairing models", models, indices);
     },
   })
 
@@ -469,6 +468,24 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     }
   });
 
+  PrisonersDilemma.Util = {};
+  PrisonersDilemma.Util.convertModels = function (participantCollection) {
+      var pdParticipants = participantCollection.map(function (participant) {
+        return new PrisonersDilemma.Model({ alias: participant.get("alias") });
+      });
+      // ensure we have even number of participants by adding a bot
+      if (pdParticipants.length % 2 === 1) {
+        pdParticipants.push(new PrisonersDilemma.Bot());
+      }
+
+      return pdParticipants;
+  };
+
+  // converts a Participant.Collection to a PrisonersDilemma.Collection
+  PrisonersDilemma.Util.makeCollection = function (participantCollection) {
+      return new PrisonersDilemma.Collection(PrisonersDilemma.Util.convertModels(participantCollection));
+  };
+
   // To be used in StateApps
   PrisonersDilemma.States = {};
   PrisonersDilemma.States.Play = function (options) {
@@ -486,17 +503,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     },
 
     beforeRender: function () {
-      console.log(this.input);
-      // create PD Participants from these Participant Models
-      var pdParticipants = this.input.map(function (participant) {
-        return new PrisonersDilemma.Model({ alias: participant.get("alias") });
-      });
-      // ensure we have even number of participants by adding a bot
-      if (pdParticipants.length % 2 === 1) {
-        pdParticipants.push(new PrisonersDilemma.Bot());
-      }
-
-      this.participants = new PrisonersDilemma.Collection(pdParticipants);
+      this.participants = PrisonersDilemma.Util.makeCollection(this.input);
 
       this.options.viewOptions = { collection: this.participants };
     },

@@ -189,7 +189,7 @@ function(app, PrisonersDilemma, Participant, StateApp) {
 
       this.options.viewOptions = { collection: this.participants, payoff: payoff };
 
-      // TODO: log results
+      // log results
       this.logResults(this.participants, payoff);
     },
 

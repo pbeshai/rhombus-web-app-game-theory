@@ -25,6 +25,7 @@ function(app) {
   Participant.Collection = Backbone.Collection.extend({
     url: "/api/participants",
   	model: Participant.Model,
+    comparator: "alias",
     aliasMap: {},
     defaults: {
       acceptNew: false // if true, users when data is received for users not in the collection, they are added
