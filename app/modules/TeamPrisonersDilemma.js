@@ -237,8 +237,8 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       // calculate the scores
       this.assignScores(this.teamsModel);
 
-      // TODO: log results
-      //this.logResults(this.teamsModel);
+      // log results
+      this.logResults(this.teamsModel);
     },
 
     setViewOptions: function () {
@@ -249,17 +249,28 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       };
     },
 
-    logResults: function (models, payoff) {
-      var results = models.map(function (model) {
+    logResults: function (teamsModel) {
+      var modelTransform = function (model) {
         return {
           alias: model.get("alias"),
           choice: model.get("choice"),
           score: model.get("score"),
+          partner: {
+            alias: model.get("partner").get("alias"),
+            choice: model.get("partner").get("choice"),
+            score: model.get("partner").get("score"),
+          },
         };
-      });
-      console.log("TEAM PD RESULTS = ", results);
+      };
+
+      var team1Results = teamsModel.get("team1").map(modelTransform);
+      var team2Results = teamsModel.get("team2").map(modelTransform);
+      console.log("TEAM PD RESULTS (team1,team2) = ", team1Results, team2Results);
       var logData = {
-        results: results,
+        results: {
+          team1: team1Results,
+          team2: team2Results
+        },
         config: this.config,
         version: this.stateApp.version
       };
