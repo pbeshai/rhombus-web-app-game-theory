@@ -108,8 +108,10 @@ function(app, PrisonersDilemma, Participant, StateApp) {
 
     beforeRender: function () {
       this.setViews({
-        ".results-participants .team1-inner": new PrisonersDilemma.Views.Results.Participants({ collection: this.model.get("team1") }),
-        ".results-participants .team2-inner": new PrisonersDilemma.Views.Results.Participants({ collection: this.model.get("team2") }),
+        ".results-participants .team1 .team-grid": new PrisonersDilemma.Views.Results.Participants({ collection: this.model.get("team1") }),
+        ".results-participants .team1 .team-stats": new TeamPrisonersDilemma.Views.Results.TeamStats({ collection: this.model.get("team1") }),
+        ".results-participants .team2 .team-grid": new PrisonersDilemma.Views.Results.Participants({ collection: this.model.get("team2") }),
+        ".results-participants .team2 .team-stats": new TeamPrisonersDilemma.Views.Results.TeamStats({ collection: this.model.get("team2") }),
         ".results-stats": new PrisonersDilemma.Views.Results.Stats({ collection: this.model.get("participants") })
       });
     },
@@ -118,6 +120,15 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       this.listenTo(this.model.get("participants"), "reset", this.render);
     }
   });
+
+  TeamPrisonersDilemma.Views.Results.TeamStats = PrisonersDilemma.Views.Results.Stats.extend({
+    template: "teampd/results/team_stats",
+    afterRender: function () { }, // do not render graphs
+    serialize: function () {
+      var stats = PrisonersDilemma.Views.Results.Stats.prototype.serialize.call(this);
+      return stats[0];
+    }
+  })
 
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "teampd/configure",
