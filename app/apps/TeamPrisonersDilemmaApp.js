@@ -1,8 +1,8 @@
 /**
 
-Prisoner's Dilemma:
+Team Prisoner's Dilemma:
 
-Attendance -> Prisoner's Dilemma Play -> Prisoner's Dilemam Results
+Attendance -> Team Prisoner's Dilemma Play -> Team Prisoner's Dilemam Results
 
 */
 define([
@@ -19,7 +19,7 @@ define([
 function(app, StateApp, Participant, Attendance, TeamPrisonersDilemma) {
 
 	/**
-	 *  Prisoner's Dilemma App
+	 *  Team Prisoner's Dilemma App
 	 */
 	var TeamPrisonersDilemmaApp = function (options) {
 		this.options = options || {};
