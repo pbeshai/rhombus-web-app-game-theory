@@ -15,6 +15,21 @@ function(app) {
   Participant.Model = Backbone.Model.extend({
     urlRoot: "/api/participants",
 
+    defaults: {
+      "played": false,
+      "complete": false
+    },
+    initialize: function () {
+      // assumes choice is set with validate:true option
+      this.on("change:choice", function (model, choice) {
+        this.set("played", choice != null);
+
+        if (this.get("complete")) { // only update choice if it isn't complete.
+          this.attributes.choice = this.previous("choice");
+        }
+      });
+    },
+
     validate: function (attrs, options) {
       if (_.isEmpty(attrs.alias)) {
         return "cannot have empty alias"

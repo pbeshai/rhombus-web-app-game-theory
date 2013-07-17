@@ -61,6 +61,36 @@ function (app, Participant, Grid) {
     },
   });
 
+  Common.Views.ParticipantHiddenPlay = Backbone.View.extend({
+    template: "common/participant_hidden_play",
+    className: "participant",
+    playedClass: "played",
+
+
+    serialize: function () {
+      return { model: this.model };
+    },
+
+    beforeRender: function () {
+      var played = this.model.get("played");
+      if (played) {
+        this.$el.addClass(this.playedClass);
+      }
+    },
+
+    afterRender: function () {
+      var played = this.model.get("played"), complete = this.model.get("complete");
+      if (played && !complete) {
+        this.$(".medium-text").hide().delay(200).fadeIn(400);
+      }
+    },
+
+    initialize: function () {
+      this.listenTo(this.model, "change", this.render);
+    }
+  });
+
+
   Common.Views.ParticipantGrid = Backbone.View.extend({
     className: "participant-grid",
     defaults: {
@@ -112,7 +142,11 @@ function (app, Participant, Grid) {
         };
         // only specify ParticipantView if it is set.
         if (this.options.ParticipantView != null) {
-          viewOptions.ParticipantView = this.options.ParticipantView;
+          if (_.isFunction(this.options.ParticipantView)) {
+            viewOptions.ParticipantView = this.options.ParticipantView;
+          } else if (this.options.ParticipantView["group" + groupNum] != null) {
+            viewOptions.ParticipantView = this.options.ParticipantView["group" + groupNum];
+          }
         }
         this.insertView(".group" + groupNum + " .group-participants", new this.options.ParticipantsView(viewOptions));
 
