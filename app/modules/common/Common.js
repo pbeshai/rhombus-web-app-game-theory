@@ -114,7 +114,6 @@ function (app, Participant, Grid) {
     overrides: { },
 
     serialize: function () {
-      console.log(this.model, this.options.messageAttribute);
       return {
         model: this.model,
         message: this.model.get(this.options.messageAttribute)

@@ -142,7 +142,6 @@ function(app, Common, Participant, StateApp, Graphs) {
         }
 
         participant.get("partner").set("offer", this.config.offerMap[participant.get("choice")]);
-        console.log(participant.get("partner"));
         participant.set("complete", true);
       }, this);
 
