@@ -18,21 +18,48 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   var UltimatumGame = app.module();
 
-  UltimatumGame.Views.Play = {};
+  UltimatumGame.Views.GiverPlay = {};
 
-  UltimatumGame.Views.Play.Giver = Common.Views.ParticipantHiddenPlay.extend({
+  UltimatumGame.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
     className: "participant giver"
   });
 
-  UltimatumGame.Views.Play.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGame.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
+    className: "participant giver",
     overrides: {
-      header: "Play",
+      locked: true
+    }
+  });
+
+  UltimatumGame.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
+    overrides: {
+      header: "Giver Play",
+      inactive: {
+        group2: true
+      },
+
       ParticipantView: {
-        group1: UltimatumGame.Views.Play.Giver,
-        group2: null
+        group1: UltimatumGame.Views.GiverPlay.Giver,
+        group2: UltimatumGame.Views.GiverPlay.Receiver
       }
     }
   });
+
+  UltimatumGame.Views.ReceiverPlay = {};
+  UltimatumGame.Views.ReceiverPlay.Layout = Common.Views.GroupLayout.extend({
+    overrides: {
+      header: "Receiver Play",
+      inactive: {
+        group1: true
+      },
+
+      ParticipantView: {
+        group1: UltimatumGame.Views.GiverPlay.Receiver, //TODO
+        group2: UltimatumGame.Views.GiverPlay.Giver
+      }
+    }
+  });
+
 
 
   UltimatumGame.Views.Results = {};
@@ -44,13 +71,13 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   // To be used in StateApps
   UltimatumGame.States = {};
-  UltimatumGame.States.Play = function (options) {
+  UltimatumGame.States.GiverPlay = function (options) {
     this.options = _.defaults({}, options, this.defaults);
 
     this.initialize();
   }
-  UltimatumGame.States.Play.prototype = new StateApp.State(UltimatumGame.Views.Play.Layout);
-  _.extend(UltimatumGame.States.Play.prototype, {
+  UltimatumGame.States.GiverPlay.prototype = new StateApp.State(UltimatumGame.Views.GiverPlay.Layout);
+  _.extend(UltimatumGame.States.GiverPlay.prototype, {
     defaults: {
       defaultChoice: "A" // choice made when a player does not play
     },
@@ -60,14 +87,27 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
 
     beforeRender: function () {
-      // reset played and choices
-      this.input.each(function (participant) {
-        participant.unset("choice");
-        participant.unset("played");
-        participant.unset("complete");
-      });
+      // could receive input as participant collection or as a group model (if returning from receive play)
+      if (this.input instanceof Common.Models.GroupModel) {
+        this.groupModel = this.input;
 
-      this.groupModel = new Common.Models.GroupModel({ participants: this.input });
+        // reset played and choices
+        this.groupModel.get("participants").each(function (participant) {
+          participant.unset("complete");
+          participant.unset("played");
+          participant.unset("choice");
+        });
+      } else {
+        // reset played and choices
+        this.input.each(function (participant) {
+          participant.unset("complete");
+          participant.unset("played");
+          participant.unset("choice");
+
+        });
+
+        this.groupModel = new Common.Models.GroupModel({ participants: this.input });
+      }
 
       this.options.viewOptions = { model: this.groupModel };
     },
@@ -80,33 +120,47 @@ function(app, Common, Participant, StateApp, Graphs) {
       };
     },
 
-    // outputs a ?????????? TODO
+    // outputs a GroupModel
     getOutput: function () {
-      return;
       // if you haven't played, then you played "A".
-      this.participants.each(function (participant) {
+      this.groupModel.get("group1").each(function (participant) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
+        participant.set("complete", true);
       }, this);
 
-      return this.participants;
+      return this.groupModel;
     }
   });
-  UltimatumGame.States.Results = function (options) {
-    this.options = _.defaults({}, options);
+
+  UltimatumGame.States.ReceiverPlay = function (options) {
+    this.options = _.defaults({}, options, this.defaults);
+
     this.initialize();
   }
-  UltimatumGame.States.Results.prototype = new StateApp.State(UltimatumGame.Views.Results.Layout);
-  _.extend(UltimatumGame.States.Results.prototype, {
+  UltimatumGame.States.ReceiverPlay.prototype = new StateApp.State(UltimatumGame.Views.ReceiverPlay.Layout);
+  _.extend(UltimatumGame.States.ReceiverPlay.prototype, {
+    defaults: {
+      defaultChoice: "A" // choice made when a player does not play
+    },
+
     initialize: function () {
       this.config = this.options.config;
     },
-    beforeRender: function () {
-      // this.input is a ???????? TODO
-      this.options.viewOptions = { collection: this.input };
 
-      this.logResults(this.input);
+    // this.input is a groupModel
+    beforeRender: function () {
+      // reset played and choices
+      this.groupModel = this.input;
+
+      this.groupModel.get("group2").each(function (participant) {
+        participant.unset("complete");
+        participant.unset("played");
+        participant.unset("choice");
+      });
+
+      this.options.viewOptions = { model: this.groupModel };
     },
 
     setViewOptions: function () {
@@ -117,7 +171,46 @@ function(app, Common, Participant, StateApp, Graphs) {
       };
     },
 
-    logResults: function (models) {
+    // outputs a groupModel
+    getOutput: function () {
+      // if you haven't played, then you played "A".
+      this.groupModel.get("group2").each(function (participant) {
+        if (participant.get("choice") === undefined) {
+          participant.set("choice", this.options.defaultChoice);
+        }
+      }, this);
+
+      return this.groupModel;
+    }
+  });
+
+
+  UltimatumGame.States.Results = function (options) {
+    this.options = _.defaults({}, options);
+    this.initialize();
+  }
+  UltimatumGame.States.Results.prototype = new StateApp.State(UltimatumGame.Views.Results.Layout);
+  _.extend(UltimatumGame.States.Results.prototype, {
+    initialize: function () {
+      this.config = this.options.config;
+    },
+    beforeRender: function () {
+      // this.input is a GroupModel
+      this.groupModel = this.input;
+      this.options.viewOptions = { model: this.groupModel };
+
+      this.logResults(this.groupModel);
+    },
+
+    setViewOptions: function () {
+      this.options.viewOptions = {
+        model: this.groupModel,
+        group1Name: this.config.group1Name,
+        group2Name: this.config.group2Name
+      };
+    },
+
+    logResults: function (groupModel) {
       // TODO: log
 
       var logData = {

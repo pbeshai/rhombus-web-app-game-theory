@@ -65,7 +65,10 @@ function (app, Participant, Grid) {
     template: "common/participant_hidden_play",
     className: "participant",
     playedClass: "played",
-
+    defaults: {
+      locked: false
+    },
+    overrides: { },
 
     serialize: function () {
       return { model: this.model };
@@ -85,8 +88,15 @@ function (app, Participant, Grid) {
       }
     },
 
-    initialize: function () {
-      this.listenTo(this.model, "change", this.render);
+    safeRender: function () {
+      if (!this.options.locked) {
+        this.render();
+      }
+    },
+
+    initialize: function (options) {
+      this.options = _.defaults(options || {}, this.overrides, this.defaults);
+      this.listenTo(this.model, "change", this.safeRender);
     }
   });
 
@@ -96,6 +106,7 @@ function (app, Participant, Grid) {
     defaults: {
       ParticipantView: Grid.Views.Participant,
     },
+    overrides: { },
 
     beforeRender: function () {
       this.collection.each(function (participant) {
@@ -123,6 +134,7 @@ function (app, Participant, Grid) {
       PostParticipantsView: null,
       PreGroupsView: null,
       PostGroupsView: null,
+      inactive: {}
     },
     overrides: { }, // quick way for direct subclasses to override defaults
 
@@ -172,6 +184,15 @@ function (app, Participant, Grid) {
         this.insertView(".post-groups", new this.options.PostGroupsView({
           collection: this.model.get("participants")
         }));
+      }
+    },
+
+    afterRender: function () {
+      if (this.options.inactive.group1) {
+        this.$(".group1").addClass("inactive");
+      }
+      if (this.options.inactive.group2) {
+        this.$(".group2").addClass("inactive");
       }
     },
 

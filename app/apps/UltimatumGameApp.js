@@ -57,7 +57,11 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 				saveNew: false
 			});
 
-			var playState = new UltimatumGame.States.Play({
+			var giverPlayState = new UltimatumGame.States.GiverPlay({
+				config: this.config
+			});
+
+			var receiverPlayState = new UltimatumGame.States.ReceiverPlay({
 				config: this.config
 			});
 
@@ -67,12 +71,14 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 
 			this.states = {
 		  	"attendance": attendanceState,
-		  	"play": playState,
+		  	"giverPlay": giverPlayState,
+		  	"receiverPlay": receiverPlayState,
 		  	"results": resultsState
 	  	};
 
-			attendanceState.setNext(playState);
-			playState.setNext(resultsState);
+			attendanceState.setNext(giverPlayState);
+			giverPlayState.setNext(receiverPlayState);
+			receiverPlayState.setNext(resultsState);
 		},
 
 		initialize: function () {
@@ -89,15 +95,19 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 		},
 
 		transitions: {
-	  		attendance_play: function () {
+	  		attendance_giverPlay: function () {
 	  			// take output from attendance and use it in grid
 	  		},
 
-	  		play_attendance: function () {
+	  		giverPlay_attendance: function () {
 				  this.options.participants.fetch(); // reset the participants that attendance uses
 	  		},
 
-	  		play_results: function () {
+	  		giverPlay_receiverPlay: function () {
+
+	  		},
+
+	  		receiverPlay_results: function () {
 	  		}
 		}
 	});
