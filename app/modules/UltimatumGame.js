@@ -72,9 +72,10 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   UltimatumGame.Views.Results = {};
-  UltimatumGame.Views.Results.Layout = Backbone.View.extend({
+  UltimatumGame.Views.Results.Layout = Common.Views.GroupLayout.extend({
     overrides: {
-      header: "Results"
+      header: "Results",
+      //ParticipantsView: null TOOD
     }
   });
 
@@ -189,6 +190,7 @@ function(app, Common, Participant, StateApp, Graphs) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
+        participant.set("complete", true);
       }, this);
 
       return this.groupModel;
@@ -210,7 +212,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.groupModel = this.input;
       this.options.viewOptions = { model: this.groupModel };
 
-      this.logResults(this.groupModel);
+      // TODO log
+      //this.logResults(this.groupModel);
     },
 
     setViewOptions: function () {
