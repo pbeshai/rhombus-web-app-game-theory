@@ -24,8 +24,8 @@ function(app, StateApp, Participant, Attendance, TeamPrisonersDilemma) {
 	var TeamPrisonersDilemmaApp = function (options) {
 		this.options = options || {};
 		this.config = _.extend({
-			team1Name: "Team 1",
-			team2Name: "Team 2",
+			group1Name: "Team 1",
+			group2Name: "Team 2",
 			scoringMatrix: {
         CC: 3,
         CD: 0,

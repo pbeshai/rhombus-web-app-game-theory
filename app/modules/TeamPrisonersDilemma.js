@@ -19,9 +19,13 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   TeamPrisonersDilemma.Views.Results = {};
   TeamPrisonersDilemma.Views.Play = {};
 
-  TeamPrisonersDilemma.TeamsModel = Common.Models.GroupModel.extend({});
   TeamPrisonersDilemma.Collection = PrisonersDilemma.Collection.extend({
     pairModels: function () { }
+  });
+
+
+  TeamPrisonersDilemma.TeamsModel = Common.Models.GroupModel.extend({
+    GroupCollection: TeamPrisonersDilemma.Collection
   });
 
   TeamPrisonersDilemma.Views.Play.Layout = Common.Views.GroupLayout.extend({
