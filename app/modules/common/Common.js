@@ -149,6 +149,51 @@ function (app, Participant, Grid) {
     },
   });
 
+  Common.Views.GroupConfigure = Backbone.View.extend({
+    template: "common/group_configure",
+    modelOptions: {
+      group1Name: "Group 1",
+      group2Name: "Group 2"
+    },
+    defaults: {
+      nameHeader: "Group Names",
+      group1Label: "Group 1",
+      group2Label: "Group 2"
+    },
+
+    events: {
+      "change #group1-name-input" : "updateGroup1Name",
+      "change #group2-name-input" : "updateGroup2Name"
+    },
+
+    serialize: function () {
+      return {
+        nameHeader: this.options.nameHeader,
+        group1Label: this.options.group1Label,
+        group2Label: this.options.group2Label,
+        group1Name: this.model.get("group1Name"),
+        group2Name: this.model.get("group2Name")
+      }
+    },
+
+    updateGroup1Name: function (evt) {
+      var group1Name = this.$("#group1-name-input").val();
+      this.model.set("group1Name", group1Name);
+    },
+
+    updateGroup2Name: function (evt) {
+      var group2Name = this.$("#group2-name-input").val();
+      this.model.set("group2Name", group2Name);
+    },
+
+    initialize: function (options) {
+      this.options = _.defaults({}, options, this.overrides, this.defaults);
+
+      // use defaults so we don't overwrite if already there
+      _.defaults(this.model.attributes, this.modelOptions);
+    }
+  });
+
 
   return Common;
 })

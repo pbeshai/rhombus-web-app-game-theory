@@ -49,43 +49,17 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     },
   });
 
-
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "teampd/configure",
-    modelOptions: {
-      team1Name: "Team 1",
-      team2Name: "Team 2"
-    },
-
-    events: {
-      "change #team1-name-input" : "updateTeam1Name",
-      "change #team2-name-input" : "updateTeam2Name"
-    },
-
-    serialize: function () {
-      return {
-        team1Name: this.model.get("team1Name"),
-        team2Name: this.model.get("team2Name")
-      }
-    },
-
-    updateTeam1Name: function (evt) {
-      var team1Name = this.$("#team1-name-input").val();
-      this.model.set("team1Name", team1Name);
-    },
-
-    updateTeam2Name: function (evt) {
-      var team2Name = this.$("#team2-name-input").val();
-      this.model.set("team2Name", team2Name);
-    },
 
     beforeRender: function () {
       this.setView(".pd-configure", new PrisonersDilemma.Views.Configure({ model: this.model }));
-    },
-
-    initialize: function () {
-      // use defaults so we don't overwrite if already there
-      _.defaults(this.model.attributes, this.modelOptions);
+      this.setView(".team-name-configure", new Common.Views.GroupConfigure({
+        model: this.model,
+        nameHeader: "Team Names",
+        group1Label: "Team 1",
+        group2Label: "Team 2"
+      }));
     }
   });
 
@@ -114,8 +88,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     setViewOptions: function () {
       this.options.viewOptions = {
         model: this.teamsModel,
-        group1Name: this.config.team1Name,
-        group2Name: this.config.team2Name
+        group1Name: this.config.group1Name,
+        group2Name: this.config.group2Name
       };
     },
 
@@ -164,8 +138,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     setViewOptions: function () {
       this.options.viewOptions = {
         model: this.teamsModel,
-        group1Name: this.config.team1Name,
-        group2Name: this.config.team2Name
+        group1Name: this.config.group1Name,
+        group2Name: this.config.group2Name
       };
     },
 
