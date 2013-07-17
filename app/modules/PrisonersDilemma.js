@@ -22,21 +22,14 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
   PrisonersDilemma.Views.Play = {};
   PrisonersDilemma.Views.Results = {};
 
-  PrisonersDilemma.Model = Backbone.Model.extend({
+  PrisonersDilemma.Model = Participant.Model.extend({
+    urlRoot: null,
+
     defaults: {
       "played": false,
       "partner": null,
-      "score": null
-    },
-    initialize: function () {
-      // assumes choice is set with validate:true option
-      this.on("change:choice", function (model, choice) {
-        this.set("played", choice != null);
-
-        if (this.get("complete")) { // only update choice if it isn't complete.
-          this.attributes.choice = this.previous("choice");
-        }
-      });
+      "score": null,
+      "complete": false
     },
 
     validate: function (attrs, options) {
