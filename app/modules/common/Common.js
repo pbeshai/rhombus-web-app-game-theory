@@ -63,7 +63,7 @@ function (app, Participant, Grid) {
 
   Common.Views.ParticipantPlay = Backbone.View.extend({
     template: "common/participant_play",
-    className: "participant",
+    className: "participant player",
     playedClass: "played",
     defaults: {
       locked: false
@@ -78,6 +78,13 @@ function (app, Participant, Grid) {
       var played = this.model.get("played");
       if (played) {
         this.$el.addClass(this.playedClass);
+      }
+    },
+
+    afterRender: function () {
+      var played = this.model.get("played"), complete = this.model.get("complete");
+      if (played && !complete) {
+        this.$(".played-text").hide().delay(200).fadeIn(400);
       }
     },
 

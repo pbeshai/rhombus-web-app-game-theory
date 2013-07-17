@@ -21,11 +21,9 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.Views.GiverPlay = {};
 
   UltimatumGame.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
-    className: "participant giver"
   });
 
   UltimatumGame.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
-    className: "participant receiver",
     overrides: {
       locked: true
     }
@@ -48,14 +46,12 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.Views.ReceiverPlay = {};
 
   UltimatumGame.Views.ReceiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
-    className: "participant giver",
     overrides: {
       locked: true
     }
   });
 
   UltimatumGame.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
-    className: "participant receiver",
     overrides: {
       messageAttribute: "offer"
     }
