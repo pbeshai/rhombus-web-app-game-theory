@@ -61,8 +61,8 @@ function (app, Participant, Grid) {
     },
   });
 
-  Common.Views.ParticipantHiddenPlay = Backbone.View.extend({
-    template: "common/participant_hidden_play",
+  Common.Views.ParticipantPlay = Backbone.View.extend({
+    template: "common/participant_play",
     className: "participant",
     playedClass: "played",
     defaults: {
@@ -81,13 +81,6 @@ function (app, Participant, Grid) {
       }
     },
 
-    afterRender: function () {
-      var played = this.model.get("played"), complete = this.model.get("complete");
-      if (played && !complete) {
-        this.$(".medium-text").hide().delay(200).fadeIn(400);
-      }
-    },
-
     safeRender: function () {
       if (!this.options.locked) {
         this.render();
@@ -98,6 +91,35 @@ function (app, Participant, Grid) {
       this.options = _.defaults(options || {}, this.overrides, this.defaults);
       this.listenTo(this.model, "change", this.safeRender);
     }
+  });
+
+  Common.Views.ParticipantHiddenPlay = Common.Views.ParticipantPlay.extend({
+    template: "common/participant_hidden_play",
+
+    afterRender: function () {
+      var played = this.model.get("played"), complete = this.model.get("complete");
+      if (played && !complete) {
+        this.$(".medium-text").hide().delay(200).fadeIn(400);
+      }
+    },
+  });
+
+  // creates a participant with a message inside it (e.g. the offer in the ultimatum game)
+  Common.Views.ParticipantMessagePlay =  Common.Views.ParticipantPlay.extend({
+    template: "common/participant_message_play",
+    defaults: {
+      locked: false,
+      messageAttribute: "message"
+    },
+    overrides: { },
+
+    serialize: function () {
+      console.log(this.model, this.options.messageAttribute);
+      return {
+        model: this.model,
+        message: this.model.get(this.options.messageAttribute)
+      };
+    },
   });
 
 

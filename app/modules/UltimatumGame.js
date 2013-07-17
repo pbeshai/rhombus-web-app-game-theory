@@ -25,7 +25,7 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   UltimatumGame.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
-    className: "participant giver",
+    className: "participant receiver",
     overrides: {
       locked: true
     }
@@ -33,7 +33,7 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   UltimatumGame.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
     overrides: {
-      header: "Giver Play",
+      header: "Givers Play",
       inactive: {
         group2: true
       },
@@ -46,21 +46,34 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   UltimatumGame.Views.ReceiverPlay = {};
+
+  UltimatumGame.Views.ReceiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
+    className: "participant giver",
+    overrides: {
+      locked: true
+    }
+  });
+
+  UltimatumGame.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
+    className: "participant receiver",
+    overrides: {
+      messageAttribute: "offer"
+    }
+  });
+
   UltimatumGame.Views.ReceiverPlay.Layout = Common.Views.GroupLayout.extend({
     overrides: {
-      header: "Receiver Play",
+      header: "Receivers Play",
       inactive: {
         group1: true
       },
 
       ParticipantView: {
-        group1: UltimatumGame.Views.GiverPlay.Receiver, //TODO
-        group2: UltimatumGame.Views.GiverPlay.Giver
+        group1: UltimatumGame.Views.ReceiverPlay.Giver,
+        group2: UltimatumGame.Views.ReceiverPlay.Receiver
       }
     }
   });
-
-
 
   UltimatumGame.Views.Results = {};
   UltimatumGame.Views.Results.Layout = Backbone.View.extend({
@@ -127,6 +140,9 @@ function(app, Common, Participant, StateApp, Graphs) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
+
+        participant.get("partner").set("offer", this.config.offerMap[participant.get("choice")]);
+        console.log(participant.get("partner"));
         participant.set("complete", true);
       }, this);
 
