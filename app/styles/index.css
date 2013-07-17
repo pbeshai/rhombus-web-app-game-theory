@@ -16,6 +16,7 @@
 @import "app.styl";
 @import "grid.styl";
 @import "charts.styl";
+@import "common.styl";
 
 /*-- Prisoner's Dilemma ---*/
 @import "pd.styl";

@@ -7,117 +7,27 @@ define([
   // Application.
   "app",
 
+  "modules/common/Common",
   "modules/PrisonersDilemma",
   "modules/Participant",
 
   "apps/StateApp",
 ],
-function(app, PrisonersDilemma, Participant, StateApp) {
+function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   var TeamPrisonersDilemma = app.module();
   TeamPrisonersDilemma.Views.Results = {};
   TeamPrisonersDilemma.Views.Play = {};
 
-
+  TeamPrisonersDilemma.TeamsModel = Common.Models.GroupModel.extend({});
   TeamPrisonersDilemma.Collection = PrisonersDilemma.Collection.extend({
     pairModels: function () { }
   });
 
-  TeamPrisonersDilemma.TeamsModel = Backbone.Model.extend({
-    url: null,
-
-    // 'participants' is an array of PrisonersDilemma.Model
-    initialize: function (attrs, options) {
-      this.set("team1", new TeamPrisonersDilemma.Collection());
-      this.set("team2", new TeamPrisonersDilemma.Collection());
-      this.on("reset", this.assignTeams);
-
-      var participants = attrs.participants;
-      var collection = new TeamPrisonersDilemma.Collection(participants);
-      this.set("participants", collection);
-      this.listenTo(collection, "reset", this.assignTeams);
-      this.assignTeams(collection);
-    },
-
-    // put the participants into teams and pair them up (team 1 participants paired with team 2)
-    assignTeams: function (collection) {
-      var models = (collection !== undefined) ? collection.models : this.get("participants").models;
-
-      var indices = [];
-      _.each(models, function (model, i) { indices[i] = i; });
-      indices = _.shuffle(indices);
-
-      if (indices.length < 2) {
-        console.log("less than two models");
-      } else {
-        for(var i = 0; i < (indices.length - (indices.length % 2)); i += 2) {
-          this.get("team1").add(models[indices[i]]);
-          models[indices[i]].set("partner", models[indices[i+1]]);
-
-          this.get("team2").add(models[indices[i+1]]);
-          models[indices[i+1]].set("partner", models[indices[i]]);
-        }
-
-        if (indices.length % 2 == 1) {
-          console.log("uneven number of models, one model with no partner: " + models[indices[indices.length-1]].get("alias"));
-        }
-      }
-
-
-    },
-  });
-
-  TeamPrisonersDilemma.Views.Play.Layout = Backbone.View.extend({
-    template: "teampd/play/layout",
-
-    serialize: function () {
-      return {
-        hasPlayers: (this.model.get("participants").length > 0),
-        team1Name: this.options.team1Name,
-        team2Name: this.options.team2Name
-      };
-    },
-
-    beforeRender: function () {
-      this.model.get("team1").each(addTeam(1), this);
-      this.model.get("team2").each(addTeam(2), this);
-
-      function addTeam(teamNum) {
-        return function (participant, i) {
-          this.insertView(".team" + teamNum + " .participant-grid", new PrisonersDilemma.Views.Play.Participant({ model: participant }));
-        };
-      }
-    },
-
-    initialize: function () {
-      var participants = this.model.get("participants")
-      app.participantServer.hookCollection(participants, this);
-    },
-  });
-
-   TeamPrisonersDilemma.Views.Results.Layout = Backbone.View.extend({
-    template: "teampd/results/layout",
-
-    serialize: function () {
-      return {
-        hasPlayers: (this.model.get("participants").length > 0),
-        team1Name: this.options.team1Name,
-        team2Name: this.options.team2Name
-      };
-    },
-
-    beforeRender: function () {
-      this.setViews({
-        ".results-participants .team1 .team-grid": new PrisonersDilemma.Views.Results.Participants({ collection: this.model.get("team1") }),
-        ".results-participants .team1 .team-stats": new TeamPrisonersDilemma.Views.Results.TeamStats({ collection: this.model.get("team1") }),
-        ".results-participants .team2 .team-grid": new PrisonersDilemma.Views.Results.Participants({ collection: this.model.get("team2") }),
-        ".results-participants .team2 .team-stats": new TeamPrisonersDilemma.Views.Results.TeamStats({ collection: this.model.get("team2") }),
-        ".results-stats": new PrisonersDilemma.Views.Results.Stats({ collection: this.model.get("participants") })
-      });
-    },
-
-    initialize: function () {
-      this.listenTo(this.model.get("participants"), "reset", this.render);
+  TeamPrisonersDilemma.Views.Play.Layout = Common.Views.GroupLayout.extend({
+    overrides: {
+      header: "Play",
+      ParticipantView: PrisonersDilemma.Views.Play.Participant
     }
   });
 
@@ -128,7 +38,17 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       var stats = PrisonersDilemma.Views.Results.Stats.prototype.serialize.call(this);
       return stats[0];
     }
-  })
+  });
+
+  TeamPrisonersDilemma.Views.Results.Layout = Common.Views.GroupLayout.extend({
+    overrides: {
+      header: "Results",
+      ParticipantsView: PrisonersDilemma.Views.Results.Participants,
+      PostParticipantsView: TeamPrisonersDilemma.Views.Results.TeamStats,
+      PostGroupsView: PrisonersDilemma.Views.Results.Stats
+    },
+  });
+
 
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "teampd/configure",
@@ -194,8 +114,8 @@ function(app, PrisonersDilemma, Participant, StateApp) {
     setViewOptions: function () {
       this.options.viewOptions = {
         model: this.teamsModel,
-        team1Name: this.config.team1Name,
-        team2Name: this.config.team2Name
+        group1Name: this.config.team1Name,
+        group2Name: this.config.team2Name
       };
     },
 
@@ -244,8 +164,8 @@ function(app, PrisonersDilemma, Participant, StateApp) {
     setViewOptions: function () {
       this.options.viewOptions = {
         model: this.teamsModel,
-        team1Name: this.config.team1Name,
-        team2Name: this.config.team2Name
+        group1Name: this.config.team1Name,
+        group2Name: this.config.team2Name
       };
     },
 
@@ -263,8 +183,8 @@ function(app, PrisonersDilemma, Participant, StateApp) {
         };
       };
 
-      var team1Results = teamsModel.get("team1").map(modelTransform);
-      var team2Results = teamsModel.get("team2").map(modelTransform);
+      var team1Results = teamsModel.get("group1").map(modelTransform);
+      var team2Results = teamsModel.get("group2").map(modelTransform);
       console.log("TEAM PD RESULTS (team1,team2) = ", team1Results, team2Results);
       var logData = {
         results: {
