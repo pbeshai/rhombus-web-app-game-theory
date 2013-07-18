@@ -17,7 +17,8 @@ function(app) {
 
     defaults: {
       "played": false,
-      "complete": false
+      "complete": false,
+      "validChoices": [ "A", "B", "C", "D", "E" ]
     },
     initialize: function () {
       // assumes choice is set with validate:true option
@@ -34,6 +35,10 @@ function(app) {
       if (_.isEmpty(attrs.alias)) {
         return "cannot have empty alias"
       }
+
+      if (attrs.choice != null && !_.contains(this.get("validChoices"), attrs.choice)) {
+        return "invalid choice " + attrs.choice + ", valid choices are " + this.get("validChoices").join(", ");
+      }
     }
   });
 
@@ -43,7 +48,8 @@ function(app) {
     comparator: "alias",
     aliasMap: {},
     defaults: {
-      acceptNew: false // if true, users when data is received for users not in the collection, they are added
+      acceptNew: false, // if true, users when data is received for users not in the collection, they are added
+      validateOnChoice: true,
     },
 
   	initialize: function (models, options) {

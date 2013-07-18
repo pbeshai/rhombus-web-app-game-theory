@@ -154,7 +154,9 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.States.ReceiverPlay.prototype = new StateApp.State(UltimatumGame.Views.ReceiverPlay.Layout);
   _.extend(UltimatumGame.States.ReceiverPlay.prototype, {
     defaults: {
-      defaultChoice: "A" // choice made when a player does not play
+      defaultChoice: "A", // choice made when a player does not play
+      acceptChoice: "A",
+      rejectChoice: "B"
     },
 
     initialize: function () {
@@ -165,11 +167,13 @@ function(app, Common, Participant, StateApp, Graphs) {
     beforeRender: function () {
       // reset played and choices
       this.groupModel = this.input;
+      var validChoices = [this.options.acceptChoice, this.options.rejectChoice];
 
       this.groupModel.get("group2").each(function (participant) {
         participant.unset("complete");
         participant.unset("played");
         participant.unset("choice");
+        participant.set("validChoices", validChoices);
       });
 
       this.options.viewOptions = { model: this.groupModel };
