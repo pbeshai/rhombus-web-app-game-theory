@@ -20,3 +20,6 @@
 
 /*-- Prisoner's Dilemma ---*/
 @import "pd.styl";
+
+/*-- Ultimatum Game ---*/
+@import "ultimatum.styl";

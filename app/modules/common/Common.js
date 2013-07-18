@@ -114,6 +114,7 @@ function (app, Participant, Grid) {
   // creates a participant with a message inside it (e.g. the offer in the ultimatum game)
   Common.Views.ParticipantMessagePlay =  Common.Views.ParticipantPlay.extend({
     template: "common/participant_message_play",
+    className: "participant player has-bottom",
     defaults: {
       locked: false,
       messageAttribute: "message"
@@ -128,8 +129,55 @@ function (app, Participant, Grid) {
     },
   });
 
+  Common.Views.ParticipantDisplay = Backbone.View.extend({
+    template: "common/participant_display",
+    className: "participant",
+    defaults: {
+      locked: false,
+      cssClass: function () { },
+      bottomText: function () { },
+      mainText: function () { }
+    },
+    overrides: { },
 
-  Common.Views.ParticipantGrid = Backbone.View.extend({
+    serialize: function () {
+      return {
+        model: this.model,
+        bottomText: this.options.bottomText(this.model),
+        mainText: this.options.mainText(this.model)
+      };
+    },
+
+    beforeRender: function () {
+      // reset any extra classes added in after render (do this since we
+      // do not know which classes are added by this.options.cssClass)
+      this.$el.attr("class", this.className);
+    },
+
+    afterRender: function () {
+      var bottomText = this.options.bottomText(this.model);
+      if (bottomText) {
+        this.$el.addClass("has-bottom");
+      } else {
+        this.$el.removeClass("has-bottom");
+      }
+      this.$el.addClass(this.options.cssClass(this.model));
+    },
+
+    safeRender: function () {
+      if (!this.options.locked) {
+        this.render();
+      }
+    },
+
+    initialize: function (options) {
+      this.options = _.defaults(options || {}, this.overrides, this.defaults);
+      this.listenTo(this.model, "change", this.safeRender);
+    }
+  });
+
+
+  Common.Views.ParticipantsGrid = Backbone.View.extend({
     className: "participant-grid",
     defaults: {
       ParticipantView: Grid.Views.Participant,
@@ -157,7 +205,7 @@ function (app, Participant, Grid) {
       group1Name: "Group 1",
       group2Name: "Group 2",
       ParticipantView: null,
-      ParticipantsView: Common.Views.ParticipantGrid,
+      ParticipantsView: Common.Views.ParticipantsGrid,
       PreParticipantsView: null,
       PostParticipantsView: null,
       PreGroupsView: null,

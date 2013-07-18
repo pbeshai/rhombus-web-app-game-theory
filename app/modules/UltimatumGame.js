@@ -74,9 +74,25 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.Views.Results = {};
 
 
-  UltimatumGame.Views.Results.Score = Common.Views.ParticipantMessagePlay.extend({
+  UltimatumGame.Views.Results.Score = Common.Views.ParticipantDisplay.extend({
     overrides: {
-      messageAttribute: "score"
+      cssClass: function (model) {
+        if (model.get("score") === 0) {
+          return "rejected";
+        } else {
+          return "accepted";
+        }
+      },
+      bottomText: function (model) {
+        if (model.get("score") === 0) {
+          return "Rejected";
+        } else {
+          return "Accepted";
+        }
+      },
+      mainText: function (model) {
+        return model.get("score");
+      }
     }
   });
 
