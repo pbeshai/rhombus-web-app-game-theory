@@ -6,14 +6,14 @@ Attendance -> Ultimatum Game Play -> Ultimatum Game Results
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/Participant",
-  "modules/Attendance",
-  "modules/UltimatumGame"
+	"modules/Participant",
+	"modules/Attendance",
+	"modules/UltimatumGame"
 ],
 
 function(app, StateApp, Participant, Attendance, UltimatumGame) {
@@ -33,7 +33,9 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 				"E": 1
 			},
 			group1Name: "Givers",
-			group2Name: "Receivers"
+			group2Name: "Receivers",
+			acceptChoice: "A", // choice a receiver makes to accept
+			rejectChoice: "B", // choice a receiver makes to reject
 		}, this.options.config);
 		this.initialize();
 	};
@@ -70,11 +72,11 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 			});
 
 			this.states = {
-		  	"attendance": attendanceState,
-		  	"giverPlay": giverPlayState,
-		  	"receiverPlay": receiverPlayState,
-		  	"results": resultsState
-	  	};
+				"attendance": attendanceState,
+				"giverPlay": giverPlayState,
+				"receiverPlay": receiverPlayState,
+				"results": resultsState
+			};
 
 			attendanceState.setNext(giverPlayState);
 			giverPlayState.setNext(receiverPlayState);
@@ -95,23 +97,23 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 		},
 
 		transitions: {
-	  		attendance_giverPlay: function () {
-	  			// take output from attendance and use it in grid
-	  		},
+				attendance_giverPlay: function () {
+					// take output from attendance and use it in grid
+				},
 
-	  		giverPlay_attendance: function () {
-				  this.options.participants.fetch(); // reset the participants that attendance uses
-	  		},
+				giverPlay_attendance: function () {
+					this.options.participants.fetch(); // reset the participants that attendance uses
+				},
 
-	  		giverPlay_receiverPlay: function () {
+				giverPlay_receiverPlay: function () {
 
-	  		},
+				},
 
-	  		receiverPlay_results: function () {
-	  		}
+				receiverPlay_results: function () {
+				}
 		}
 	});
 
 
-  return UltimatumGameApp;
+	return UltimatumGameApp;
 });

@@ -18,7 +18,7 @@ function(app) {
     defaults: {
       "played": false,
       "complete": false,
-      "validChoices": [ "A", "B", "C", "D", "E" ]
+      "validChoices": [ "A", "B", "C", "D", "E" ] // if null, all choices are accepted
     },
     initialize: function () {
       // assumes choice is set with validate:true option
@@ -31,12 +31,20 @@ function(app) {
       });
     },
 
+    // resets choice related attributes (retains alias)
+    reset: function () {
+      this.unset("complete", { silent: true });
+      this.unset("played", { silent: true });
+      this.unset("choice", { silent: true });
+      this.unset("validChoices", { silent: true });
+    },
+
     validate: function (attrs, options) {
       if (_.isEmpty(attrs.alias)) {
         return "cannot have empty alias"
       }
 
-      if (attrs.choice != null && !_.contains(this.get("validChoices"), attrs.choice)) {
+      if (this.get("validChoices") != null && attrs.choice != null && !_.contains(this.get("validChoices"), attrs.choice)) {
         return "invalid choice " + attrs.choice + ", valid choices are " + this.get("validChoices").join(", ");
       }
     }

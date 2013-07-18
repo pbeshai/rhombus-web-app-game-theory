@@ -72,10 +72,18 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   UltimatumGame.Views.Results = {};
+
+
+  UltimatumGame.Views.Results.Score = Common.Views.ParticipantMessagePlay.extend({
+    overrides: {
+      messageAttribute: "score"
+    }
+  });
+
   UltimatumGame.Views.Results.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Results",
-      //ParticipantsView: null TOOD
+      ParticipantView: UltimatumGame.Views.Results.Score
     }
   });
 
@@ -103,17 +111,12 @@ function(app, Common, Participant, StateApp, Graphs) {
 
         // reset played and choices
         this.groupModel.get("participants").each(function (participant) {
-          participant.unset("complete");
-          participant.unset("played");
-          participant.unset("choice");
+          participant.reset();
         });
       } else {
         // reset played and choices
         this.input.each(function (participant) {
-          participant.unset("complete");
-          participant.unset("played");
-          participant.unset("choice");
-
+          participant.reset();
         });
 
         this.groupModel = new Common.Models.GroupModel({ participants: this.input });
@@ -137,8 +140,10 @@ function(app, Common, Participant, StateApp, Graphs) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
-
-        participant.get("partner").set("offer", this.config.offerMap[participant.get("choice")]);
+        var offer = this.config.offerMap[participant.get("choice")];
+        var keep = this.config.amount - offer;
+        participant.set("keep", keep); // amount kept
+        participant.get("partner").set("offer", this.config.offerMap[participant.get("choice")]); // amount given away
         participant.set("complete", true);
       }, this);
 
@@ -155,8 +160,6 @@ function(app, Common, Participant, StateApp, Graphs) {
   _.extend(UltimatumGame.States.ReceiverPlay.prototype, {
     defaults: {
       defaultChoice: "A", // choice made when a player does not play
-      acceptChoice: "A",
-      rejectChoice: "B"
     },
 
     initialize: function () {
@@ -167,12 +170,10 @@ function(app, Common, Participant, StateApp, Graphs) {
     beforeRender: function () {
       // reset played and choices
       this.groupModel = this.input;
-      var validChoices = [this.options.acceptChoice, this.options.rejectChoice];
+      var validChoices = [this.config.acceptChoice, this.config.rejectChoice];
 
       this.groupModel.get("group2").each(function (participant) {
-        participant.unset("complete");
-        participant.unset("played");
-        participant.unset("choice");
+        participant.reset();
         participant.set("validChoices", validChoices);
       });
 
@@ -216,6 +217,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.groupModel = this.input;
       this.options.viewOptions = { model: this.groupModel };
 
+      this.assignScores(this.groupModel);
+
       // TODO log
       //this.logResults(this.groupModel);
     },
@@ -226,6 +229,20 @@ function(app, Common, Participant, StateApp, Graphs) {
         group1Name: this.config.group1Name,
         group2Name: this.config.group2Name
       };
+    },
+
+    assignScores: function (groupModel) {
+      // for each receiver
+      groupModel.get("group2").each(function (receiver) {
+        var giver = receiver.get("partner");
+        if (receiver.get("choice") === this.config.acceptChoice) {
+          receiver.set("score", receiver.get("offer"));
+          giver.set("score", giver.get("keep"));
+        } else {
+          receiver.set("score", 0);
+          giver.set("score", 0)
+        }
+      }, this);
     },
 
     logResults: function (groupModel) {
