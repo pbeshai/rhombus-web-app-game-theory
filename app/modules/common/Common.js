@@ -17,6 +17,9 @@ function (app, Participant, Grid) {
 
     // 'participants' is an array of models
     initialize: function (attrs, options) {
+      this.options = _.extend({}, {
+        forceEven: false
+      }, options);
 
       this.set("group1", new this.GroupCollection());
       this.set("group2", new this.GroupCollection());
@@ -28,9 +31,21 @@ function (app, Participant, Grid) {
       }
 
       var collection = new this.GroupCollection(participants);
+      // ensure we have even number of participants by adding a bot
+
+      if (this.options.forceEven && collection.length % 2 === 1) {
+        this.addBot(collection)
+      }
+
       this.set("participants", collection);
       this.listenTo(collection, "reset", this.assignGroups);
       this.assignGroups(collection);
+    },
+
+    // TODO: maybe this can be an option to override it instead of just overriding...
+    // can be overridden by subclasses to change type of bot added
+    addBot: function (collection) {
+      collection.add(new Participant.Bot());
     },
 
     // put the participants into groups and pair them up (group 1 participants paired with group 2)

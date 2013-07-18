@@ -50,6 +50,51 @@ function(app) {
     }
   });
 
+  Participant.Bot = Participant.Model.extend({
+    bot: true,
+
+    initialize: function () {
+      Participant.Model.prototype.initialize.call(this);
+      if (this.get("alias") === undefined) {
+        this.set("alias", "bot");
+      }
+
+      // short delay before playing
+      this.delayedPlay();
+    },
+
+    save: function () {
+      console.log("trying to save bot");
+      return false;
+    },
+
+    sync: function () {
+      console.log("trying to sync bot");
+      return false;
+    },
+
+    fetch: function () {
+      console.log("trying to fetch bot");
+      return false;
+    },
+
+    destroy: function () {
+      console.log("trying to destroy bot");
+      return false;
+    },
+
+    delayedPlay: function () {
+      setTimeout(_.bind(this.play, this), 50);
+    },
+
+    play: function () {
+      var choices = this.get("validChoices");
+      var choice = choices[Math.max(Math.floor(Math.random() * choices.length), choices.length - 1)];
+      this.set("choice", choice);
+    }
+  });
+
+
   Participant.Collection = Backbone.Collection.extend({
     url: "/api/participants",
   	model: Participant.Model,

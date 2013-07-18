@@ -135,7 +135,7 @@ function(app, Common, Participant, StateApp, Graphs) {
           participant.reset();
         });
 
-        this.groupModel = new Common.Models.GroupModel({ participants: this.input });
+        this.groupModel = new Common.Models.GroupModel({ participants: this.input }, { forceEven: true });
       }
 
       this.options.viewOptions = { model: this.groupModel };
