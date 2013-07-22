@@ -94,31 +94,7 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       Participant.Collection.prototype.initialize.apply(this, [models, options]);
       this.on("reset", this.pairModels);
       this.pairModels(models);
-    },
-
-    // put all the models into pairs
-    pairModels: function (models) {
-      if (!_.isArray(models)) {
-        models = this.models;
-      }
-
-      var indices = [];
-      _.each(models, function (model, i) { indices[i] = i; });
-      indices = _.shuffle(indices);
-
-      if (indices.length < 2) {
-        console.log("less than two models");
-      } else {
-        for(var i = 0; i < (indices.length - (indices.length % 2)); i += 2) {
-          models[indices[i]].set("partner", models[indices[i+1]]);
-          models[indices[i+1]].set("partner", models[indices[i]]);
-        }
-
-        if (indices.length % 2 == 1) {
-          console.log("uneven number of models, one model with no partner: " + models[indices[indices.length-1]].get("alias"));
-        }
-      }
-    },
+    }
   })
 
 

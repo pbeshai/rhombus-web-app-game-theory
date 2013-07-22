@@ -212,6 +212,50 @@ function (app, Participant, Grid) {
   });
 
 
+  // uses a Participant collection
+  Common.Views.SimpleLayout = Backbone.View.extend({
+    template: "common/simple_layout",
+    defaults: {
+      header: "Participants",
+      ParticipantView: null,
+      ParticipantsView: Common.Views.ParticipantsGrid,
+      PreParticipantsView: null,
+      PostParticipantsView: null,
+    },
+    overrides: { }, // quick way for direct subclasses to override defaults
+
+    serialize: function () {
+      return {
+        header: this.options.header,
+        hasPlayers: (this.collection.length > 0),
+      };
+    },
+
+    beforeRender: function () {
+      var viewOptions = _.extend({
+        collection: this.collection
+      }, this.options);
+
+      this.insertView(".participants", new this.options.ParticipantsView(viewOptions));
+
+      if (this.options.PreParticipantsView != null) {
+        this.insertView(".pre-participants", new this.options.PreParticipantsView(viewOptions));
+      }
+
+      if (this.options.PostParticipantsView != null) {
+        this.insertView(".post-participants", new this.options.PostParticipantsView(viewOptions));
+      }
+    },
+
+    initialize: function (options) {
+      this.options = _.defaults({}, options, this.overrides, this.defaults);
+
+      var participants = this.collection;
+      app.participantServer.hookCollection(participants, this);
+    },
+  });
+
+
   // requires model Common.Models.GroupModel or similar
   Common.Views.GroupLayout = Backbone.View.extend({
     template: "common/group_layout",

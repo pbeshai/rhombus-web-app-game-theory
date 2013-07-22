@@ -51,7 +51,6 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGamePartitioned.Views.PreGroups = Backbone.View.extend({
     template: "ultimatum/pre_participants",
     serialize: function () {
-      console.log(this.options);
       return { total: this.options.config.amount }
     },
   })
@@ -131,14 +130,6 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-  // To be used in StateApps
-  UltimatumGamePartitioned.States = {};
-  UltimatumGamePartitioned.States.GiverPlay = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
-
-    this.initialize();
-  }
-
   UltimatumGamePartitioned.Util = {};
   UltimatumGamePartitioned.Util.assignOffers = function (givers, amount, offerMap) {
     givers.each(function (giver) {
@@ -151,6 +142,13 @@ function(app, Common, Participant, StateApp, Graphs) {
   };
 
 
+  // To be used in StateApps
+  UltimatumGamePartitioned.States = {};
+  UltimatumGamePartitioned.States.GiverPlay = function (options) {
+    this.options = _.defaults({}, options, this.defaults);
+
+    this.initialize();
+  }
   UltimatumGamePartitioned.States.GiverPlay.prototype = new StateApp.State(UltimatumGamePartitioned.Views.GiverPlay.Layout);
   _.extend(UltimatumGamePartitioned.States.GiverPlay.prototype, {
     defaults: {
@@ -320,8 +318,8 @@ function(app, Common, Participant, StateApp, Graphs) {
         config: this.config,
         version: this.stateApp.version
       };
-      console.log("ULTIMATUM RESULTS = ", logData);
-      app.api({ call: "apps/ultimatum/results", type: "post", data: logData });
+      console.log("ULTIMATUM PARTITION RESULTS = ", logData);
+      app.api({ call: "apps/ultimatum-partition/results", type: "post", data: logData });
     },
 
     getOutput: function () { }
