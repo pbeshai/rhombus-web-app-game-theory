@@ -55,6 +55,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "teampd/configure",
+    modelOptions: {
+      group1Name: "Team 1",
+      group2Name: "Team 2"
+    },
 
     beforeRender: function () {
       this.setView(".pd-configure", new PrisonersDilemma.Views.Configure({ model: this.model }));
@@ -64,6 +68,12 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         group1Label: "Team 1",
         group2Label: "Team 2"
       }));
+    },
+
+    initialize: function () {
+
+      // use defaults so we don't overwrite if already there
+      _.defaults(this.model.attributes, this.modelOptions);
     }
   });
 
