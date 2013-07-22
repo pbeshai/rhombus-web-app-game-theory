@@ -340,6 +340,160 @@ function (app, Participant, Grid) {
     }
   });
 
+  /*
+  Model configure is for automatically generating a form from a JS object
+
+  */
+  Common.Views.ModelConfigure = {};
+  var inputIds = 0;
+  Common.Views.ModelConfigure.TextInput = Backbone.View.extend({
+    template: "common/model_configure/text_input",
+    events: {
+      "change input": "update",
+    },
+
+    update: function (evt) {
+      // attach an empty {} for flags that event handlers can use to communicate with
+      this.trigger("update", this.options.key, evt.target.value, {});
+    },
+
+    serialize: function () {
+      return {
+        value: this.options.value,
+        label: this.options.label,
+        inputId: this.inputId
+      }
+    },
+
+    initialize: function (options) {
+      this.inputId = "model-configure-input-" + (inputIds++);
+    }
+  });
+
+  Common.Views.ModelConfigure.ObjectConfigure = Backbone.View.extend({
+    className: "object-configure",
+    template: "common/model_configure/object_configure",
+
+    serialize: function () {
+      return {
+        header: this.options.header,
+      }
+    },
+
+    prettifyLabel: function (attr) {
+      return _.map(attr, function (char, i) {
+        if (i === 0) { // capitalize first letter
+          return char.toUpperCase();
+        }
+
+        // add a space before a capital or a number
+        return (/[A-Z0-9]/.test(char)) ? " "+char : char;
+      }).join("");
+    },
+
+    beforeRender: function () {
+      // handle simple properties first
+      _.each(_.keys(this.model), function (attr) {
+        var val = this.model[attr];
+        if (!_.isObject(val)) { // insert a text field
+          this.insertView(new Common.Views.ModelConfigure.TextInput({ key: attr, label: this.prettifyLabel(attr), value: val }));
+        }
+      }, this);
+
+      // then handle objects
+      _.each(_.keys(this.model), function (attr) {
+        var val = this.model[attr];
+        if (_.isObject(val)) {
+          this.insertView(new Common.Views.ModelConfigure.ObjectConfigure({ key: attr, header: this.prettifyLabel(attr), model: val }));
+        }
+      }, this);
+    },
+
+    onUpdate: function (key, value, flags) {
+      if (flags.handled) {
+        return;
+      }
+      flags.handled = true;
+
+      var curr = this.model[key]
+      if (_.isNumber(curr)) { // if the current value is a number, try making this one a nubmer
+        try {
+          value = parseFloat(value);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      this.model[key] = value;
+    },
+
+    initialize: function () {
+      this.on("update", this.onUpdate);
+    }
+  });
+
+
+  Common.Views.ModelConfigure.Layout = Backbone.View.extend({
+    template: "common/model_configure/layout",
+
+    serialize: function () {
+      return this.model.attributes;
+    },
+
+    prettifyLabel: function (attr) {
+      return _.map(attr, function (char, i) {
+        if (i === 0) { // capitalize first letter
+          return char.toUpperCase();
+        }
+
+        // add a space before a capital or a number
+        return (/[A-Z0-9]/.test(char)) ? " "+char : char;
+      }).join("");
+    },
+
+    beforeRender: function () {
+      // handle simple properties first
+      _.each(_.keys(this.model.attributes), function (attr) {
+        var val = this.model.attributes[attr];
+
+        if (!_.isObject(val)) { // insert a text field
+          this.insertView(".form", new Common.Views.ModelConfigure.TextInput({ key: attr, label: this.prettifyLabel(attr), value: val }));
+        }
+      }, this);
+
+      // then objects
+      _.each(_.keys(this.model.attributes), function (attr) {
+        var val = this.model.attributes[attr];
+
+        if (_.isObject(val)) {
+          this.insertView(".form", new Common.Views.ModelConfigure.ObjectConfigure({ key: attr, header: this.prettifyLabel(attr), model: val }));
+        }
+      }, this);
+    },
+
+    onUpdate: function (key, value, flags) {
+      if (flags.handled) {
+        return;
+      }
+
+      var curr = this.model.get(key);
+      if (_.isNumber(curr)) { // if the current value is a number, try making this one a nubmer
+        try {
+          value = parseFloat(value);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      this.model.set(key, value);
+    },
+
+    initialize: function () {
+      // use defaults so we don't overwrite if already there
+      _.defaults(this.model.attributes, this.modelOptions);
+
+      this.on("update", this.onUpdate);
+    }
+  });
+
 
   return Common;
 })

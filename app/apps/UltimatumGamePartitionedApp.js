@@ -1,6 +1,6 @@
 /**
 
-Ultimatum Game
+Ultimatum Game (Partitioned)
 
 Attendance -> Ultimatum Game Play -> Ultimatum Game Results
 
@@ -13,43 +13,30 @@ define([
 
 	"modules/Participant",
 	"modules/Attendance",
-	"modules/UltimatumGame"
+	"modules/UltimatumGamePartitioned"
 ],
 
-function(app, StateApp, Participant, Attendance, UltimatumGame) {
+function(app, StateApp, Participant, Attendance, UltimatumGamePartitioned) {
 
 	/**
 	 *  Team Prisoner's Dilemma App
 	 */
-	var UltimatumGameApp = function (options) {
+	var UltimatumGamePartitionedApp = function (options) {
 		this.options = options || {};
-		this.config = _.extend({
-			amount: 10,
-			offerMap: {
-				"A": 5,
-				"B": 4,
-				"C": 3,
-				"D": 2,
-				"E": 1
-			},
-			group1Name: "Givers",
-			group2Name: "Receivers",
-			acceptChoice: "A", // choice a receiver makes to accept
-			rejectChoice: "B", // choice a receiver makes to reject
-		}, this.options.config);
+		this.config = _.extend({}, UltimatumGamePartitioned.config, this.options.config);
 		this.initialize();
 	};
 	// description for use in router
-	UltimatumGameApp.app = {
+	UltimatumGamePartitionedApp.app = {
 		instantiate: function (router) {
-			return new UltimatumGameApp({ participants: router.participants });
+			return new UltimatumGamePartitionedApp({ participants: router.participants });
 		},
-		configView: UltimatumGame.Views.Configure,
+		configView: UltimatumGamePartitioned.Views.Configure,
 		title: "Ultimatum Game"
 	};
 
-	UltimatumGameApp.prototype = new StateApp.App();
-	_.extend(UltimatumGameApp.prototype, {
+	UltimatumGamePartitionedApp.prototype = new StateApp.App();
+	_.extend(UltimatumGamePartitionedApp.prototype, {
 		version: "1.0",
 
 		defineStates: function () {
@@ -59,15 +46,15 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 				saveNew: false
 			});
 
-			var giverPlayState = new UltimatumGame.States.GiverPlay({
+			var giverPlayState = new UltimatumGamePartitioned.States.GiverPlay({
 				config: this.config
 			});
 
-			var receiverPlayState = new UltimatumGame.States.ReceiverPlay({
+			var receiverPlayState = new UltimatumGamePartitioned.States.ReceiverPlay({
 				config: this.config
 			});
 
-			var resultsState = new UltimatumGame.States.Results({
+			var resultsState = new UltimatumGamePartitioned.States.Results({
 				config: this.config
 			});
 
@@ -115,5 +102,5 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 	});
 
 
-	return UltimatumGameApp;
+	return UltimatumGamePartitionedApp;
 });

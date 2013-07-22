@@ -16,20 +16,39 @@ define([
 ],
 function(app, Common, Participant, StateApp, Graphs) {
 
-  var UltimatumGame = app.module();
+  var UltimatumGamePartitioned = app.module();
 
-  UltimatumGame.Views.GiverPlay = {};
+  UltimatumGamePartitioned.config = {
+    amount: 10,
+    offerMap: { // map of choices givers make to amounts offered
+      "A": 5,
+      "B": 4,
+      "C": 3,
+      "D": 2,
+      "E": 1
+    },
+    group1Name: "Givers",
+    group2Name: "Receivers",
+    acceptChoice: "A", // choice a receiver makes to accept
+    rejectChoice: "B", // choice a receiver makes to reject
+  };
 
-  UltimatumGame.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
+  UltimatumGamePartitioned.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
+    modelOptions: _.extend({}, UltimatumGamePartitioned.config)
   });
 
-  UltimatumGame.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
+  UltimatumGamePartitioned.Views.GiverPlay = {};
+
+  UltimatumGamePartitioned.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
+  });
+
+  UltimatumGamePartitioned.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
     overrides: {
       locked: true
     }
   });
 
-  UltimatumGame.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGamePartitioned.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Givers Play",
       inactive: {
@@ -37,27 +56,27 @@ function(app, Common, Participant, StateApp, Graphs) {
       },
 
       ParticipantView: {
-        group1: UltimatumGame.Views.GiverPlay.Giver,
-        group2: UltimatumGame.Views.GiverPlay.Receiver
+        group1: UltimatumGamePartitioned.Views.GiverPlay.Giver,
+        group2: UltimatumGamePartitioned.Views.GiverPlay.Receiver
       }
     }
   });
 
-  UltimatumGame.Views.ReceiverPlay = {};
+  UltimatumGamePartitioned.Views.ReceiverPlay = {};
 
-  UltimatumGame.Views.ReceiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
+  UltimatumGamePartitioned.Views.ReceiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
     overrides: {
       locked: true
     }
   });
 
-  UltimatumGame.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
+  UltimatumGamePartitioned.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
     overrides: {
       messageAttribute: "offer"
     }
   });
 
-  UltimatumGame.Views.ReceiverPlay.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGamePartitioned.Views.ReceiverPlay.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Receivers Play",
       inactive: {
@@ -65,16 +84,16 @@ function(app, Common, Participant, StateApp, Graphs) {
       },
 
       ParticipantView: {
-        group1: UltimatumGame.Views.ReceiverPlay.Giver,
-        group2: UltimatumGame.Views.ReceiverPlay.Receiver
+        group1: UltimatumGamePartitioned.Views.ReceiverPlay.Giver,
+        group2: UltimatumGamePartitioned.Views.ReceiverPlay.Receiver
       }
     }
   });
 
-  UltimatumGame.Views.Results = {};
+  UltimatumGamePartitioned.Views.Results = {};
 
 
-  UltimatumGame.Views.Results.Score = Common.Views.ParticipantDisplay.extend({
+  UltimatumGamePartitioned.Views.Results.Score = Common.Views.ParticipantDisplay.extend({
     overrides: {
       cssClass: function (model) {
         if (model.get("score") === 0) {
@@ -96,22 +115,22 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-  UltimatumGame.Views.Results.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGamePartitioned.Views.Results.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Results",
-      ParticipantView: UltimatumGame.Views.Results.Score
+      ParticipantView: UltimatumGamePartitioned.Views.Results.Score
     }
   });
 
   // To be used in StateApps
-  UltimatumGame.States = {};
-  UltimatumGame.States.GiverPlay = function (options) {
+  UltimatumGamePartitioned.States = {};
+  UltimatumGamePartitioned.States.GiverPlay = function (options) {
     this.options = _.defaults({}, options, this.defaults);
 
     this.initialize();
   }
-  UltimatumGame.States.GiverPlay.prototype = new StateApp.State(UltimatumGame.Views.GiverPlay.Layout);
-  _.extend(UltimatumGame.States.GiverPlay.prototype, {
+  UltimatumGamePartitioned.States.GiverPlay.prototype = new StateApp.State(UltimatumGamePartitioned.Views.GiverPlay.Layout);
+  _.extend(UltimatumGamePartitioned.States.GiverPlay.prototype, {
     defaults: {
       defaultChoice: "A" // choice made when a player does not play
     },
@@ -167,13 +186,13 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-  UltimatumGame.States.ReceiverPlay = function (options) {
+  UltimatumGamePartitioned.States.ReceiverPlay = function (options) {
     this.options = _.defaults({}, options, this.defaults);
 
     this.initialize();
   }
-  UltimatumGame.States.ReceiverPlay.prototype = new StateApp.State(UltimatumGame.Views.ReceiverPlay.Layout);
-  _.extend(UltimatumGame.States.ReceiverPlay.prototype, {
+  UltimatumGamePartitioned.States.ReceiverPlay.prototype = new StateApp.State(UltimatumGamePartitioned.Views.ReceiverPlay.Layout);
+  _.extend(UltimatumGamePartitioned.States.ReceiverPlay.prototype, {
     defaults: {
       defaultChoice: "A", // choice made when a player does not play
     },
@@ -219,12 +238,12 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
 
-  UltimatumGame.States.Results = function (options) {
+  UltimatumGamePartitioned.States.Results = function (options) {
     this.options = _.defaults({}, options);
     this.initialize();
   }
-  UltimatumGame.States.Results.prototype = new StateApp.State(UltimatumGame.Views.Results.Layout);
-  _.extend(UltimatumGame.States.Results.prototype, {
+  UltimatumGamePartitioned.States.Results.prototype = new StateApp.State(UltimatumGamePartitioned.Views.Results.Layout);
+  _.extend(UltimatumGamePartitioned.States.Results.prototype, {
     initialize: function () {
       this.config = this.options.config;
     },
@@ -275,5 +294,5 @@ function(app, Common, Participant, StateApp, Graphs) {
     getOutput: function () { }
   });
 
-  return UltimatumGame;
+  return UltimatumGamePartitioned;
 });
