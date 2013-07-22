@@ -111,6 +111,9 @@ function(app) {
 		return this.flow.prev;
 	};
 
+	// can be called when a state app configures itself (perhaps a new config is set)
+	State.prototype.handleConfigure = function () {}
+
 	/**
 	 * State App - prototype object
 	 */

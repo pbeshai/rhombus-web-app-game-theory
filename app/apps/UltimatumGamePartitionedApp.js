@@ -75,10 +75,11 @@ function(app, StateApp, Participant, Attendance, UltimatumGamePartitioned) {
 		},
 
 		handleConfigure: function () {
+			this.currentState.handleConfigure();
 			// redraw if results are active
 			if (this.currentState === this.states.results) {
 				this.currentState.render();
-			} else if (this.currentState === this.states.play) {
+			} else if (this.currentState === this.states.giverPlay || this.currentState === this.states.receiverPlay) {
 				this.currentState.render();
 			}
 		},

@@ -48,13 +48,21 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
+  UltimatumGamePartitioned.Views.PreGroups = Backbone.View.extend({
+    template: "ultimatum/pre_participants",
+    serialize: function () {
+      console.log(this.options);
+      return { total: this.options.config.amount }
+    },
+  })
+
   UltimatumGamePartitioned.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Givers Play",
       inactive: {
         group2: true
       },
-
+      PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
       ParticipantView: {
         group1: UltimatumGamePartitioned.Views.GiverPlay.Giver,
         group2: UltimatumGamePartitioned.Views.GiverPlay.Receiver
@@ -82,7 +90,7 @@ function(app, Common, Participant, StateApp, Graphs) {
       inactive: {
         group1: true
       },
-
+      PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
       ParticipantView: {
         group1: UltimatumGamePartitioned.Views.ReceiverPlay.Giver,
         group2: UltimatumGamePartitioned.Views.ReceiverPlay.Receiver
@@ -118,6 +126,7 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGamePartitioned.Views.Results.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Results",
+      PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
       ParticipantView: UltimatumGamePartitioned.Views.Results.Score
     }
   });
@@ -129,6 +138,19 @@ function(app, Common, Participant, StateApp, Graphs) {
 
     this.initialize();
   }
+
+  UltimatumGamePartitioned.Util = {};
+  UltimatumGamePartitioned.Util.assignOffers = function (givers, amount, offerMap) {
+    givers.each(function (giver) {
+      var offer = offerMap[giver.get("choice")];
+      var keep = amount - offer;
+      giver.set("keep", keep); // amount kept
+      giver.get("partner").set("offer", offerMap[giver.get("choice")]); // amount given away
+      giver.set("complete", true);
+    }, this);
+  };
+
+
   UltimatumGamePartitioned.States.GiverPlay.prototype = new StateApp.State(UltimatumGamePartitioned.Views.GiverPlay.Layout);
   _.extend(UltimatumGamePartitioned.States.GiverPlay.prototype, {
     defaults: {
@@ -164,7 +186,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.options.viewOptions = {
         model: this.groupModel,
         group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name
+        group2Name: this.config.group2Name,
+        config: this.config
       };
     },
 
@@ -175,12 +198,10 @@ function(app, Common, Participant, StateApp, Graphs) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
-        var offer = this.config.offerMap[participant.get("choice")];
-        var keep = this.config.amount - offer;
-        participant.set("keep", keep); // amount kept
-        participant.get("partner").set("offer", this.config.offerMap[participant.get("choice")]); // amount given away
-        participant.set("complete", true);
       }, this);
+
+      UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
+        this.config.amount, this.config.offerMap);
 
       return this.groupModel;
     }
@@ -201,6 +222,11 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.config = this.options.config;
     },
 
+    handleConfigure: function () {
+      UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
+        this.config.amount, this.config.offerMap);
+    },
+
     // this.input is a groupModel
     beforeRender: function () {
       // reset played and choices
@@ -219,7 +245,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.options.viewOptions = {
         model: this.groupModel,
         group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name
+        group2Name: this.config.group2Name,
+        config: this.config
       };
     },
 
@@ -258,11 +285,17 @@ function(app, Common, Participant, StateApp, Graphs) {
       //this.logResults(this.groupModel);
     },
 
+    handleConfigure: function () {
+      UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
+        this.config.amount, this.config.offerMap);
+    },
+
     setViewOptions: function () {
       this.options.viewOptions = {
         model: this.groupModel,
         group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name
+        group2Name: this.config.group2Name,
+        config: this.config
       };
     },
 

@@ -240,9 +240,9 @@ function (app, Participant, Grid) {
 
     beforeRender: function () {
       function addGroup(groupNum) {
-        var viewOptions = {
+        var viewOptions = _.extend({
           collection: this.model.get("group" + groupNum)
-        };
+        }, this.options);
         // only specify ParticipantView if it is set.
         if (this.options.ParticipantView != null) {
           if (_.isFunction(this.options.ParticipantView)) {
@@ -254,27 +254,27 @@ function (app, Participant, Grid) {
         this.insertView(".group" + groupNum + " .group-participants", new this.options.ParticipantsView(viewOptions));
 
         if (this.options.PreParticipantsView != null) {
-          this.insertView(".group" + groupNum + " .pre-participants", new this.options.PreParticipantsView({ collection: viewOptions.collection }));
+          this.insertView(".group" + groupNum + " .pre-participants", new this.options.PreParticipantsView(viewOptions));
         }
 
         if (this.options.PostParticipantsView != null) {
-          this.insertView(".group" + groupNum + " .post-participants", new this.options.PostParticipantsView({ collection: viewOptions.collection }));
+          this.insertView(".group" + groupNum + " .post-participants", new this.options.PostParticipantsView(viewOptions));
         }
       }
 
       addGroup.apply(this, [1]);
       addGroup.apply(this, [2]);
 
+      var viewOptions = _.extend({
+        collection: this.model.get("participants")
+      }, this.options);
+
       if (this.options.PreGroupsView != null) {
-        this.insertView(".pre-groups", new this.options.PreGroupsView({
-          collection: this.model.get("participants")
-        }));
+        this.insertView(".pre-groups", new this.options.PreGroupsView(viewOptions));
       }
 
       if (this.options.PostGroupsView != null) {
-        this.insertView(".post-groups", new this.options.PostGroupsView({
-          collection: this.model.get("participants")
-        }));
+        this.insertView(".post-groups", new this.options.PostGroupsView(viewOptions));
       }
     },
 
