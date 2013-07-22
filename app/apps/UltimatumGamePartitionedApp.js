@@ -32,7 +32,7 @@ function(app, StateApp, Participant, Attendance, UltimatumGamePartitioned) {
 			return new UltimatumGamePartitionedApp({ participants: router.participants });
 		},
 		configView: UltimatumGamePartitioned.Views.Configure,
-		title: "Ultimatum Game"
+		title: "Ultimatum Game (Partitioned)"
 	};
 
 	UltimatumGamePartitionedApp.prototype = new StateApp.App();
