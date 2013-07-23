@@ -173,6 +173,26 @@ function(app) {
       }
     },
 
+    // matches each model with another, but not in a symmetric way.
+    // e.g. A -> B -> C -> A  :: (A,B), (B,C), (C,A)
+    pairModelsAsymmetric: function (models) {
+      if (!_.isArray(models)) {
+        models = this.models;
+      }
+
+      var indices = [];
+      _.each(models, function (model, i) { indices[i] = i; });
+      indices = _.shuffle(indices);
+
+      if (indices.length < 2) {
+        console.log("less than two models");
+      } else {
+        for(var i = 0; i < indices.length; i ++) {
+          models[indices[i]].set("partner", models[indices[(i+1) % indices.length]]);
+        }
+      }
+    },
+
     // put all the models into pairs
     pairModels: function (models) {
       if (!_.isArray(models)) {

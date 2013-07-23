@@ -117,7 +117,14 @@ function(app, Common, Participant, StateApp, Graphs) {
         }
       },
       mainText: function (model) {
-        return model.get("score");
+        if (model.get("score") !== 0) {
+          return model.get("score");
+        }
+        // show the original offer if rejected
+        if (model.get("offer")) {
+          return model.get("offer") + " &rarr; " + model.get("score");
+        }
+        return model.get("keep") + " &rarr; " + model.get("score");
       }
     }
   });
@@ -275,12 +282,10 @@ function(app, Common, Participant, StateApp, Graphs) {
     beforeRender: function () {
       // this.input is a GroupModel
       this.groupModel = this.input;
-      this.options.viewOptions = { model: this.groupModel };
 
       this.assignScores(this.groupModel);
 
-      // TODO log
-      //this.logResults(this.groupModel);
+      this.logResults(this.groupModel);
     },
 
     handleConfigure: function () {
@@ -312,11 +317,29 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
 
     logResults: function (groupModel) {
-      // TODO: log
+      var results = {};
+      results.givers = groupModel.get("group1").map(function (giver) {
+        return {
+          alias: giver.get("alias"),
+          keep: giver.get("keep"),
+          score: giver.get("score"),
+          partner: giver.get("partner").get("alias")
+        };
+      });
+
+      results.receivers = groupModel.get("group2").map(function (receiver) {
+        return {
+          alias: receiver.get("alias"),
+          offer: receiver.get("offer"),
+          score: receiver.get("score"),
+          partner: receiver.get("partner").get("alias")
+        };
+      });
 
       var logData = {
         config: this.config,
-        version: this.stateApp.version
+        version: this.stateApp.version,
+        results: results
       };
       console.log("ULTIMATUM PARTITION RESULTS = ", logData);
       app.api({ call: "apps/ultimatum-partition/results", type: "post", data: logData });

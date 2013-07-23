@@ -139,7 +139,7 @@ function(app, Common, Participant, StateApp, Graphs) {
         this.input.addBot();
       }
       // re-partners each render
-      this.input.pairModels();
+      this.input.pairModelsAsymmetric();
 
       this.collection = this.input;
     },
@@ -158,6 +158,10 @@ function(app, Common, Participant, StateApp, Graphs) {
         if (participant.get("choice") === undefined) {
           participant.set("choice", this.options.defaultChoice);
         }
+
+        // store the partner as the "giver partner", and as the "receiver partner" the other way
+        participant.set("giverPartner", participant.get("partner"));
+        participant.get("partner").set("receiverPartner", participant);
       }, this);
 
       UltimatumGame.Util.assignOffers(this.collection,
@@ -233,12 +237,10 @@ function(app, Common, Participant, StateApp, Graphs) {
     beforeRender: function () {
       // this.input is a participant collection
       this.collection = this.input;
-      this.options.viewOptions = { model: this.groupModel };
 
-      this.assignScores(this.groupModel);
+      this.assignScores(this.collection);
 
-      // TODO log
-      //this.logResults(this.groupModel);
+      this.logResults(this.collection);
     },
 
     handleConfigure: function () {
@@ -253,9 +255,9 @@ function(app, Common, Participant, StateApp, Graphs) {
       };
     },
 
-    assignScores: function (groupModel) {
+    assignScores: function (collection) {
       // for each receiver
-      this.collection.each(function (receiver) {
+      collection.each(function (receiver) {
         var giver = receiver.get("partner");
         if (receiver.get("choice") === this.config.acceptChoice) {
           receiver.set("receiverScore", receiver.get("offer"));
@@ -267,12 +269,23 @@ function(app, Common, Participant, StateApp, Graphs) {
       }, this);
     },
 
-    logResults: function (groupModel) {
-      // TODO: log
+    logResults: function (collection) {
+      var results = collection.map(function (model) {
+        return {
+          alias: model.get("alias"),
+          giverOffer: model.get("keep"),
+          giverScore: model.get("giverScore"),
+          giverPartner: model.get("giverPartner").get("alias"),
+          receiverOffer: model.get("offer"),
+          receiverScore: model.get("receiverScore"),
+          receiverPartner: model.get("receiverPartner").get("alias")
+        };
+      });
 
       var logData = {
         config: this.config,
-        version: this.stateApp.version
+        version: this.stateApp.version,
+        results: results
       };
       console.log("ULTIMATUM RESULTS = ", logData);
       app.api({ call: "apps/ultimatum/results", type: "post", data: logData });
