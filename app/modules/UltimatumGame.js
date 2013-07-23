@@ -76,23 +76,16 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.Views.Results = {};
 
   UltimatumGame.Views.Results.Score = Common.Views.ParticipantDisplay.extend({
-    overrides: {
-      cssClass: function (model) {
-        if (model.get("score") === 0) {
-          return "rejected";
-        } else {
-          return "accepted";
-        }
-      },
-      bottomText: function (model) {
-        if (model.get("score") === 0) {
-          return "Rejected";
-        } else {
-          return "Accepted";
-        }
-      },
-      mainText: function (model) {
-        return model.get("score");
+    template: "ultimatum/score",
+    serialize: function () {
+      return {
+        alias: this.model.get("alias"),
+        giverOffer: this.model.get("keep"),
+        giverScore: this.model.get("giverScore"),
+        giverScoreClass: (this.model.get("giverScore") === 0) ? "rejected" : "accepted",
+        receiverOffer: this.model.get("offer"),
+        receiverScore: this.model.get("receiverScore"),
+        receiverScoreClass: (this.model.get("receiverScore") === 0) ? "rejected" : "accepted"
       }
     }
   });
@@ -100,6 +93,7 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.Views.Results.Layout = Common.Views.SimpleLayout.extend({
     overrides: {
       header: "Results",
+      className: "ultimatum-results",
       PreParticipantsView: UltimatumGame.Views.PreParticipants,
       ParticipantView: UltimatumGame.Views.Results.Score
     }
@@ -264,11 +258,11 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.collection.each(function (receiver) {
         var giver = receiver.get("partner");
         if (receiver.get("choice") === this.config.acceptChoice) {
-          receiver.set("score", receiver.get("offer"));
-          giver.set("score", giver.get("keep"));
+          receiver.set("receiverScore", receiver.get("offer"));
+          giver.set("giverScore", giver.get("keep"));
         } else {
-          receiver.set("score", 0);
-          giver.set("score", 0)
+          receiver.set("receiverScore", 0);
+          giver.set("giverScore", 0)
         }
       }, this);
     },
