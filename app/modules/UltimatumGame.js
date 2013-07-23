@@ -215,11 +215,11 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
 
     handleConfigure: function () {
-      UltimatumGame.Util.assignOffers(this.groupModel.get("group1"),
+      UltimatumGame.Util.assignOffers(this.collection,
         this.config.amount, this.config.offerMap);
     },
 
-    // this.input is a groupModel
+    // this.input is a collection
     beforeRender: function () {
       // reset played and choices
       this.collection = this.input;
@@ -241,7 +241,7 @@ function(app, Common, Participant, StateApp, Graphs) {
       };
     },
 
-    // outputs a groupModel
+    // outputs a collection
     getOutput: function () {
       // if you haven't played, then you played "A".
       this.collection.each(function (participant) {
