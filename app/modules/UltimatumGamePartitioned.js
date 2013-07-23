@@ -174,6 +174,9 @@ function(app, Common, Participant, StateApp, Graphs) {
         // reset played and choices
         this.groupModel.get("participants").each(function (participant) {
           participant.reset();
+          if (participant.bot) {
+            participant.delayedPlay();
+          }
         });
       } else {
         // reset played and choices
@@ -241,6 +244,9 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.groupModel.get("group2").each(function (participant) {
         participant.reset();
         participant.set("validChoices", validChoices);
+        if (participant.bot) {
+          participant.delayedPlay();
+        }
       });
 
       this.options.viewOptions = { model: this.groupModel };

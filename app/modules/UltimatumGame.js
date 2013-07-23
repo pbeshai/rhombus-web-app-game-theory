@@ -130,16 +130,19 @@ function(app, Common, Participant, StateApp, Graphs) {
 
     // this.input is a participant collection.
     beforeRender: function () {
-      // reset played and choices
-      this.input.each(function (participant) {
-        participant.reset();
-      });
-
-      if (this.input.length % 2 === 1) {
+      if (this.input.length < 2) {
         this.input.addBot();
       }
       // re-partners each render
       this.input.pairModelsAsymmetric();
+
+      // reset played and choices
+      this.input.each(function (participant) {
+        participant.reset();
+        if (participant.bot) {
+          participant.delayedPlay();
+        }
+      });
 
       this.collection = this.input;
     },
@@ -200,6 +203,9 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.collection.each(function (participant) {
         participant.reset();
         participant.set("validChoices", validChoices);
+        if (participant.bot) {
+          participant.delayedPlay();
+        }
       });
     },
 

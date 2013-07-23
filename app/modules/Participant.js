@@ -36,7 +36,7 @@ function(app) {
       this.unset("complete", { silent: true });
       this.unset("played", { silent: true });
       this.unset("choice", { silent: true });
-      this.unset("validChoices", { silent: true });
+      this.set("validChoices", this.defaults.validChoices, { silent: true });
     },
 
     validate: function (attrs, options) {
@@ -89,7 +89,7 @@ function(app) {
 
     play: function () {
       var choices = this.get("validChoices");
-      var choice = choices[Math.max(Math.floor(Math.random() * choices.length), choices.length - 1)];
+      var choice = choices[Math.min(Math.floor(Math.random() * choices.length), choices.length - 1)];
       this.set("choice", choice);
     }
   });
