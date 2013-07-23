@@ -76,6 +76,32 @@ function (app, Participant, Grid) {
     },
   });
 
+  Common.Models.Instructions = Backbone.Model.extend({
+    initialize: function (attrs, options) {
+      _.defaults(this.attributes, { header: this.header, description: this.description, buttonConfig: this.buttonConfig });
+
+      // easy way to initialize with a config is to subclass and supply a configInit function
+      // while passing a config object as an option
+      if (_.isFunction(this.configInit)) {
+        this.configInit(options.config);
+      }
+    }
+  });
+
+  Common.Views.Instructions = Backbone.View.extend({
+    template: "common/instructions",
+    className: "instructions",
+
+    serialize: function () {
+      return {
+        header: this.model.get("header") || "Instructions",
+        description: this.model.get("description"),
+        buttons: [ "A", "B", "C", "D", "E" ],
+        buttonConfig: this.model.get("buttonConfig"), // buttonConfig: { A: { description: "" }, B: undefined } undefined = disabled
+      }
+    }
+  });
+
   Common.Views.ParticipantPlay = Backbone.View.extend({
     template: "common/participant_play",
     className: "participant player",
@@ -221,6 +247,7 @@ function (app, Participant, Grid) {
       ParticipantsView: Common.Views.ParticipantsGrid,
       PreParticipantsView: null,
       PostParticipantsView: null,
+      InstructionsModel: null,
     },
     overrides: { }, // quick way for direct subclasses to override defaults
 
@@ -244,6 +271,10 @@ function (app, Participant, Grid) {
 
       if (this.options.PostParticipantsView != null) {
         this.insertView(".post-participants", new this.options.PostParticipantsView(viewOptions));
+      }
+
+      if (this.options.InstructionsModel != null) {
+        this.insertView(new Common.Views.Instructions({ model: new this.options.InstructionsModel(null, { config: this.options.config }) }))
       }
     },
 

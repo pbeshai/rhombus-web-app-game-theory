@@ -7,14 +7,26 @@ define([
   // Application.
   "app",
 
+  "modules/common/Common",
   "modules/Participant",
 
   "apps/StateApp"
 ],
 
-function(app, Participant, StateApp) {
+function(app, Common, Participant, StateApp) {
 
   var Attendance = app.module();
+
+  Attendance.Instructions = Common.Models.Instructions.extend({
+    description: "Press any button to check-in.",
+    buttonConfig: {
+      "A": { description: "Check-in" },
+      "B": { description: "Check-in" },
+      "C": { description: "Check-in" },
+      "D": { description: "Check-in" },
+      "E": { description: "Check-in" }
+    }
+  });
 
   Attendance.Views.Participant = app.BaseView.extend({
   	template: "attendance/participant",
@@ -60,6 +72,7 @@ function(app, Participant, StateApp) {
       this.collection.each(function (participant) {
   			this.insertView(".participant-grid", new Attendance.Views.Participant({ model: participant }));
   		}, this);
+      this.insertView(new Common.Views.Instructions({ model: new Attendance.Instructions() }));
   	},
 
     add: function (participant) {

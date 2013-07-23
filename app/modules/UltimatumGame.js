@@ -33,6 +33,29 @@ function(app, Common, Participant, StateApp, Graphs) {
     rejectChoice: "B", // choice a receiver makes to reject
   };
 
+  UltimatumGame.Instructions = {};
+  UltimatumGame.Instructions.GiverPlay = Common.Models.Instructions.extend({
+    header: "Giver Instructions",
+    configInit: function (config) {
+      this.attributes.buttonConfig = {
+        "A": { description: "Offer " + config.offerMap.A },
+        "B": { description: "Offer " + config.offerMap.B },
+        "C": { description: "Offer " + config.offerMap.C },
+        "D": { description: "Offer " + config.offerMap.D },
+        "E": { description: "Offer " + config.offerMap.E },
+      }
+    }
+  });
+  UltimatumGame.Instructions.ReceiverPlay = Common.Models.Instructions.extend({
+    header: "Receiver Instructions",
+    configInit: function (config) {
+      var buttonConfig = this.attributes.buttonConfig = {};
+      buttonConfig[config.acceptChoice] = { description: "Accept offer" };
+      buttonConfig[config.rejectChoice] = { description: "Reject offer" };
+    }
+  });
+
+
   UltimatumGame.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
     modelOptions: _.extend({}, UltimatumGame.config)
   });
@@ -54,6 +77,7 @@ function(app, Common, Participant, StateApp, Graphs) {
       header: "Givers Play",
       PreParticipantsView: UltimatumGame.Views.PreParticipants,
       ParticipantView: UltimatumGame.Views.GiverPlay.Giver,
+      InstructionsModel: UltimatumGame.Instructions.GiverPlay
     }
   });
 
@@ -70,6 +94,7 @@ function(app, Common, Participant, StateApp, Graphs) {
       header: "Receivers Play",
       PreParticipantsView: UltimatumGame.Views.PreParticipants,
       ParticipantView: UltimatumGame.Views.ReceiverPlay.Receiver,
+      InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
     }
   });
 
