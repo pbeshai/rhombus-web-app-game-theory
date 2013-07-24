@@ -31,7 +31,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   TeamPrisonersDilemma.Views.Play.Layout = Common.Views.GroupLayout.extend({
     overrides: {
       header: "Play",
-      ParticipantView: PrisonersDilemma.Views.Play.Participant
+      ParticipantView: PrisonersDilemma.Views.Play.Participant,
+      InstructionsModel: PrisonersDilemma.Instructions
     }
   });
 
@@ -103,7 +104,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
       this.options.viewOptions = {
         model: this.teamsModel,
         group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name
+        group2Name: this.config.group2Name,
+        config: this.config
       };
     },
 

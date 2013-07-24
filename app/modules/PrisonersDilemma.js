@@ -7,6 +7,8 @@ define([
   // Application.
   "app",
 
+  "modules/common/Common",
+
   "modules/Participant",
 
   "apps/StateApp",
@@ -16,11 +18,20 @@ define([
 
   "util/d3/rickshaw/graphs"
 ],
-function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
+function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
 
   var PrisonersDilemma = app.module();
   PrisonersDilemma.Views.Play = {};
   PrisonersDilemma.Views.Results = {};
+
+
+  PrisonersDilemma.Instructions = Common.Models.Instructions.extend({
+    description: { template: "pd/play/instructions" },
+    buttonConfig: {
+      "C": { description: "Cooperate" },
+      "D": { description: "Defect" },
+    }
+  });
 
   PrisonersDilemma.Model = Participant.Model.extend({
     urlRoot: null,
@@ -140,11 +151,16 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
       this.collection.each(function (participant) {
   			this.insertView(".participant-grid", new PrisonersDilemma.Views.Play.Participant({ model: participant }));
   		}, this);
+
+
+      this.insertView(new Common.Views.Instructions({ model: new this.options.InstructionsModel(null, { config: this.options.config }) }))
   	},
 
 
   	initialize: function () {
       app.participantServer.hookCollection(this.collection, this);
+
+      this.options.InstructionsModel || (this.options.InstructionsModel = PrisonersDilemma.Instructions);
 
       this.listenTo(this.collection, {
   			"reset": this.render
@@ -469,12 +485,13 @@ function(app, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
     },
 
     initialize: function () {
+      this.config = this.options.config;
     },
 
     beforeRender: function () {
       this.participants = PrisonersDilemma.Util.makeCollection(this.input);
 
-      this.options.viewOptions = { collection: this.participants };
+      this.options.viewOptions = { collection: this.participants, config: this.config };
     },
 
     // outputs a PrisonersDilemma.Collection

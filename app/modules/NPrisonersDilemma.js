@@ -6,15 +6,23 @@
 define([
   // Application.
   "app",
-
+  "modules/common/Common",
   "modules/PrisonersDilemma",
   "modules/Participant",
 
   "apps/StateApp",
 ],
-function(app, PrisonersDilemma, Participant, StateApp) {
+function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   var NPrisonersDilemma = app.module();
+
+  NPrisonersDilemma.Instructions = Common.Models.Instructions.extend({
+    buttonConfig: {
+      "C": { description: "Cooperate" },
+      "D": { description: "Defect" },
+    }
+  });
+
   NPrisonersDilemma.Views.Results = {};
 
   NPrisonersDilemma.Views.Results.Participant = PrisonersDilemma.Views.Results.Participant.extend({
@@ -120,7 +128,7 @@ function(app, PrisonersDilemma, Participant, StateApp) {
 
       this.participants = new PrisonersDilemma.Collection(pdParticipants);
 
-      this.options.viewOptions = { collection: this.participants };
+      this.options.viewOptions = { collection: this.participants, config: this.config, InstructionsModel: NPrisonersDilemma.Instructions };
     },
 
     // outputs a PrisonersDilemma.Collection

@@ -9,12 +9,13 @@ define([
   "modules/common/Common",
 
   "modules/Participant",
+  "modules/UltimatumGame",
 
   "apps/StateApp",
 
   "util/d3/rickshaw/graphs"
 ],
-function(app, Common, Participant, StateApp, Graphs) {
+function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
 
   var UltimatumGamePartitioned = app.module();
 
@@ -32,6 +33,8 @@ function(app, Common, Participant, StateApp, Graphs) {
     acceptChoice: "A", // choice a receiver makes to accept
     rejectChoice: "B", // choice a receiver makes to reject
   };
+
+
 
   UltimatumGamePartitioned.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
     modelOptions: _.extend({}, UltimatumGamePartitioned.config)
@@ -65,7 +68,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       ParticipantView: {
         group1: UltimatumGamePartitioned.Views.GiverPlay.Giver,
         group2: UltimatumGamePartitioned.Views.GiverPlay.Receiver
-      }
+      },
+      InstructionsModel: UltimatumGame.Instructions.GiverPlay
     }
   });
 
@@ -93,7 +97,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       ParticipantView: {
         group1: UltimatumGamePartitioned.Views.ReceiverPlay.Giver,
         group2: UltimatumGamePartitioned.Views.ReceiverPlay.Receiver
-      }
+      },
+      InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
     }
   });
 

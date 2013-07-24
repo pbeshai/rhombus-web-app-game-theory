@@ -7,12 +7,13 @@ define([
   // Application.
   "app",
 
+  "modules/common/Common",
   "modules/PrisonersDilemma",
   "modules/Participant",
 
   "apps/StateApp",
 ],
-function(app, PrisonersDilemma, Participant, StateApp) {
+function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   var PrisonersDilemmaMulti = app.module();
   PrisonersDilemmaMulti.Views.Play = {};
@@ -48,6 +49,8 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       if (this.options.round > 1) {
         this.setView(".results-stats", new PrisonersDilemma.Views.Results.Stats({ collection: this.collection }));
       }
+
+      this.insertView(new Common.Views.Instructions({ model: new PrisonersDilemma.Instructions(null, { config: this.options.config }) }))
     },
 
 
@@ -131,7 +134,7 @@ function(app, PrisonersDilemma, Participant, StateApp) {
       // input is a PrisonersDilemma.Collection
       this.participants = this.input;
 
-      this.options.viewOptions = { collection: this.participants, round: this.stateApp.round, gameOver: this.config.gameOver };
+      this.options.viewOptions = { collection: this.participants, round: this.stateApp.round, gameOver: this.config.gameOver, config: this.config };
     },
 
     // outputs a PrisonersDilemma.Collection

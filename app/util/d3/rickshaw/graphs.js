@@ -12,7 +12,7 @@ function (Rickshaw, TimeseriesTooltip) {
 
     var graphDefaults = {
       element: view.$(".chart")[0],
-      width: 960,
+      width: 800,
       height: 300,
       renderer: 'line',
       padding: { top: 0.1 }

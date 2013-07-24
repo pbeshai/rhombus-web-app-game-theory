@@ -53,7 +53,9 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 				saveNew: false
 			});
 
-			var playState = new PrisonersDilemma.States.Play();
+			var playState = new PrisonersDilemma.States.Play({
+				config: this.config
+			});
 
 			var resultsState = new PrisonersDilemma.States.Results({
 				config: this.config

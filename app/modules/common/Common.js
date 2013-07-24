@@ -78,7 +78,16 @@ function (app, Participant, Grid) {
 
   Common.Models.Instructions = Backbone.Model.extend({
     initialize: function (attrs, options) {
-      _.defaults(this.attributes, { header: this.header, description: this.description, buttonConfig: this.buttonConfig });
+      attrs = _.defaults(this.attributes, { header: this.header, description: this.description, buttonConfig: this.buttonConfig });
+      var instrModel = this;
+      // check if the description is a template, in which case, load it
+      if (_.isObject(this.description) && this.description.template) {
+        console.log("CONFIG IS ", options.config);
+          attrs.description = ""; // prevents [Object object] from showing up
+          new Backbone.View({ template: this.description.template, serialize: options.config }).render().then(function () {
+            instrModel.set("description", this.el.innerHTML);
+          });
+      }
 
       // easy way to initialize with a config is to subclass and supply a configInit function
       // while passing a config object as an option
@@ -99,6 +108,10 @@ function (app, Participant, Grid) {
         buttons: [ "A", "B", "C", "D", "E" ],
         buttonConfig: this.model.get("buttonConfig"), // buttonConfig: { A: { description: "" }, B: undefined } undefined = disabled
       }
+    },
+
+    initialize: function () {
+      this.listenTo(this.model, "change", this.render); // ensures the view is up to date
     }
   });
 
@@ -300,6 +313,7 @@ function (app, Participant, Grid) {
       PostParticipantsView: null,
       PreGroupsView: null,
       PostGroupsView: null,
+      InstructionsModel: null,
       inactive: {}
     },
     overrides: { }, // quick way for direct subclasses to override defaults
@@ -350,6 +364,11 @@ function (app, Participant, Grid) {
 
       if (this.options.PostGroupsView != null) {
         this.insertView(".post-groups", new this.options.PostGroupsView(viewOptions));
+      }
+
+      if (this.options.InstructionsModel != null) {
+        console.log("instr model with ", this.options);
+        this.insertView(new Common.Views.Instructions({ model: new this.options.InstructionsModel(null, { config: this.options.config }) }))
       }
     },
 
