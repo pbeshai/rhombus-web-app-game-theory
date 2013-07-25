@@ -75,86 +75,20 @@ function(app, Common, Participant, StateApp, Graphs) {
   // To be used in StateApps
   CoinMatching.States = {};
   // needs view,
-  CoinMatching.States.Play = StateApp.defineState({
-    defaults: {
-      defaultChoice: "A" // choice made when a player does not play
-    },
-
-    // this.input is a participant collection.
-    beforeRender: function () {
-      // could receive input as participant collection or as a group model (if returning from receive play)
-      if (this.input instanceof Common.Models.GroupModel) {
-        this.groupModel = this.input;
-
-        // reset played and choices
-        this.groupModel.get("participants").each(function (participant) {
-          participant.reset();
-          if (participant.bot) {
-            participant.delayedPlay();
-          }
-        });
-      } else {
-        // reset played and choices
-        this.input.each(function (participant) {
-          participant.reset();
-        });
-
-        this.groupModel = new Common.Models.GroupModel({ participants: this.input }, { forceEven: true });
-      }
-
-      if (this.input.length % 2 === 1) {
-        this.input.addBot();
-      }
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        model: this.groupModel,
-        config: this.config,
-        group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name,
-      };
-    },
-
-    // outputs a participant collection
-    getOutput: function () {
-      return this.groupModel;
-    }
+  CoinMatching.States.Play = StateApp.defineState(Common.States.GroupPlay, {
+    view: CoinMatching.Views.Play.Layout,
+    defaultChoice: null,
   });
 
-  CoinMatching.States.Results = StateApp.defineState({
+  CoinMatching.States.Results = StateApp.defineState(Common.States.GroupResults, {
     view: CoinMatching.Views.Results.Layout,
-
-    beforeRender: function () {
-      // this.input is a GroupModel
-      this.groupModel = this.input;
-
-      //this.assignScores(this.collection);
-
-      // TODO: log results
-      //this.logResults(this.collection);
-    },
 
     handleConfigure: function () {
     },
 
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        model: this.groupModel,
-        config: this.config,
-        group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name,
-      };
-    },
-
-    assignScores: function (collection) {
-      // for each receiver
-      collection.each(function (participant) {
-
-      }, this);
-    },
-
     logResults: function (collection) {
+      return;
+
       var results = collection.map(function (model) {
         return {
           alias: model.get("alias"),
