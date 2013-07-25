@@ -189,6 +189,7 @@ function(app) {
       } else {
         for(var i = 0; i < indices.length; i ++) {
           models[indices[i]].set("partner", models[indices[(i+1) % indices.length]]);
+          models[indices[(i+1) % indices.length]].set("partnerBackward", models[indices[i]]);
         }
       }
     },

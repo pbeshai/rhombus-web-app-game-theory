@@ -94,6 +94,7 @@ function(app, StateApp, Participant, Attendance, UltimatumGame) {
 				},
 
 				giverPlay_receiverPlay: function () {
+					console.log("transitioning gp rp");
 
 				},
 

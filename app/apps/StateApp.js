@@ -21,7 +21,7 @@ function(app) {
 		this.stateApp = stateApp;
 	};
 	_.extend(State.prototype, Backbone.Events);
-
+	State.prototype.initialize = function () { };
 	State.prototype.getOutput = function () { }; // no-op
 	State.prototype.beforeRender = function () { }; // no-op
 	State.prototype.afterRender = function () { }; // no-op
@@ -110,6 +110,17 @@ function(app) {
 		}
 		return this.flow.prev;
 	};
+
+	// commonly used to log results via an API call
+	State.prototype.log = function (apiCall, data) {
+      var logData = _.extend({
+        config: this.config,
+        version: this.stateApp.version,
+      }, data);
+
+      console.log("Logging", logData);
+      app.api({ call: apiCall, type: "post", data: logData });
+    },
 
 	// can be called when a state app configures itself (perhaps a new config is set)
 	State.prototype.handleConfigure = function () {}
@@ -204,8 +215,29 @@ function(app) {
 		});
 	};
 
+	// properties must include a view property e.g. view: CoinMatching.Views.Play.Layout
+	// extendState([ParentState,] properties)
+	var defineState = function (ParentState, properties) {
+		if (arguments.length === 1) { // ParentState is an optional first argument (defaults to State)
+			properties = ParentState;
+			ParentState = State;
+		}
+
+		var DefState = function (options) {
+			this.flow = { next: undefined, prev: undefined };
+	    this.options = _.defaults({}, options, this.defaults);
+	    this.config = this.options.config; // commonly passed option done here to avoid always overriding initialize
+	    this.initialize();
+	  };
+	  DefState.prototype = new ParentState();
+  	_.extend(DefState.prototype, properties);
+
+  	return DefState;
+	}
+
 	return {
 		State: State,
-		App: StateApp
+		App: StateApp,
+		defineState: defineState
 	};
 });

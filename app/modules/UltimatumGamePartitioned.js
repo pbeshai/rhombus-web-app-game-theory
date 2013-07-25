@@ -156,53 +156,8 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
 
   // To be used in StateApps
   UltimatumGamePartitioned.States = {};
-  UltimatumGamePartitioned.States.GiverPlay = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
-
-    this.initialize();
-  }
-  UltimatumGamePartitioned.States.GiverPlay.prototype = new StateApp.State(UltimatumGamePartitioned.Views.GiverPlay.Layout);
-  _.extend(UltimatumGamePartitioned.States.GiverPlay.prototype, {
-    defaults: {
-      defaultChoice: "A" // choice made when a player does not play
-    },
-
-    initialize: function () {
-      this.config = this.options.config;
-    },
-
-    beforeRender: function () {
-      // could receive input as participant collection or as a group model (if returning from receive play)
-      if (this.input instanceof Common.Models.GroupModel) {
-        this.groupModel = this.input;
-
-        // reset played and choices
-        this.groupModel.get("participants").each(function (participant) {
-          participant.reset();
-          if (participant.bot) {
-            participant.delayedPlay();
-          }
-        });
-      } else {
-        // reset played and choices
-        this.input.each(function (participant) {
-          participant.reset();
-        });
-
-        this.groupModel = new Common.Models.GroupModel({ participants: this.input }, { forceEven: true });
-      }
-
-      this.options.viewOptions = { model: this.groupModel };
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        model: this.groupModel,
-        group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name,
-        config: this.config
-      };
-    },
+  UltimatumGamePartitioned.States.GiverPlay = StateApp.defineState(Common.States.GroupPlay, {
+    view: UltimatumGamePartitioned.Views.GiverPlay.Layout,
 
     // outputs a GroupModel
     getOutput: function () {
@@ -220,19 +175,11 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     }
   });
 
-  UltimatumGamePartitioned.States.ReceiverPlay = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
-
-    this.initialize();
-  }
-  UltimatumGamePartitioned.States.ReceiverPlay.prototype = new StateApp.State(UltimatumGamePartitioned.Views.ReceiverPlay.Layout);
-  _.extend(UltimatumGamePartitioned.States.ReceiverPlay.prototype, {
-    defaults: {
-      defaultChoice: "A", // choice made when a player does not play
-    },
+  UltimatumGamePartitioned.States.ReceiverPlay = StateApp.defineState(Common.States.GroupPlay, {
+    view: UltimatumGamePartitioned.Views.ReceiverPlay.Layout,
 
     initialize: function () {
-      this.config = this.options.config;
+      this.validChoices = [this.config.acceptChoice, this.config.rejectChoice];
     },
 
     handleConfigure: function () {
@@ -244,26 +191,15 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     beforeRender: function () {
       // reset played and choices
       this.groupModel = this.input;
-      var validChoices = [this.config.acceptChoice, this.config.rejectChoice];
 
+      // only reset group2
       this.groupModel.get("group2").each(function (participant) {
         participant.reset();
-        participant.set("validChoices", validChoices);
+        participant.set("validChoices", this.validChoices);
         if (participant.bot) {
           participant.delayedPlay();
         }
       });
-
-      this.options.viewOptions = { model: this.groupModel };
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        model: this.groupModel,
-        group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name,
-        config: this.config
-      };
     },
 
     // outputs a groupModel
@@ -281,36 +217,12 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   });
 
 
-  UltimatumGamePartitioned.States.Results = function (options) {
-    this.options = _.defaults({}, options);
-    this.initialize();
-  }
-  UltimatumGamePartitioned.States.Results.prototype = new StateApp.State(UltimatumGamePartitioned.Views.Results.Layout);
-  _.extend(UltimatumGamePartitioned.States.Results.prototype, {
-    initialize: function () {
-      this.config = this.options.config;
-    },
-    beforeRender: function () {
-      // this.input is a GroupModel
-      this.groupModel = this.input;
-
-      this.assignScores(this.groupModel);
-
-      this.logResults(this.groupModel);
-    },
+  UltimatumGamePartitioned.States.Results = StateApp.defineState(Common.States.GroupResults, {
+    view: UltimatumGamePartitioned.Views.Results.Layout,
 
     handleConfigure: function () {
       UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
         this.config.amount, this.config.offerMap);
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        model: this.groupModel,
-        group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name,
-        config: this.config
-      };
     },
 
     assignScores: function (groupModel) {
@@ -347,16 +259,8 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         };
       });
 
-      var logData = {
-        config: this.config,
-        version: this.stateApp.version,
-        results: results
-      };
-      console.log("ULTIMATUM PARTITION RESULTS = ", logData);
-      app.api({ call: "apps/ultimatum-partition/results", type: "post", data: logData });
+      this.log( "apps/ultimatum-partition/results", { results: results });
     },
-
-    getOutput: function () { }
   });
 
   return UltimatumGamePartitioned;

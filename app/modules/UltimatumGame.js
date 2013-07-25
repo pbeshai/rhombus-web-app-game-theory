@@ -124,7 +124,6 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-
   UltimatumGame.Util = {};
   UltimatumGame.Util.assignOffers = function (givers, amount, offerMap) {
     givers.each(function (giver) {
@@ -138,166 +137,50 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   // To be used in StateApps
   UltimatumGame.States = {};
-  UltimatumGame.States.GiverPlay = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
-
-    this.initialize();
-  }
-  UltimatumGame.States.GiverPlay.prototype = new StateApp.State(UltimatumGame.Views.GiverPlay.Layout);
-  _.extend(UltimatumGame.States.GiverPlay.prototype, {
-    defaults: {
-      defaultChoice: "A" // choice made when a player does not play
-    },
-
-    initialize: function () {
-      this.config = this.options.config;
-    },
-
-    // this.input is a participant collection.
-    beforeRender: function () {
-      if (this.input.length < 2) {
-        this.input.addBot();
-      }
-      // re-partners each render
-      this.input.pairModelsAsymmetric();
-
-      // reset played and choices
-      this.input.each(function (participant) {
-        participant.reset();
-        if (participant.bot) {
-          participant.delayedPlay();
-        }
-      });
-
-      this.collection = this.input;
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        collection: this.collection,
-        config: this.config
-      };
-    },
+  UltimatumGame.States.GiverPlay = StateApp.defineState(Common.States.Play, {
+    view: UltimatumGame.Views.GiverPlay.Layout,
+    pairModels: "asymmetric",
 
     // outputs a participant collection
-    getOutput: function () {
-      // if you haven't played, then you played "A".
-      this.collection.each(function (participant) {
-        if (participant.get("choice") === undefined) {
-          participant.set("choice", this.options.defaultChoice);
-        }
-
-        // store the partner as the "giver partner", and as the "receiver partner" the other way
-        participant.set("giverPartner", participant.get("partner"));
-        participant.get("partner").set("receiverPartner", participant);
-      }, this);
-
+    processOutput: function () {
       UltimatumGame.Util.assignOffers(this.collection,
         this.config.amount, this.config.offerMap);
-
-      return this.collection;
     }
   });
 
-  UltimatumGame.States.ReceiverPlay = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
-
-    this.initialize();
-  }
-  UltimatumGame.States.ReceiverPlay.prototype = new StateApp.State(UltimatumGame.Views.ReceiverPlay.Layout);
-  _.extend(UltimatumGame.States.ReceiverPlay.prototype, {
-    defaults: {
-      defaultChoice: "A", // choice made when a player does not play
-    },
+  UltimatumGame.States.ReceiverPlay = StateApp.defineState(Common.States.Play, {
+    view: UltimatumGame.Views.ReceiverPlay.Layout,
+    pairModels: false,
+    botCheck: false,
 
     initialize: function () {
-      this.config = this.options.config;
+      this.validChoices = [this.config.acceptChoice, this.config.rejectChoice];
     },
+
+    handleConfigure: function () {
+      UltimatumGame.Util.assignOffers(this.collection,
+        this.config.amount, this.config.offerMap);
+    }
+  });
+
+  UltimatumGame.States.Results = StateApp.defineState(Common.States.Results, {
+    view: UltimatumGame.Views.Results.Layout,
 
     handleConfigure: function () {
       UltimatumGame.Util.assignOffers(this.collection,
         this.config.amount, this.config.offerMap);
     },
 
-    // this.input is a collection
-    beforeRender: function () {
-      // reset played and choices
-      this.collection = this.input;
-      var validChoices = [this.config.acceptChoice, this.config.rejectChoice];
-
-      this.collection.each(function (participant) {
-        participant.reset();
-        participant.set("validChoices", validChoices);
-        if (participant.bot) {
-          participant.delayedPlay();
-        }
-      });
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        collection: this.collection,
-        config: this.config
-      };
-    },
-
-    // outputs a collection
-    getOutput: function () {
-      // if you haven't played, then you played "A".
-      this.collection.each(function (participant) {
-        if (participant.get("choice") === undefined) {
-          participant.set("choice", this.options.defaultChoice);
-        }
-        participant.set("complete", true);
-      }, this);
-
-      return this.collection;
-    }
-  });
-
-
-  UltimatumGame.States.Results = function (options) {
-    this.options = _.defaults({}, options);
-    this.initialize();
-  }
-  UltimatumGame.States.Results.prototype = new StateApp.State(UltimatumGame.Views.Results.Layout);
-  _.extend(UltimatumGame.States.Results.prototype, {
-    initialize: function () {
-      this.config = this.options.config;
-    },
-    beforeRender: function () {
-      // this.input is a participant collection
-      this.collection = this.input;
-
-      this.assignScores(this.collection);
-
-      this.logResults(this.collection);
-    },
-
-    handleConfigure: function () {
-      UltimatumGame.Util.assignOffers(this.collection,
-        this.config.amount, this.config.offerMap);
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = {
-        collection: this.collection,
-        config: this.config
-      };
-    },
-
-    assignScores: function (collection) {
-      // for each receiver
-      collection.each(function (receiver) {
-        var giver = receiver.get("partner");
-        if (receiver.get("choice") === this.config.acceptChoice) {
-          receiver.set("receiverScore", receiver.get("offer"));
-          giver.set("giverScore", giver.get("keep"));
-        } else {
-          receiver.set("receiverScore", 0);
-          giver.set("giverScore", 0)
-        }
-      }, this);
+    assignScore: function (participant) {
+      var receiver = participant;
+      var giver = receiver.get("partner");
+      if (receiver.get("choice") === this.config.acceptChoice) {
+        receiver.set("receiverScore", receiver.get("offer"));
+        giver.set("giverScore", giver.get("keep"));
+      } else {
+        receiver.set("receiverScore", 0);
+        giver.set("giverScore", 0)
+      }
     },
 
     logResults: function (collection) {
@@ -306,23 +189,15 @@ function(app, Common, Participant, StateApp, Graphs) {
           alias: model.get("alias"),
           giverOffer: model.get("keep"),
           giverScore: model.get("giverScore"),
-          giverPartner: model.get("giverPartner").get("alias"),
+          giverPartner: model.get("partner").get("alias"),
           receiverOffer: model.get("offer"),
           receiverScore: model.get("receiverScore"),
-          receiverPartner: model.get("receiverPartner").get("alias")
+          receiverPartner: model.get("partnerBackward").get("alias")
         };
       });
 
-      var logData = {
-        config: this.config,
-        version: this.stateApp.version,
-        results: results
-      };
-      console.log("ULTIMATUM RESULTS = ", logData);
-      app.api({ call: "apps/ultimatum/results", type: "post", data: logData });
-    },
-
-    getOutput: function () { }
+      this.log("apps/ultimatum/results", { results: results });
+    }
   });
 
   return UltimatumGame;

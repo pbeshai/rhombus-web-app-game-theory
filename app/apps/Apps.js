@@ -8,10 +8,11 @@ define([
   "apps/NPrisonersDilemmaApp",
   "apps/TeamPrisonersDilemmaApp",
   "apps/UltimatumGameApp",
-  "apps/UltimatumGamePartitionedApp"
+  "apps/UltimatumGamePartitionedApp",
+  "apps/CoinMatchingApp"
 ],
 function (GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDilemmaApp,
-	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp) {
+	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp, CoinMatchingApp) {
 	var Apps = {
 		"grid": GridApp.app,
 		"pd": PrisonersDilemmaApp.app,
@@ -19,7 +20,8 @@ function (GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDile
 		"npd": NPrisonersDilemmaApp.app,
 		"teampd": TeamPrisonersDilemmaApp.app,
 		"ultimatum": UltimatumGameApp.app,
-		"ultimatum-partitioned": UltimatumGamePartitionedApp.app
+		"ultimatum-partitioned": UltimatumGamePartitionedApp.app,
+		"coin-matching": CoinMatchingApp.app
 	};
 	return Apps;
 });
