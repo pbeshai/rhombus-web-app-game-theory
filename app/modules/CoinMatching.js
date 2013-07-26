@@ -19,11 +19,11 @@ function(app, Common, Participant, StateApp, Graphs) {
   var CoinMatching = app.module();
 
   CoinMatching.config = {
-    pointsPerRound: 1,
+    pointsPerPlay: 1,
+    playsPerRound: 10,
     group1Name: "Lab 1",
     group2Name: "Lab 2",
-    round: 1,
-    gameOver: true
+    round: 1
   };
 
   CoinMatching.Instructions = Common.Models.Instructions.extend({
@@ -86,18 +86,12 @@ function(app, Common, Participant, StateApp, Graphs) {
     handleConfigure: function () {
     },
 
-    logResults: function (collection) {
-      return;
+    logResults: function () {
+      return; // TODO: logging
 
-      var results = collection.map(function (model) {
+      var results = this.collection.map(function (model) {
         return {
           alias: model.get("alias"),
-          giverOffer: model.get("keep"),
-          giverScore: model.get("giverScore"),
-          giverPartner: model.get("giverPartner").get("alias"),
-          receiverOffer: model.get("offer"),
-          receiverScore: model.get("receiverScore"),
-          receiverPartner: model.get("receiverPartner").get("alias")
         };
       });
 

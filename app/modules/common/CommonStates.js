@@ -14,6 +14,18 @@ function(app, CommonModels, StateApp) {
 
     processBeforeRender: function () { }, // template method
 
+    prepareParticipant: function (participant) {
+      participant.reset();
+
+      if (this.validChoices) {
+        participant.set("validChoices", this.validChoices);
+      }
+
+      if (participant.bot) {
+        participant.delayedPlay();
+      }
+    },
+
     // this.input is a participant collection.
     beforeRender: function () {
       var collection = this.collection = this.input;
@@ -31,17 +43,7 @@ function(app, CommonModels, StateApp) {
       }
 
       // reset played and choices
-      collection.each(function (participant) {
-        participant.reset();
-
-        if (this.validChoices) {
-          participant.set("validChoices", this.validChoices);
-        }
-
-        if (participant.bot) {
-          participant.delayedPlay();
-        }
-      }, this);
+      collection.each(this.prepareParticipant, this);
 
       this.processBeforeRender();
     },
@@ -76,31 +78,46 @@ function(app, CommonModels, StateApp) {
 
     processBeforeRender: function () { }, // template method
 
+    prepareParticipant: function (participant) {
+      participant.reset();
+
+
+      if (this.validChoices) {
+        console.log("setting valid choices as ", this.validChoices);
+        participant.set("validChoices", this.validChoices);
+      }
+
+      if (participant.bot) {
+        participant.delayedPlay();
+      }
+    },
+
+    prepareParticipantGroup1: function (participant) {
+      this.prepareParticipant(participant);
+    },
+
+    prepareParticipantGroup2: function (participant) {
+      this.prepareParticipant(participant);
+    },
+
+    beforeRenderGroup1: function() {
+      this.groupModel.get("group1").each(this.prepareParticipantGroup1, this);
+    },
+
+    beforeRenderGroup2: function() {
+      this.groupModel.get("group2").each(this.prepareParticipantGroup2, this);
+    },
+
     beforeRender: function () {
       // could receive input as participant collection or as a group model (if returning from receive play)
       if (this.input instanceof CommonModels.GroupModel) {
         this.groupModel = this.input;
-
-        // reset played and choices
-        this.groupModel.get("participants").each(function (participant) {
-          participant.reset();
-
-          if (this.validChoices) {
-            participant.set("validChoices", this.validChoices);
-          }
-
-          if (participant.bot) {
-            participant.delayedPlay();
-          }
-        });
-      } else {
-        // reset played and choices
-        this.input.each(function (participant) {
-          participant.reset();
-        });
-
+      } else { // input is a collection, so create group model
         this.groupModel = new CommonModels.GroupModel({ participants: this.input }, this.groupModelOptions);
       }
+
+      this.beforeRenderGroup1();
+      this.beforeRenderGroup2();
 
       this.processBeforeRender();
     },
@@ -116,14 +133,34 @@ function(app, CommonModels, StateApp) {
 
     processOutput: function () { }, // template method
 
+    prepareParticipantOutput: function (participant) {
+      if (participant.get("choice") === undefined && this.defaultChoice) {
+        participant.set("choice", this.defaultChoice);
+      }
+    },
+
+    prepareParticipantOutputGroup1: function (participant) {
+      this.prepareParticipantOutput(participant);
+    },
+
+    prepareParticipantOutputGroup2: function (participant) {
+      this.prepareParticipantOutput(participant);
+    },
+
+    prepareOutputGroup1: function () {
+      // if you haven't played, then you played "A".
+      this.groupModel.get("group1").each(this.prepareParticipantOutputGroup1, this);
+    },
+
+    prepareOutputGroup2: function () {
+      // if you haven't played, then you played "A".
+      this.groupModel.get("group2").each(this.prepareParticipantOutputGroup2, this);
+    },
+
     // outputs a GroupModel
     getOutput: function () {
-      // if you haven't played, then you played "A".
-      this.groupModel.get("participants").each(function (participant) {
-        if (participant.get("choice") === undefined && this.defaultChoice) {
-          participant.set("choice", this.defaultChoice);
-        }
-      }, this);
+      this.prepareOutputGroup1();
+      this.prepareOutputGroup2();
 
       this.processOutput();
 
@@ -136,9 +173,9 @@ function(app, CommonModels, StateApp) {
       // this.input is a participant collection
       this.collection = this.input;
 
-      this.assignScores(this.collection);
+      this.assignScores();
 
-      this.logResults(this.collection);
+      this.logResults();
     },
 
     setViewOptions: function () {
@@ -152,13 +189,11 @@ function(app, CommonModels, StateApp) {
       return 0;
     },
 
-    assignScores: function (collection) {
-      collection.each(function (participant) {
-        this.assignScore(participant);
-      }, this);
+    assignScores: function () {
+      this.collection.each(this.assignScore, this);
     },
 
-    logResults: function (collection) { }, // template method
+    logResults: function () { }, // template method
 
     getOutput: function () { }
   });
@@ -168,9 +203,9 @@ function(app, CommonModels, StateApp) {
       // this.input is a GroupModel
       this.groupModel = this.input;
 
-      this.assignScores(this.groupModel);
+      this.assignScores();
 
-      this.logResults(this.groupModel);
+      this.logResults();
     },
 
     setViewOptions: function () {
@@ -186,13 +221,28 @@ function(app, CommonModels, StateApp) {
       return 0;
     },
 
-    assignScores: function (groupModel) {
-      groupModel.get("participants").each(function (participant) {
-        this.assignScore(participant);
-      }, this);
+    assignScoreGroup1: function (participant) {
+      return this.assignScore(participant);
     },
 
-    logResults: function (groupModel) { }, // template method
+    assignScoreGroup2: function (participant) {
+      return this.assignScore(participant);
+    },
+
+    assignScores: function () {
+      this.assignScoresGroup1();
+      this.assignScoresGroup2();
+    },
+
+    assignScoresGroup1: function () {
+      this.groupModel.get("group1").each(this.assignScoreGroup1, this);
+    },
+
+    assignScoresGroup2: function () {
+      this.groupModel.get("group2").each(this.assignScoreGroup2, this);
+    },
+
+    logResults: function () { }, // template method
 
     getOutput: function () { }
   });

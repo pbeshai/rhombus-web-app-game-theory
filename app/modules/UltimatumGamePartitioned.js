@@ -159,19 +159,13 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   UltimatumGamePartitioned.States.GiverPlay = StateApp.defineState(Common.States.GroupPlay, {
     view: UltimatumGamePartitioned.Views.GiverPlay.Layout,
 
-    // outputs a GroupModel
-    getOutput: function () {
-      // if you haven't played, then you played "A".
-      this.groupModel.get("group1").each(function (participant) {
-        if (participant.get("choice") === undefined) {
-          participant.set("choice", this.options.defaultChoice);
-        }
-      }, this);
+    // do not modify group2
+    prepareOutputGroup2: function () { },
 
+    processOutput: function () {
+      // assign offers
       UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
         this.config.amount, this.config.offerMap);
-
-      return this.groupModel;
     }
   });
 
@@ -187,32 +181,16 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         this.config.amount, this.config.offerMap);
     },
 
-    // this.input is a groupModel
-    beforeRender: function () {
-      // reset played and choices
-      this.groupModel = this.input;
+    // do not reset or prepare group1, but prepare group2 as normal
+    beforeRenderGroup1: function () { },
 
-      // only reset group2
-      this.groupModel.get("group2").each(function (participant) {
-        participant.reset();
-        participant.set("validChoices", this.validChoices);
-        if (participant.bot) {
-          participant.delayedPlay();
-        }
-      });
-    },
+    // do not modify group 1
+    prepareOutputGroup1: function () { },
 
-    // outputs a groupModel
-    getOutput: function () {
-      // if you haven't played, then you played "A".
-      this.groupModel.get("group2").each(function (participant) {
-        if (participant.get("choice") === undefined) {
-          participant.set("choice", this.options.defaultChoice);
-        }
-        participant.set("complete", true);
-      }, this);
-
-      return this.groupModel;
+    // set complete to true on group2 participants
+    prepareParticipantOutputGroup2: function (participant) {
+      this.prepareParticipantOutput(participant);
+      participant.set("complete", true);
     }
   });
 
@@ -225,23 +203,23 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         this.config.amount, this.config.offerMap);
     },
 
-    assignScores: function (groupModel) {
-      // for each receiver
-      groupModel.get("group2").each(function (receiver) {
-        var giver = receiver.get("partner");
-        if (receiver.get("choice") === this.config.acceptChoice) {
-          receiver.set("score", receiver.get("offer"));
-          giver.set("score", giver.get("keep"));
-        } else {
-          receiver.set("score", 0);
-          giver.set("score", 0)
-        }
-      }, this);
+    assignScoresGroup1: function () { },
+
+    // assign score by iterating over receivers with this function
+    assignScoreGroup2: function (receiver) {
+      var giver = receiver.get("partner");
+      if (receiver.get("choice") === this.config.acceptChoice) {
+        receiver.set("score", receiver.get("offer"));
+        giver.set("score", giver.get("keep"));
+      } else {
+        receiver.set("score", 0);
+        giver.set("score", 0)
+      }
     },
 
-    logResults: function (groupModel) {
+    logResults: function () {
       var results = {};
-      results.givers = groupModel.get("group1").map(function (giver) {
+      results.givers = this.groupModel.get("group1").map(function (giver) {
         return {
           alias: giver.get("alias"),
           keep: giver.get("keep"),
@@ -250,7 +228,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         };
       });
 
-      results.receivers = groupModel.get("group2").map(function (receiver) {
+      results.receivers = this.groupModel.get("group2").map(function (receiver) {
         return {
           alias: receiver.get("alias"),
           offer: receiver.get("offer"),

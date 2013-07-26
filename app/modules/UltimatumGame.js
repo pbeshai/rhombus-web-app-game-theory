@@ -183,8 +183,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       }
     },
 
-    logResults: function (collection) {
-      var results = collection.map(function (model) {
+    logResults: function () {
+      var results = this.collection.map(function (model) {
         return {
           alias: model.get("alias"),
           giverOffer: model.get("keep"),
