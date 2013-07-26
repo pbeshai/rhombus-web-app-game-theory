@@ -20,23 +20,9 @@ define([
 ],
 
 function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDilemmaMulti) {
-	var PrisonersDilemmaMultiApp = function (options) {
-		this.options = options || {};
-		this.config = _.extend({}, PrisonersDilemmaMulti.config, this.options.config);
-		this.initialize();
-	};
-	// description for use in router
-	PrisonersDilemmaMultiApp.app = {
-		instantiate: function (router) {
-			return new PrisonersDilemmaMultiApp({ participants: router.participants });
-		},
-		configView: PrisonersDilemmaMulti.Views.Configure,
-		title: "Multiround Prisoner's Dilemma"
-	};
-
-	PrisonersDilemmaMultiApp.prototype = new StateApp.App();
-	_.extend(PrisonersDilemmaMultiApp.prototype, {
+	var PrisonersDilemmaMultiApp = StateApp.App.extend({
 		version: "1.0",
+		config: PrisonersDilemmaMulti.config,
 
 		defineStates: function () {
 			var attendanceState = new Attendance.State({
@@ -60,17 +46,6 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 
 			attendanceState.setNext(playState);
 			playState.setNext(resultsState);
-		},
-
-		initialize: function () {
-			StateApp.App.prototype.initialize.call(this);
-		},
-
-		handleConfigure: function () {
-			// redraw if results are active
-			if (this.currentState === this.states.results) {
-				this.currentState.render();
-			}
 		},
 
 		transitions: {
@@ -130,6 +105,14 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 		}
 	});
 
+	// description for use in router
+	PrisonersDilemmaMultiApp.app = {
+		instantiate: function (router) {
+			return new PrisonersDilemmaMultiApp({ participants: router.participants });
+		},
+		configView: PrisonersDilemmaMulti.Views.Configure,
+		title: "Multiround Prisoner's Dilemma"
+	};
 
   return PrisonersDilemmaMultiApp;
 });

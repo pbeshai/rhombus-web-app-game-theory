@@ -11,21 +11,19 @@ define([
 
   "apps/StateApp",
 
-  "modules/Participant",
-  "modules/Attendance",
+  "modules/common/CommonStateApps",
   "modules/NPrisonersDilemma"
 ],
 
-function(app, StateApp, Participant, Attendance, NPrisonersDilemma) {
+function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
 
-	/**
-	 *  Prisoner's Dilemma App
-	 */
-	var NPrisonersDilemmaApp = function (options) {
-		this.options = options || {};
-		this.config = _.extend({}, NPrisonersDilemma.config, this.options.config);
-		this.initialize();
-	};
+	var NPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
+		version: "1.0",
+		config: NPrisonersDilemma.config,
+		PlayStates: [ NPrisonersDilemma.States.Play ],
+		ResultsState: NPrisonersDilemma.States.Results,
+	});
+
 	// description for use in router
 	NPrisonersDilemmaApp.app = {
 		instantiate: function (router) {
@@ -34,59 +32,6 @@ function(app, StateApp, Participant, Attendance, NPrisonersDilemma) {
 		configView: NPrisonersDilemma.Views.Configure,
 		title: "N-Person Prisoner's Dilemma"
 	};
-
-	NPrisonersDilemmaApp.prototype = new StateApp.App();
-	_.extend(NPrisonersDilemmaApp.prototype, {
-		version: "1.0",
-
-		defineStates: function () {
-			var attendanceState = new Attendance.State({
-				participants: this.options.participants,
-				acceptNew: true,
-				saveNew: false
-			});
-
-			var playState = new NPrisonersDilemma.States.Play();
-
-			var resultsState = new NPrisonersDilemma.States.Results({
-				config: this.config
-			});
-
-			this.states = {
-		  	"attendance": attendanceState,
-		  	"play": playState,
-		  	"results": resultsState
-	  	};
-
-			attendanceState.setNext(playState);
-			playState.setNext(resultsState);
-		},
-
-		initialize: function () {
-			StateApp.App.prototype.initialize.call(this);
-			console.log("pd app initialize");
-		},
-
-		handleConfigure: function () {
-			// redraw if results are active
-			if (this.currentState === this.states.results) {
-				this.currentState.render();
-			}
-		},
-
-		transitions: {
-	  		attendance_play: function () {
-	  		},
-
-	  		play_attendance: function () {
-				  this.options.participants.fetch(); // reset the participants that attendance uses
-	  		},
-
-	  		play_results: function () {
-	  		}
-		}
-	});
-
 
   return NPrisonersDilemmaApp;
 });

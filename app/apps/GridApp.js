@@ -19,21 +19,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 	/**
 	 *  Grid App
 	 */
-	var GridApp = function (options) {
-		this.options = options;
-		this.initialize();
-	};
-	// description for use in router
-	GridApp.app = {
-		instantiate: function (router) {
-			return new GridApp({ participants: router.participants });
-		},
-		configView: undefined,
-		title: "Grid App"
-	}
-
-	GridApp.prototype = new StateApp.App();
-	_.extend(GridApp.prototype, {
+	var GridApp = StateApp.App.extend({
 		defineStates: function () {
 			console.log("define states");
 			var attendanceState = new Attendance.State({
@@ -52,11 +38,6 @@ function(app, StateApp, Participant, Attendance, Grid) {
 			attendanceState.setNext(gridState);
 		},
 
-		initialize: function () {
-			StateApp.App.prototype.initialize.call(this);
-			console.log("grid app initialize");
-		},
-
 		transitions: {
 	  		attendance_grid: function () {
 	  			console.log("going from attendance to grid");
@@ -69,6 +50,15 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		}
 	});
 
+	// description for use in router
+	GridApp.app = {
+		instantiate: function (router) {
+			var app = new GridApp({ participants: router.participants });
+			return app;
+		},
+		configView: undefined,
+		title: "Grid App"
+	}
 
   return GridApp;
 });

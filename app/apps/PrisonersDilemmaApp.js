@@ -11,21 +11,19 @@ define([
 
   "apps/StateApp",
 
-  "modules/Participant",
-  "modules/Attendance",
+  "modules/common/CommonStateApps",
   "modules/PrisonersDilemma"
 ],
 
-function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
+function(app, StateApp, CommonStateApps, PrisonersDilemma) {
 
-	/**
-	 *  Prisoner's Dilemma App
-	 */
-	var PrisonersDilemmaApp = function (options) {
-		this.options = options || {};
-		this.config = _.extend({}, PrisonersDilemma.config, this.options.config);
-		this.initialize();
-	};
+	var PrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
+		version: "1.0",
+		config: PrisonersDilemma.config,
+		PlayStates: [ PrisonersDilemma.States.Play ],
+		ResultsState: PrisonersDilemma.States.Results,
+	})
+
 	// description for use in router
 	PrisonersDilemmaApp.app = {
 		instantiate: function (router) {
@@ -34,61 +32,6 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma) {
 		configView: PrisonersDilemma.Views.Configure,
 		title: "Prisoner's Dilemma"
 	};
-
-	PrisonersDilemmaApp.prototype = new StateApp.App();
-	_.extend(PrisonersDilemmaApp.prototype, {
-		version: "1.0",
-
-		defineStates: function () {
-			var attendanceState = new Attendance.State({
-				participants: this.options.participants,
-				acceptNew: true,
-				saveNew: false
-			});
-
-			var playState = new PrisonersDilemma.States.Play({
-				config: this.config
-			});
-
-			var resultsState = new PrisonersDilemma.States.Results({
-				config: this.config
-			});
-
-			this.states = {
-		  	"attendance": attendanceState,
-		  	"play": playState,
-		  	"results": resultsState
-	  	};
-
-			attendanceState.setNext(playState);
-			playState.setNext(resultsState);
-		},
-
-		initialize: function () {
-			StateApp.App.prototype.initialize.call(this);
-		},
-
-		handleConfigure: function () {
-			// redraw if results are active
-			if (this.currentState === this.states.results) {
-				this.currentState.render();
-			}
-		},
-
-		transitions: {
-	  		attendance_play: function () {
-	  			// take output from attendance and use it in grid
-	  		},
-
-	  		play_attendance: function () {
-				  this.options.participants.fetch(); // reset the participants that attendance uses
-	  		},
-
-	  		play_results: function () {
-	  		}
-		}
-	});
-
 
   return PrisonersDilemmaApp;
 });

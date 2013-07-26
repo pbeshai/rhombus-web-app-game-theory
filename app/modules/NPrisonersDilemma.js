@@ -93,14 +93,14 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   // To be used in StateApps
   NPrisonersDilemma.States = {};
-  NPrisonersDilemma.States.Play = StateApp.defineState(PrisonersDilemma.States.Play, {
+  NPrisonersDilemma.States.Play = PrisonersDilemma.States.Play.extend({
     setViewOptions: function () {
       PrisonersDilemma.States.Play.prototype.setViewOptions.call(this);
       this.options.viewOptions.InstructionsModel = NPrisonersDilemma.Instructions;
     }
   });
 
-  NPrisonersDilemma.States.Results = StateApp.defineState(Common.States.Results, {
+  NPrisonersDilemma.States.Results = Common.States.Results.extend({
     view: NPrisonersDilemma.Views.Results.Layout,
 
     assignScores: function () {

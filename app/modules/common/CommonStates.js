@@ -7,7 +7,7 @@ define([
 function(app, CommonModels, StateApp) {
   var CommonStates = {};
 
-  CommonStates.Play = StateApp.defineState({
+  CommonStates.Play = StateApp.State.extend({
     botCheck: function (collection) { return collection.length === 1; },
     pairModels: true,
     defaultChoice: "A", // choice made when a player does not play
@@ -72,7 +72,7 @@ function(app, CommonModels, StateApp) {
     }
   });
 
-  CommonStates.GroupPlay = StateApp.defineState({
+  CommonStates.GroupPlay = StateApp.State.extend({
     defaultChoice: "A",
     groupModelOptions: { forceEven: true },
 
@@ -157,6 +157,10 @@ function(app, CommonModels, StateApp) {
       this.groupModel.get("group2").each(this.prepareParticipantOutputGroup2, this);
     },
 
+    handleConfigure: function () {
+      this.renderView(); // ensures team names show update
+    },
+
     // outputs a GroupModel
     getOutput: function () {
       this.prepareOutputGroup1();
@@ -168,7 +172,7 @@ function(app, CommonModels, StateApp) {
     }
   });
 
-  CommonStates.Results = StateApp.defineState({
+  CommonStates.Results = StateApp.State.extend({
     beforeRender: function () {
       // this.input is a participant collection
       this.collection = this.input;
@@ -185,6 +189,10 @@ function(app, CommonModels, StateApp) {
       };
     },
 
+    handleConfigure: function () {
+      this.render();
+    },
+
     assignScore: function (participant) { // template method
       return 0;
     },
@@ -198,7 +206,7 @@ function(app, CommonModels, StateApp) {
     getOutput: function () { }
   });
 
-  CommonStates.GroupResults = StateApp.defineState({
+  CommonStates.GroupResults = StateApp.State.extend({
     beforeRender: function () {
       // this.input is a GroupModel
       this.groupModel = this.input;
@@ -215,6 +223,10 @@ function(app, CommonModels, StateApp) {
         group2Name: this.config.group2Name,
         config: this.config
       };
+    },
+
+    handleConfigure: function () {
+      this.render();
     },
 
     assignScore: function (participant) { // template method

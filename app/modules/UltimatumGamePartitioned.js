@@ -156,9 +156,12 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
 
   // To be used in StateApps
   UltimatumGamePartitioned.States = {};
-  UltimatumGamePartitioned.States.GiverPlay = StateApp.defineState(Common.States.GroupPlay, {
+  UltimatumGamePartitioned.States.GiverPlay = Common.States.GroupPlay.extend({
     view: UltimatumGamePartitioned.Views.GiverPlay.Layout,
 
+    handleConfigure: function () {
+      this.render();
+    },
     // do not modify group2
     prepareOutputGroup2: function () { },
 
@@ -169,8 +172,12 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     }
   });
 
-  UltimatumGamePartitioned.States.ReceiverPlay = StateApp.defineState(Common.States.GroupPlay, {
+  UltimatumGamePartitioned.States.ReceiverPlay = Common.States.GroupPlay.extend({
     view: UltimatumGamePartitioned.Views.ReceiverPlay.Layout,
+
+    handleConfigure: function () {
+      this.render();
+    },
 
     initialize: function () {
       this.validChoices = [this.config.acceptChoice, this.config.rejectChoice];
@@ -195,7 +202,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   });
 
 
-  UltimatumGamePartitioned.States.Results = StateApp.defineState(Common.States.GroupResults, {
+  UltimatumGamePartitioned.States.Results = Common.States.GroupResults.extend({
     view: UltimatumGamePartitioned.Views.Results.Layout,
 
     handleConfigure: function () {

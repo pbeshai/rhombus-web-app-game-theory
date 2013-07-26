@@ -137,9 +137,12 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   // To be used in StateApps
   UltimatumGame.States = {};
-  UltimatumGame.States.GiverPlay = StateApp.defineState(Common.States.Play, {
+  UltimatumGame.States.GiverPlay = Common.States.Play.extend({
     view: UltimatumGame.Views.GiverPlay.Layout,
     pairModels: "asymmetric",
+    handleConfigure: function () {
+      this.render();
+    },
 
     // outputs a participant collection
     processOutput: function () {
@@ -148,7 +151,7 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-  UltimatumGame.States.ReceiverPlay = StateApp.defineState(Common.States.Play, {
+  UltimatumGame.States.ReceiverPlay = Common.States.Play.extend({
     view: UltimatumGame.Views.ReceiverPlay.Layout,
     pairModels: false,
     botCheck: false,
@@ -160,10 +163,12 @@ function(app, Common, Participant, StateApp, Graphs) {
     handleConfigure: function () {
       UltimatumGame.Util.assignOffers(this.collection,
         this.config.amount, this.config.offerMap);
+
+      this.render();
     }
   });
 
-  UltimatumGame.States.Results = StateApp.defineState(Common.States.Results, {
+  UltimatumGame.States.Results = Common.States.Results.extend({
     view: UltimatumGame.Views.Results.Layout,
 
     handleConfigure: function () {

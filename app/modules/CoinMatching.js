@@ -75,12 +75,12 @@ function(app, Common, Participant, StateApp, Graphs) {
   // To be used in StateApps
   CoinMatching.States = {};
   // needs view,
-  CoinMatching.States.Play = StateApp.defineState(Common.States.GroupPlay, {
+  CoinMatching.States.Play = Common.States.GroupPlay.extend({
     view: CoinMatching.Views.Play.Layout,
     defaultChoice: null,
   });
 
-  CoinMatching.States.Results = StateApp.defineState(Common.States.GroupResults, {
+  CoinMatching.States.Results = Common.States.GroupResults.extend({
     view: CoinMatching.Views.Results.Layout,
 
     handleConfigure: function () {

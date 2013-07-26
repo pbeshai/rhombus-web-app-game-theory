@@ -69,24 +69,18 @@ function(app, Participant, StateApp) {
   });
 
   // To be used in StateApps
-  Grid.State = function (options) {
-    this.options = options
-    this.initialize();
-  }
-  Grid.State.prototype = new StateApp.State(Grid.Views.Participants);
-  _.extend(Grid.State.prototype, {
+  Grid.State = StateApp.State.extend({
+    view: Grid.Views.Participants,
     initialize: function () {
       this.options.viewOptions = { collection: this.options.participants }
     },
 
     beforeRender: function () {
-      console.log("grid before render: ", this.input);
       if (this.input) {
         this.options.viewOptions = { collection: this.input };
       }
     }
-  })
-
+  });
 
   return Grid;
 });

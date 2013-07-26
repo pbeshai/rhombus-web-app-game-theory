@@ -116,7 +116,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   // To be used in StateApps
   PrisonersDilemmaMulti.States = {};
-  PrisonersDilemmaMulti.States.Play = StateApp.defineState(Common.States.Play, {
+  PrisonersDilemmaMulti.States.Play = Common.States.Play.extend({
     view: PrisonersDilemmaMulti.Views.Play.Layout,
     defaultChoice: "C", // choice made when a player does not play
     validChoices: ["C", "D"],
@@ -131,7 +131,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     },
   });
 
-  PrisonersDilemmaMulti.States.Results = StateApp.defineState(Common.States.Results, {
+  PrisonersDilemmaMulti.States.Results = Common.States.Results.extend({
     view: PrisonersDilemmaMulti.Views.Results.Layout,
 
     assignScore: function (participant) {

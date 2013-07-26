@@ -81,13 +81,13 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   // To be used in StateApps
   TeamPrisonersDilemma.States = {};
-  TeamPrisonersDilemma.States.Play = StateApp.defineState(Common.States.GroupPlay, {
+  TeamPrisonersDilemma.States.Play = Common.States.GroupPlay.extend({
     view: TeamPrisonersDilemma.Views.Play.Layout,
     defaultChoice: "C", // choice made when a player does not play
-    validChoices: ["C", "D"],
+    validChoices: ["C", "D"]
   });
 
-  TeamPrisonersDilemma.States.Results = StateApp.defineState(Common.States.GroupResults, {
+  TeamPrisonersDilemma.States.Results = Common.States.GroupResults.extend({
     view: TeamPrisonersDilemma.Views.Results.Layout,
 
     assignScore: function (participant) {

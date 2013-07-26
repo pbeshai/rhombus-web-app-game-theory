@@ -106,12 +106,9 @@ function(app, Common, Participant, StateApp) {
   });
 
   // To be used in StateApps
-  Attendance.State = function (options) {
-    this.options = options;
-    this.initialize();
-  }
-  Attendance.State.prototype = new StateApp.State(Attendance.Views.Participants);
-  _.extend(Attendance.State.prototype, {
+  Attendance.State = StateApp.State.extend({
+    view: Attendance.Views.Participants,
+
     initialize: function () {
       this.options.viewOptions = {
         collection: this.options.participants,
@@ -130,7 +127,6 @@ function(app, Common, Participant, StateApp) {
       if (this.options.acceptNew && this.options.saveNew) {
         presentParticipants.saveNew();
       }
-
 
       return presentParticipants;
     }

@@ -282,14 +282,14 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
   // To be used in StateApps
   PrisonersDilemma.States = {};
-  PrisonersDilemma.States.Play = StateApp.defineState(Common.States.Play, {
+  PrisonersDilemma.States.Play = Common.States.Play.extend({
     view: PrisonersDilemma.Views.Play.Layout,
     defaultChoice: "C",
     validChoices: ["C", "D"],
   });
 
 
-  PrisonersDilemma.States.Results = StateApp.defineState(Common.States.Results, {
+  PrisonersDilemma.States.Results = Common.States.Results.extend({
     view: PrisonersDilemma.Views.Results.Layout,
 
     assignScore: function (model) {
