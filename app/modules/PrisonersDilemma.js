@@ -21,9 +21,17 @@ define([
 function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graphs) {
 
   var PrisonersDilemma = app.module();
+  PrisonersDilemma.config = {
+    scoringMatrix: {
+      CC: 3,
+      CD: 0,
+      DC: 5,
+      DD: 1
+    }
+  };
+
   PrisonersDilemma.Views.Play = {};
   PrisonersDilemma.Views.Results = {};
-
 
   PrisonersDilemma.Instructions = Common.Models.Instructions.extend({
     description: { template: "pd/play/instructions" },
@@ -33,179 +41,23 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   });
 
-  PrisonersDilemma.Model = Participant.Model.extend({
-    urlRoot: null,
+  PrisonersDilemma.Views.Play.Participant = Common.Views.ParticipantHiddenPlay;
 
-    defaults: {
-      "played": false,
-      "partner": null,
-      "score": null,
-      "complete": false
-    },
-
-    validate: function (attrs, options) {
-      if (attrs.choice !== "C" && attrs.choice !== "D") {
-        return "invalid choice " + attrs.choice + ". valid choices are C or D.";
-      }
-    },
-  });
-
-
-  PrisonersDilemma.Bot = PrisonersDilemma.Model.extend({
-    bot: true,
-
-    initialize: function () {
-      PrisonersDilemma.Model.prototype.initialize.call(this);
-      if (this.get("alias") === undefined) {
-        this.set("alias", "bot");
-      }
-
-      // short delay before playing
-      this.delayedPlay();
-    },
-
-    save: function () {
-      console.log("trying to save bot");
-      return false;
-    },
-
-    sync: function () {
-      console.log("trying to sync bot");
-      return false;
-    },
-
-    fetch: function () {
-      console.log("trying to fetch bot");
-      return false;
-    },
-
-    destroy: function () {
-      console.log("trying to destroy bot");
-      return false;
-    },
-
-    delayedPlay: function () {
-      setTimeout(_.bind(this.play, this), 50);
-    },
-
-    play: function () {
-      var choice = Math.floor(Math.random() * 2) === 0 ? "C" : "D";
-      this.set("choice", choice);
+  PrisonersDilemma.Views.Play.Layout = Common.Views.SimpleLayout.extend({
+    overrides: {
+      ParticipantView: PrisonersDilemma.Views.Play.Participant,
+      InstructionsModel: PrisonersDilemma.Instructions
     }
   });
 
-  PrisonersDilemma.Collection = Participant.Collection.extend({
-    url: null,
-    model: PrisonersDilemma.Model,
-
-    initialize: function (models, options) {
-      options = _.defaults(options || {}, {
-        validateOnChoice: true
-      });
-      Participant.Collection.prototype.initialize.apply(this, [models, options]);
-      this.on("reset", this.pairModels);
-      this.pairModels(models);
+  PrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
+    template: "pd/results/participant",
+    overrides: {
+      cssClass: function () {
+        return "results choices-" + this.model.get("pairChoices");
+      }
     }
   })
-
-
-  PrisonersDilemma.Views.Play.Participant = Backbone.View.extend({
-  	template: "pd/play/participant",
-    tagName: "div",
-    className: "participant",
-    playedClass: "played",
-
-
-  	serialize: function () {
-  		return { model: this.model };
-  	},
-
-    beforeRender: function () {
-      var played = this.model.get("played");
-      // remove old choice classes and set new one
-      if (played) {
-        this.$el.addClass(this.playedClass);
-      }
-    },
-
-    afterRender: function () {
-      var played = this.model.get("played"), complete = this.model.get("complete");
-      if (played && !complete) {
-        this.$(".medium-text").hide().delay(200).fadeIn(400);
-      }
-    },
-
-  	initialize: function () {
-  		this.listenTo(this.model, "change", this.render);
-  	}
-  });
-
-  PrisonersDilemma.Views.Play.Participants = Backbone.View.extend({
-    template: "pd/play/layout",
-
-    serialize: function () {
-      return { hasPlayers: (this.collection.length > 0) };
-    },
-
-  	beforeRender: function () {
-      this.collection.each(function (participant) {
-  			this.insertView(".participant-grid", new PrisonersDilemma.Views.Play.Participant({ model: participant }));
-  		}, this);
-
-
-      this.insertView(new Common.Views.Instructions({ model: new this.options.InstructionsModel(null, { config: this.options.config }) }))
-  	},
-
-
-  	initialize: function () {
-      app.participantServer.hookCollection(this.collection, this);
-
-      this.options.InstructionsModel || (this.options.InstructionsModel = PrisonersDilemma.Instructions);
-
-      this.listenTo(this.collection, {
-  			"reset": this.render
-  		});
-  	},
-  });
-
-  PrisonersDilemma.Views.Results.Participant = Backbone.View.extend({
-    template: "pd/results/participant",
-    tagName: "div",
-    className: "participant results",
-
-
-    serialize: function () {
-      return { model: this.model };
-    },
-
-    beforeRender: function () {
-      var choice = this.model.get("choice");
-      var pairChoices = this.model.get("pairChoices");
-
-      this.$el.addClass("choices-"+pairChoices);
-    },
-
-    initialize: function () {
-      this.listenTo(this.model, "change", this.render);
-    }
-  });
-
-  PrisonersDilemma.Views.Results.Participants = Backbone.View.extend({
-    className: "participant-grid",
-
-    beforeRender: function () {
-      this.collection.each(function (participant) {
-        this.insertView(new PrisonersDilemma.Views.Results.Participant({ model: participant }));
-      }, this);
-    },
-
-
-    initialize: function () {
-      this.listenTo(this.collection, {
-        "reset": this.render
-      });
-    }
-  });
 
   PrisonersDilemma.Views.Results.Stats = Backbone.View.extend({
     template: "pd/results/stats",
@@ -394,41 +246,16 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   });
 
-  PrisonersDilemma.Views.Results.Layout = Backbone.View.extend({
-    template: "pd/results/results",
-
-    serialize: function () {
-      return { hasPlayers: (this.collection.length > 0) };
-    },
-
-    beforeRender: function () {
-      if (this.collection.length) {
-        this.setViews({
-          ".results-participants": new PrisonersDilemma.Views.Results.Participants({ collection: this.collection }),
-          ".results-stats": new PrisonersDilemma.Views.Results.Stats({ collection: this.collection })
-        });
-      }
-    },
-
-
-    initialize: function () {
-      this.listenTo(this.collection, {
-        "reset": this.render
-      });
+  PrisonersDilemma.Views.Results.Layout = Common.Views.SimpleLayout.extend({
+    overrides: {
+      ParticipantView: PrisonersDilemma.Views.Results.Participant,
+      PostParticipantsView: PrisonersDilemma.Views.Results.Stats
     }
   });
 
-
   PrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "pd/configure",
-    modelOptions: {
-      scoringMatrix: {
-        CC: 3,
-        CD: 0,
-        DC: 5,
-        DD: 1
-      }
-    },
+    modelOptions: _.clone(PrisonersDilemma.config),
 
     events: {
       "change .pay-off-matrix input": "updateMatrix",
@@ -453,89 +280,28 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   });
 
-  PrisonersDilemma.Util = {};
-  PrisonersDilemma.Util.convertModels = function (participantCollection) {
-      var pdParticipants = participantCollection.map(function (participant) {
-        return new PrisonersDilemma.Model({ alias: participant.get("alias") });
-      });
-      // ensure we have even number of participants by adding a bot
-      if (pdParticipants.length % 2 === 1) {
-        pdParticipants.push(new PrisonersDilemma.Bot());
-      }
-
-      return pdParticipants;
-  };
-
-  // converts a Participant.Collection to a PrisonersDilemma.Collection
-  PrisonersDilemma.Util.makeCollection = function (participantCollection) {
-      return new PrisonersDilemma.Collection(PrisonersDilemma.Util.convertModels(participantCollection));
-  };
-
   // To be used in StateApps
   PrisonersDilemma.States = {};
-  PrisonersDilemma.States.Play = function (options) {
-    this.options = _.defaults({}, options, this.defaults);
-
-    this.initialize();
-  }
-  PrisonersDilemma.States.Play.prototype = new StateApp.State(PrisonersDilemma.Views.Play.Participants);
-  _.extend(PrisonersDilemma.States.Play.prototype, {
-    defaults: {
-      defaultChoice: "C" // choice made when a player does not play
-    },
-
-    initialize: function () {
-      this.config = this.options.config;
-    },
-
-    beforeRender: function () {
-      this.participants = PrisonersDilemma.Util.makeCollection(this.input);
-
-      this.options.viewOptions = { collection: this.participants, config: this.config };
-    },
-
-    // outputs a PrisonersDilemma.Collection
-    getOutput: function () {
-      // if you haven't played, then you played "A".
-      this.participants.each(function (participant) {
-        if (participant.get("choice") === undefined) {
-          participant.set("choice", this.options.defaultChoice);
-        }
-      }, this);
-
-      return this.participants;
-    }
+  PrisonersDilemma.States.Play = StateApp.defineState(Common.States.Play, {
+    view: PrisonersDilemma.Views.Play.Layout,
+    defaultChoice: "C",
+    validChoices: ["C", "D"],
   });
-  PrisonersDilemma.States.Results = function (options) {
-    this.options = _.defaults({}, options);
-    this.initialize();
-  }
-  PrisonersDilemma.States.Results.prototype = new StateApp.State(PrisonersDilemma.Views.Results.Layout);
-  _.extend(PrisonersDilemma.States.Results.prototype, {
-    initialize: function () {
-      this.config = this.options.config;
+
+
+  PrisonersDilemma.States.Results = StateApp.defineState(Common.States.Results, {
+    view: PrisonersDilemma.Views.Results.Layout,
+
+    assignScore: function (model) {
+      var pairChoices = model.get("choice") + model.get("partner").get("choice");
+      model.set({
+        "score": this.config.scoringMatrix[pairChoices],
+        "pairChoices": pairChoices
+      });
     },
 
-    assignScores: function (models) {
-      var scoringMatrix = this.config.scoringMatrix;
-      models.each(function (model) {
-        var pairChoices = model.get("choice") + model.get("partner").get("choice");
-        model.set({"score": scoringMatrix[pairChoices], "pairChoices": pairChoices});
-      }, this);
-    },
-
-    beforeRender: function () {
-      // this.input is a PrisonersDilemma.Collection
-      this.options.viewOptions = { collection: this.input };
-
-      // calculate the scores
-      this.assignScores(this.input);
-
-      this.logResults(this.input);
-    },
-
-    logResults: function (models) {
-      var results = models.map(function (model) {
+    logResults: function () {
+      var results = this.collection.map(function (model) {
         return {
           alias: model.get("alias"),
           choice: model.get("choice"),
@@ -547,17 +313,9 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
           },
         };
       });
-      console.log("PD RESULTS = ", results);
-      var logData = {
-        results: results,
-        config: this.config,
-        version: this.stateApp.version
-      };
 
-      app.api({ call: "apps/pd/results", type: "post", data: logData });
+      this.log("apps/pd/results", { results: results });
     },
-
-    getOutput: function () { }
   })
 
   return PrisonersDilemma;

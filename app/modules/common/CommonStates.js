@@ -34,7 +34,7 @@ function(app, CommonModels, StateApp) {
       }
 
       // re-partners each render
-      if (this.pair === true) {
+      if (this.pairModels === true) {
         console.log("pairing models");
         collection.pairModels();
       } else if (this.pairModels === "asymmetric") {

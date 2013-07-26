@@ -23,16 +23,7 @@ function(app, StateApp, Participant, Attendance, TeamPrisonersDilemma) {
 	 */
 	var TeamPrisonersDilemmaApp = function (options) {
 		this.options = options || {};
-		this.config = _.extend({
-			group1Name: "Team 1",
-			group2Name: "Team 2",
-			scoringMatrix: {
-        CC: 3,
-        CD: 0,
-        DC: 5,
-        DD: 1
-      }
-		}, this.options.config);
+		this.config = _.extend({}, TeamPrisonersDilemma.config, this.options.config);
 		this.initialize();
 	};
 	// description for use in router

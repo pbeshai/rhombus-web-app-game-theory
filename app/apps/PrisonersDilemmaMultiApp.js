@@ -22,17 +22,7 @@ define([
 function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDilemmaMulti) {
 	var PrisonersDilemmaMultiApp = function (options) {
 		this.options = options || {};
-		this.config = _.extend({
-			scoringMatrix: {
-        CC: 3,
-        CD: 0,
-        DC: 5,
-        DD: 1
-      },
-      minRounds: 4,
-      maxRounds: 8,
-      gameOver: false, // set to false when the game is over
-		}, this.options.config);
+		this.config = _.extend({}, PrisonersDilemmaMulti.config, this.options.config);
 		this.initialize();
 	};
 	// description for use in router
@@ -89,24 +79,11 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 	  				this.options.participants.fetch();
 	  				throw "Playing requires at least one participant.";
 	  			}
-
-	  			// take output from attendance and use it in grid
-
-					// create PD Participants from these Participant Models
-		      var pdParticipants = output.map(function (participant) {
-		        return new PrisonersDilemma.Model({ alias: participant.get("alias") });
-		      });
-		      // ensure we have even number of participants by adding a bot
-		      if (pdParticipants.length % 2 === 1) {
-		        pdParticipants.push(new PrisonersDilemma.Bot());
-		      }
-
-		      var participants = new PrisonersDilemma.Collection(pdParticipants);
-
 		      this.config.numRounds = Math.round(Math.random() * (this.config.maxRounds - this.config.minRounds)) + this.config.minRounds;
+		      output.pairModels();
 
 					// for each participant, set the number of rounds left.
-					participants.each(function (participant) {
+					output.each(function (participant) {
 						if (participant.get("roundsLeft") === undefined) {
 							var roundsLeft = this.config.numRounds;
 							participant.set("roundsLeft", roundsLeft);
@@ -118,7 +95,7 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 					this.config.gameOver = false;
 					this.config.newRound = true;
 
-		      return participants;
+		      // return output;
 	  		},
 
 	  		play_attendance: function () {

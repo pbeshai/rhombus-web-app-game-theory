@@ -343,7 +343,7 @@ function (app, Grid) {
 
   /*
   Model configure is for automatically generating a form from a JS object
-
+  Typically used as a Views.Configure for apps
   */
   CommonViews.ModelConfigure = {};
   var inputIds = 0;
@@ -475,6 +475,7 @@ function (app, Grid) {
       if (flags.handled) {
         return;
       }
+      flags.handled = true;
 
       var curr = this.model.get(key);
       if (_.isNumber(curr)) { // if the current value is a number, try making this one a nubmer
