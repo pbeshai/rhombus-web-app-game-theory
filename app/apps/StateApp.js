@@ -230,26 +230,6 @@ function(app) {
 		}
 	});
 
-	var defineApp = function (ParentApp, properties) {
-		if (arguments.length === 1) { // ParentState is an optional first argument (defaults to State)
-			properties = ParentApp;
-			ParentApp = StateApp;
-		}
-
-		var DefApp = function (options) {
-			this.options = options || {};
-			this.config = _.extend(this.config || {}, this.options.config);
-			console.log("initializing app", this);
-			this.initialize();
-	  };
-
-	  DefApp.prototype = new ParentApp();
-  	_.extend(DefApp.prototype, properties);
-  	DefApp.extend = StateApp.extend;
-
-  	return DefApp;
-	}
-
 	return {
 		State: State,
 		App: StateApp,
