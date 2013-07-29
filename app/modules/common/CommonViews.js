@@ -5,6 +5,17 @@ define([
 function (app, Grid) {
 	var CommonViews = {};
 
+  // sets 'this.options' and overrides properties with options if specified
+  function handleOptions(object, options) {
+    object.options = options = options || {};
+    // override properties with options if specified
+    _.each(object.optionProperties, function (property) {
+      if (options[property]) {
+        object[property] = options[property];
+      }
+    });
+  }
+
 	CommonViews.Instructions = Backbone.View.extend({
     template: "common/instructions",
     className: "instructions",
@@ -27,10 +38,8 @@ function (app, Grid) {
     template: "common/participant_play",
     className: "participant player",
     playedClass: "played",
-    defaults: {
-      locked: false
-    },
-    overrides: { },
+    locked: false,
+    optionProperties: [ "locked" ],
 
     serialize: function () {
       return { model: this.model };
@@ -51,13 +60,13 @@ function (app, Grid) {
     },
 
     safeRender: function () {
-      if (!this.options.locked) {
+      if (!this.locked) {
         this.render();
       }
     },
 
     initialize: function (options) {
-      this.options = _.defaults(options || {}, this.overrides, this.defaults);
+      handleOptions(this, options);
       this.listenTo(this.model, "change", this.safeRender);
     }
   });
@@ -74,19 +83,16 @@ function (app, Grid) {
   });
 
   // creates a participant with a message inside it (e.g. the offer in the ultimatum game)
-  CommonViews.ParticipantMessagePlay =  CommonViews.ParticipantPlay.extend({
+  CommonViews.ParticipantMessagePlay = CommonViews.ParticipantPlay.extend({
     template: "common/participant_message_play",
     className: "participant player has-bottom",
-    defaults: {
-      locked: false,
-      messageAttribute: "message"
-    },
-    overrides: { },
+    messageAttribute: "message",
+    optionProperties: [ "messageAttribute" ].concat(CommonViews.ParticipantPlay.prototype.optionProperties),
 
     serialize: function () {
       return {
         model: this.model,
-        message: this.model.get(this.options.messageAttribute)
+        message: this.model.get(this.messageAttribute)
       };
     },
   });
@@ -94,46 +100,44 @@ function (app, Grid) {
   CommonViews.ParticipantDisplay = Backbone.View.extend({
     template: "common/participant_display",
     className: "participant",
-    defaults: {
-      locked: false,
-      cssClass: function () { },
-      bottomText: function () { },
-      mainText: function () { }
-    },
-    overrides: { },
+    optionProperties: [ "locked", "cssClass", "bottomText", "mainText" ],
+    locked: false,
+    cssClass: function () { },
+    bottomText: function () { },
+    mainText: function () { },
 
     serialize: function () {
       return {
         model: this.model,
-        bottomText: this.options.bottomText(this.model),
-        mainText: this.options.mainText(this.model)
+        bottomText: this.bottomText(this.model),
+        mainText: this.mainText(this.model)
       };
     },
 
     beforeRender: function () {
       // reset any extra classes added in after render (do this since we
-      // do not know which classes are added by this.options.cssClass)
+      // do not know which classes are added by this.cssClass)
       this.$el.attr("class", this.className);
     },
 
     afterRender: function () {
-      var bottomText = this.options.bottomText(this.model);
+      var bottomText = this.bottomText(this.model);
       if (bottomText) {
         this.$el.addClass("has-bottom");
       } else {
         this.$el.removeClass("has-bottom");
       }
-      this.$el.addClass(this.options.cssClass(this.model));
+      this.$el.addClass(this.cssClass(this.model));
     },
 
     safeRender: function () {
-      if (!this.options.locked) {
+      if (!this.locked) {
         this.render();
       }
     },
 
     initialize: function (options) {
-      this.options = _.defaults(options || {}, this.overrides, this.defaults);
+      handleOptions(this, options);
       this.listenTo(this.model, "change", this.safeRender);
     }
   });
@@ -141,19 +145,17 @@ function (app, Grid) {
 
   CommonViews.ParticipantsGrid = Backbone.View.extend({
     className: "participant-grid",
-    defaults: {
-      ParticipantView: Grid.Views.Participant,
-    },
-    overrides: { },
+    ParticipantView: Grid.Views.Participant,
+    optionProperties: [ "ParticipantView" ],
 
     beforeRender: function () {
       this.collection.each(function (participant) {
-        this.insertView(new this.options.ParticipantView({ model: participant }));
+        this.insertView(new this.ParticipantView({ model: participant }));
       }, this);
     },
 
     initialize: function (options) {
-      this.options = _.defaults(options || {}, this.overrides, this.defaults);
+      handleOptions(this, options);
       this.listenTo(this.collection, "reset", this.render);
     }
   });
@@ -162,19 +164,18 @@ function (app, Grid) {
   // uses a Participant collection
   CommonViews.SimpleLayout = Backbone.View.extend({
     template: "common/simple_layout",
-    defaults: {
-      header: "Participants",
-      ParticipantView: null,
-      ParticipantsView: CommonViews.ParticipantsGrid,
-      PreParticipantsView: null,
-      PostParticipantsView: null,
-      InstructionsModel: null,
-    },
-    overrides: { }, // quick way for direct subclasses to override defaults
+    // properties that can be overridden via options
+    optionProperties: [ "header", "ParticipantView", "ParticipantsView", "PreParticipantsView", "PostParticipantsView", "InstrucitonsModel"],
+    header: "Participants",
+    ParticipantView: null,
+    ParticipantsView: CommonViews.ParticipantsGrid,
+    PreParticipantsView: null,
+    PostParticipantsView: null,
+    InstructionsModel: null,
 
     serialize: function () {
       return {
-        header: this.options.header,
+        header: this.header,
         hasPlayers: (this.collection.length > 0),
       };
     },
@@ -184,53 +185,58 @@ function (app, Grid) {
         collection: this.collection
       }, this.options);
 
-      this.insertView(".participants", new this.options.ParticipantsView(viewOptions));
-
-      if (this.options.PreParticipantsView != null) {
-        this.insertView(".pre-participants", new this.options.PreParticipantsView(viewOptions));
+      if (this.ParticipantView != null) {
+        this.insertView(".participants", new this.ParticipantsView(_.extend({
+            ParticipantView: this.ParticipantView
+          }, viewOptions)));
+      } else {
+        this.insertView(".participants", new this.ParticipantsView(viewOptions));
       }
 
-      if (this.options.PostParticipantsView != null) {
-        this.insertView(".post-participants", new this.options.PostParticipantsView(viewOptions));
+
+      if (this.PreParticipantsView != null) {
+        this.insertView(".pre-participants", new this.PreParticipantsView(viewOptions));
       }
 
-      if (this.options.InstructionsModel != null) {
-        this.insertView(new CommonViews.Instructions({ model: new this.options.InstructionsModel(null, { config: this.options.config }) }))
+      if (this.PostParticipantsView != null) {
+        this.insertView(".post-participants", new this.PostParticipantsView(viewOptions));
+      }
+
+      if (this.InstructionsModel != null) {
+        this.insertView(new CommonViews.Instructions({ model: new this.InstructionsModel(null, { config: this.options.config }) }))
       }
     },
 
     initialize: function (options) {
-      this.options = _.defaults({}, options, this.overrides, this.defaults);
-
-      var participants = this.collection;
-      app.participantServer.hookCollection(participants, this);
+      handleOptions(this, options);
+      app.participantServer.hookCollection(this.collection, this);
     },
   });
 
 	// requires model Common.Models.GroupModel or similar
   CommonViews.GroupLayout = Backbone.View.extend({
     template: "common/group_layout",
-    defaults: {
-      header: "Groups",
-      group1Name: "Group 1",
-      group2Name: "Group 2",
-      ParticipantView: null,
-      ParticipantsView: CommonViews.ParticipantsGrid,
-      PreParticipantsView: null,
-      PostParticipantsView: null,
-      PreGroupsView: null,
-      PostGroupsView: null,
-      InstructionsModel: null,
-      inactive: {}
-    },
-    overrides: { }, // quick way for direct subclasses to override defaults
+    header: "Groups",
+    group1Name: "Group 1",
+    group2Name: "Group 2",
+    ParticipantView: null,
+    ParticipantsView: CommonViews.ParticipantsGrid,
+    PreParticipantsView: null,
+    PostParticipantsView: null,
+    PreGroupsView: null,
+    PostGroupsView: null,
+    InstructionsModel: null,
+    inactive: {},
+    optionProperties: [ "header", "group1Name", "group2Name", "ParticipantView", "ParticipantsView",
+                        "PreParticipantsView", "PostParticipantsView", "PreGroupsView", "PostGroupsView",
+                        "InstructionsModel", "inactive" ],
 
     serialize: function () {
       return {
-        header: this.options.header,
+        header: this.header,
         hasPlayers: (this.model.get("participants").length > 0),
-        group1Name: this.options.group1Name,
-        group2Name: this.options.group2Name
+        group1Name: this.group1Name,
+        group2Name: this.group2Name
       };
     },
 
@@ -240,21 +246,21 @@ function (app, Grid) {
           collection: this.model.get("group" + groupNum)
         }, this.options);
         // only specify ParticipantView if it is set.
-        if (this.options.ParticipantView != null) {
-          if (_.isFunction(this.options.ParticipantView)) {
-            viewOptions.ParticipantView = this.options.ParticipantView;
-          } else if (this.options.ParticipantView["group" + groupNum] != null) {
-            viewOptions.ParticipantView = this.options.ParticipantView["group" + groupNum];
+        if (this.ParticipantView != null) {
+          if (_.isFunction(this.ParticipantView)) {
+            viewOptions.ParticipantView = this.ParticipantView;
+          } else if (this.ParticipantView["group" + groupNum] != null) {
+            viewOptions.ParticipantView = this.ParticipantView["group" + groupNum];
           }
         }
-        this.insertView(".group" + groupNum + " .group-participants", new this.options.ParticipantsView(viewOptions));
+        this.insertView(".group" + groupNum + " .group-participants", new this.ParticipantsView(viewOptions));
 
-        if (this.options.PreParticipantsView != null) {
-          this.insertView(".group" + groupNum + " .pre-participants", new this.options.PreParticipantsView(viewOptions));
+        if (this.PreParticipantsView != null) {
+          this.insertView(".group" + groupNum + " .pre-participants", new this.PreParticipantsView(viewOptions));
         }
 
-        if (this.options.PostParticipantsView != null) {
-          this.insertView(".group" + groupNum + " .post-participants", new this.options.PostParticipantsView(viewOptions));
+        if (this.PostParticipantsView != null) {
+          this.insertView(".group" + groupNum + " .post-participants", new this.PostParticipantsView(viewOptions));
         }
       }
 
@@ -265,34 +271,31 @@ function (app, Grid) {
         collection: this.model.get("participants")
       }, this.options);
 
-      if (this.options.PreGroupsView != null) {
-        this.insertView(".pre-groups", new this.options.PreGroupsView(viewOptions));
+      if (this.PreGroupsView != null) {
+        this.insertView(".pre-groups", new this.PreGroupsView(viewOptions));
       }
 
-      if (this.options.PostGroupsView != null) {
-        this.insertView(".post-groups", new this.options.PostGroupsView(viewOptions));
+      if (this.PostGroupsView != null) {
+        this.insertView(".post-groups", new this.PostGroupsView(viewOptions));
       }
 
-      if (this.options.InstructionsModel != null) {
-        console.log("instr model with ", this.options);
-        this.insertView(new CommonViews.Instructions({ model: new this.options.InstructionsModel(null, { config: this.options.config }) }))
+      if (this.InstructionsModel != null) {
+        this.insertView(new CommonViews.Instructions({ model: new this.InstructionsModel(null, { config: this.options.config }) }))
       }
     },
 
     afterRender: function () {
-      if (this.options.inactive.group1) {
+      if (this.inactive.group1) {
         this.$(".group1").addClass("inactive");
       }
-      if (this.options.inactive.group2) {
+      if (this.inactive.group2) {
         this.$(".group2").addClass("inactive");
       }
     },
 
     initialize: function (options) {
-      this.options = _.defaults({}, options, this.overrides, this.defaults);
-
-      var participants = this.model.get("participants")
-      app.participantServer.hookCollection(participants, this);
+      handleOptions(this, options);
+      app.participantServer.hookCollection(this.model.get("participants"), this);
     },
   });
 
@@ -302,11 +305,10 @@ function (app, Grid) {
       group1Name: "Group 1",
       group2Name: "Group 2"
     },
-    defaults: {
-      nameHeader: "Group Names",
-      group1Label: "Group 1",
-      group2Label: "Group 2"
-    },
+    optionProperties: [ "nameHeader", "group1Label", "group2Label" ],
+    nameHeader: "Group Names",
+    group1Label: "Group 1",
+    group2Label: "Group 2",
 
     events: {
       "change #group1-name-input" : "updateGroup1Name",
@@ -315,9 +317,9 @@ function (app, Grid) {
 
     serialize: function () {
       return {
-        nameHeader: this.options.nameHeader,
-        group1Label: this.options.group1Label,
-        group2Label: this.options.group2Label,
+        nameHeader: this.nameHeader,
+        group1Label: this.group1Label,
+        group2Label: this.group2Label,
         group1Name: this.model.get("group1Name"),
         group2Name: this.model.get("group2Name")
       }
@@ -334,7 +336,7 @@ function (app, Grid) {
     },
 
     initialize: function (options) {
-      this.options = _.defaults({}, options, this.overrides, this.defaults);
+      handleOptions(this, options);
 
       // use defaults so we don't overwrite if already there
       _.defaults(this.model.attributes, this.modelOptions);

@@ -46,29 +46,23 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   CoinMatching.Views.Play.Layout = Common.Mixins.mixin(["gameOver", "rounds"], Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Play",
-      ParticipantView: CoinMatching.Views.Play.Participant,
-      InstructionsModel: CoinMatching.Instructions
-    }
+    header: "Play",
+    ParticipantView: CoinMatching.Views.Play.Participant,
+    InstructionsModel: CoinMatching.Instructions
   }));
 
   CoinMatching.Views.Results = {};
 
   CoinMatching.Views.Results.Score = Common.Views.ParticipantDisplay.extend({
-    overrides: {
-      mainText: function (model) {
-        return model.get("choice");
-      }
+    mainText: function (model) {
+      return model.get("choice");
     }
   });
 
   CoinMatching.Views.Results.Layout = Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Results",
-      className: "coin-matching-results",
-      ParticipantView: CoinMatching.Views.Results.Score
-    }
+    header: "Results",
+    className: "coin-matching-results",
+    ParticipantView: CoinMatching.Views.Results.Score
   });
 
 

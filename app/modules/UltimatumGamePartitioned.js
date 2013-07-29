@@ -34,21 +34,15 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     rejectChoice: "B", // choice a receiver makes to reject
   };
 
-
-
   UltimatumGamePartitioned.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
     modelOptions: _.extend({}, UltimatumGamePartitioned.config)
   });
 
   UltimatumGamePartitioned.Views.GiverPlay = {};
 
-  UltimatumGamePartitioned.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
-  });
-
+  UltimatumGamePartitioned.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay;
   UltimatumGamePartitioned.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
-    overrides: {
-      locked: true
-    }
+    locked: true
   });
 
   UltimatumGamePartitioned.Views.PreGroups = Backbone.View.extend({
@@ -59,87 +53,75 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   })
 
   UltimatumGamePartitioned.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Givers Play",
-      inactive: {
-        group2: true
-      },
-      PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
-      ParticipantView: {
-        group1: UltimatumGamePartitioned.Views.GiverPlay.Giver,
-        group2: UltimatumGamePartitioned.Views.GiverPlay.Receiver
-      },
-      InstructionsModel: UltimatumGame.Instructions.GiverPlay
-    }
+    header: "Givers Play",
+    inactive: {
+      group2: true
+    },
+    PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
+    ParticipantView: {
+      group1: UltimatumGamePartitioned.Views.GiverPlay.Giver,
+      group2: UltimatumGamePartitioned.Views.GiverPlay.Receiver
+    },
+    InstructionsModel: UltimatumGame.Instructions.GiverPlay
   });
 
   UltimatumGamePartitioned.Views.ReceiverPlay = {};
 
   UltimatumGamePartitioned.Views.ReceiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
-    overrides: {
-      locked: true
-    }
+    locked: true
   });
 
   UltimatumGamePartitioned.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
-    overrides: {
-      messageAttribute: "offer"
-    }
+    messageAttribute: "offer"
   });
 
   UltimatumGamePartitioned.Views.ReceiverPlay.Layout = Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Receivers Play",
-      inactive: {
-        group1: true
-      },
-      PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
-      ParticipantView: {
-        group1: UltimatumGamePartitioned.Views.ReceiverPlay.Giver,
-        group2: UltimatumGamePartitioned.Views.ReceiverPlay.Receiver
-      },
-      InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
-    }
+    header: "Receivers Play",
+    inactive: {
+      group1: true
+    },
+    PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
+    ParticipantView: {
+      group1: UltimatumGamePartitioned.Views.ReceiverPlay.Giver,
+      group2: UltimatumGamePartitioned.Views.ReceiverPlay.Receiver
+    },
+    InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
   });
 
   UltimatumGamePartitioned.Views.Results = {};
 
 
   UltimatumGamePartitioned.Views.Results.Score = Common.Views.ParticipantDisplay.extend({
-    overrides: {
-      cssClass: function (model) {
-        if (model.get("score") === 0) {
-          return "rejected";
-        } else {
-          return "accepted";
-        }
-      },
-      bottomText: function (model) {
-        if (model.get("score") === 0) {
-          return "Rejected";
-        } else {
-          return "Accepted";
-        }
-      },
-      mainText: function (model) {
-        if (model.get("score") !== 0) {
-          return model.get("score");
-        }
-        // show the original offer if rejected
-        if (model.get("offer")) {
-          return model.get("offer") + " &rarr; " + model.get("score");
-        }
-        return model.get("keep") + " &rarr; " + model.get("score");
+    cssClass: function (model) {
+      if (model.get("score") === 0) {
+        return "rejected";
+      } else {
+        return "accepted";
       }
+    },
+    bottomText: function (model) {
+      if (model.get("score") === 0) {
+        return "Rejected";
+      } else {
+        return "Accepted";
+      }
+    },
+    mainText: function (model) {
+      if (model.get("score") !== 0) {
+        return model.get("score");
+      }
+      // show the original offer if rejected
+      if (model.get("offer")) {
+        return model.get("offer") + " &rarr; " + model.get("score");
+      }
+      return model.get("keep") + " &rarr; " + model.get("score");
     }
   });
 
   UltimatumGamePartitioned.Views.Results.Layout = Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Results",
-      PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
-      ParticipantView: UltimatumGamePartitioned.Views.Results.Score
-    }
+    header: "Results",
+    PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
+    ParticipantView: UltimatumGamePartitioned.Views.Results.Score
   });
 
   UltimatumGamePartitioned.Util = {};

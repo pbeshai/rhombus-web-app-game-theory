@@ -44,18 +44,14 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
   PrisonersDilemma.Views.Play.Participant = Common.Views.ParticipantHiddenPlay;
 
   PrisonersDilemma.Views.Play.Layout = Common.Views.SimpleLayout.extend({
-    overrides: {
-      ParticipantView: PrisonersDilemma.Views.Play.Participant,
-      InstructionsModel: PrisonersDilemma.Instructions
-    }
+    ParticipantView: PrisonersDilemma.Views.Play.Participant,
+    InstructionsModel: PrisonersDilemma.Instructions
   });
 
   PrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
     template: "pd/results/participant",
-    overrides: {
-      cssClass: function () {
-        return "results choices-" + this.model.get("pairChoices");
-      }
+    cssClass: function () {
+      return "results choices-" + this.model.get("pairChoices");
     }
   })
 
@@ -247,10 +243,8 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
   });
 
   PrisonersDilemma.Views.Results.Layout = Common.Views.SimpleLayout.extend({
-    overrides: {
-      ParticipantView: PrisonersDilemma.Views.Results.Participant,
-      PostParticipantsView: PrisonersDilemma.Views.Results.Stats
-    }
+    ParticipantView: PrisonersDilemma.Views.Results.Participant,
+    PostParticipantsView: PrisonersDilemma.Views.Results.Stats
   });
 
   PrisonersDilemma.Views.Configure = Backbone.View.extend({

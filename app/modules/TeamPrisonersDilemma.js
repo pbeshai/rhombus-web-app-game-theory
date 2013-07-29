@@ -33,11 +33,9 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   TeamPrisonersDilemma.TeamsModel = Common.Models.GroupModel;
 
   TeamPrisonersDilemma.Views.Play.Layout = Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Play",
-      ParticipantView: PrisonersDilemma.Views.Play.Participant,
-      InstructionsModel: PrisonersDilemma.Instructions
-    }
+    header: "Play",
+    ParticipantView: PrisonersDilemma.Views.Play.Participant,
+    InstructionsModel: PrisonersDilemma.Instructions
   });
 
   TeamPrisonersDilemma.Views.Results.TeamStats = PrisonersDilemma.Views.Results.Stats.extend({
@@ -50,12 +48,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   });
 
   TeamPrisonersDilemma.Views.Results.Layout = Common.Views.GroupLayout.extend({
-    overrides: {
-      header: "Results",
-      ParticipantView: PrisonersDilemma.Views.Results.Participant,
-      PostParticipantsView: TeamPrisonersDilemma.Views.Results.TeamStats,
-      PostGroupsView: PrisonersDilemma.Views.Results.Stats
-    },
+    header: "Results",
+    ParticipantView: PrisonersDilemma.Views.Results.Participant,
+    PostParticipantsView: TeamPrisonersDilemma.Views.Results.TeamStats,
+    PostGroupsView: PrisonersDilemma.Views.Results.Stats
   });
 
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({

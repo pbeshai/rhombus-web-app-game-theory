@@ -31,10 +31,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   NPrisonersDilemma.Views.Results = {};
 
   NPrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
-    overrides: {
-      cssClass: function () {
-        return "results choice-" + this.model.get("choice");
-      }
+    cssClass: function () {
+      return "results choice-" + this.model.get("choice");
     }
   });
 
@@ -55,10 +53,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   });
 
   NPrisonersDilemma.Views.Results.Layout = Common.Views.SimpleLayout.extend({
-    overrides: {
-      ParticipantView: NPrisonersDilemma.Views.Results.Participant,
-      PostParticipantsView: NPrisonersDilemma.Views.Results.Stats
-    }
+    ParticipantView: NPrisonersDilemma.Views.Results.Participant,
+    PostParticipantsView: NPrisonersDilemma.Views.Results.Stats
   });
 
   NPrisonersDilemma.Views.Configure = Backbone.View.extend({

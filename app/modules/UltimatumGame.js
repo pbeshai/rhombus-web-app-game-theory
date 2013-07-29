@@ -62,8 +62,7 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   UltimatumGame.Views.GiverPlay = {};
 
-  UltimatumGame.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
-  });
+  UltimatumGame.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay;
 
   UltimatumGame.Views.PreParticipants = Backbone.View.extend({
     template: "ultimatum/pre_participants",
@@ -73,29 +72,23 @@ function(app, Common, Participant, StateApp, Graphs) {
   })
 
   UltimatumGame.Views.GiverPlay.Layout = Common.Views.SimpleLayout.extend({
-    overrides: {
-      header: "Givers Play",
-      PreParticipantsView: UltimatumGame.Views.PreParticipants,
-      ParticipantView: UltimatumGame.Views.GiverPlay.Giver,
-      InstructionsModel: UltimatumGame.Instructions.GiverPlay
-    }
+    header: "Givers Play",
+    PreParticipantsView: UltimatumGame.Views.PreParticipants,
+    ParticipantView: UltimatumGame.Views.GiverPlay.Giver,
+    InstructionsModel: UltimatumGame.Instructions.GiverPlay
   });
 
   UltimatumGame.Views.ReceiverPlay = {};
 
   UltimatumGame.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
-    overrides: {
-      messageAttribute: "offer"
-    }
+    messageAttribute: "offer"
   });
 
   UltimatumGame.Views.ReceiverPlay.Layout = Common.Views.SimpleLayout.extend({
-    overrides: {
-      header: "Receivers Play",
-      PreParticipantsView: UltimatumGame.Views.PreParticipants,
-      ParticipantView: UltimatumGame.Views.ReceiverPlay.Receiver,
-      InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
-    }
+    header: "Receivers Play",
+    PreParticipantsView: UltimatumGame.Views.PreParticipants,
+    ParticipantView: UltimatumGame.Views.ReceiverPlay.Receiver,
+    InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
   });
 
   UltimatumGame.Views.Results = {};
@@ -116,12 +109,10 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   UltimatumGame.Views.Results.Layout = Common.Views.SimpleLayout.extend({
-    overrides: {
-      header: "Results",
-      className: "ultimatum-results",
-      PreParticipantsView: UltimatumGame.Views.PreParticipants,
-      ParticipantView: UltimatumGame.Views.Results.Score
-    }
+    header: "Results",
+    className: "ultimatum-results",
+    PreParticipantsView: UltimatumGame.Views.PreParticipants,
+    ParticipantView: UltimatumGame.Views.Results.Score
   });
 
   UltimatumGame.Util = {};
