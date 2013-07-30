@@ -160,7 +160,6 @@ function (app, Grid) {
     }
   });
 
-
   // uses a Participant collection
   CommonViews.SimpleLayout = Backbone.View.extend({
     template: "common/simple_layout",

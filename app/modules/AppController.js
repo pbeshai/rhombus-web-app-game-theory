@@ -35,7 +35,7 @@ define([
 		appNextCallback: function () {
 			var activeApp = this.get("activeApp");
 			if (activeApp) {
-	  		console.log("Next State", activeApp);
+				console.log("Next State: " + activeApp.currentState.nextString());
 	  		activeApp.next();
 	  	}
 		},
@@ -43,7 +43,7 @@ define([
 		appPrevCallback: function () {
 			var activeApp = this.get("activeApp");
 			if (activeApp) {
-	  		console.log("Prev State", activeApp);
+	  		console.log("Prev State: " + activeApp.currentState.prevString());
 	  		activeApp.prev();
 	  	}
 		},

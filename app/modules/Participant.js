@@ -221,6 +221,23 @@ function(app) {
     addBot: function () {
       this.add(new Participant.Bot());
     },
+
+    bucket: function (bucketAttribute, numBuckets) {
+      bucketAttribute || (bucketAttribute = "score");
+      numBuckets || (numBuckets = 6);
+
+      var bucketScores = this.map(function (participant) { return participant.get(bucketAttribute) }, this);
+      var min = _.min(bucketScores), max = _.max(bucketScores);
+
+      this.each(function (participant) {
+        var score = participant.get(bucketAttribute);
+        var bucket = Math.floor(((score - min) / (max - min)) * numBuckets);
+        if (isNaN(bucket)) {
+          bucket = Math.floor(numBuckets / 2);
+        }
+        participant.set("bucket", bucket);
+      });
+    }
   });
 
   Participant.Views.Item = Backbone.View.extend({

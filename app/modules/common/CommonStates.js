@@ -49,10 +49,10 @@ function(app, CommonModels, StateApp) {
     },
 
     setViewOptions: function () {
-      this.options.viewOptions = {
+      this.options.viewOptions = _.defaults({
         collection: this.collection,
         config: this.config
-      };
+      }, this.options.viewOptions);
     },
 
     processOutput: function () { }, // template method
@@ -123,12 +123,12 @@ function(app, CommonModels, StateApp) {
     },
 
     setViewOptions: function () {
-      this.options.viewOptions = {
+      this.options.viewOptions = _.defaults({
         model: this.groupModel,
         group1Name: this.config.group1Name,
         group2Name: this.config.group2Name,
         config: this.config
-      };
+      }, this.options.viewOptions);
     },
 
     processOutput: function () { }, // template method
@@ -179,14 +179,18 @@ function(app, CommonModels, StateApp) {
 
       this.assignScores();
 
+      if (this.bucket) {
+        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
+      }
+
       this.logResults();
     },
 
     setViewOptions: function () {
-      this.options.viewOptions = {
+      this.options.viewOptions = _.defaults({
         collection: this.collection,
         config: this.config
-      };
+      }, this.options.viewOptions);
     },
 
     handleConfigure: function () {
@@ -194,7 +198,7 @@ function(app, CommonModels, StateApp) {
     },
 
     assignScore: function (participant) { // template method
-      return 0;
+      participant.set("score", 0);
     },
 
     assignScores: function () {
@@ -203,7 +207,9 @@ function(app, CommonModels, StateApp) {
 
     logResults: function () { }, // template method
 
-    getOutput: function () { }
+    getOutput: function () {
+      return this.collection;
+    }
   });
 
   CommonStates.GroupResults = StateApp.State.extend({
@@ -213,16 +219,20 @@ function(app, CommonModels, StateApp) {
 
       this.assignScores();
 
+      if (this.bucket) {
+        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
+      }
+
       this.logResults();
     },
 
     setViewOptions: function () {
-      this.options.viewOptions = {
+      this.options.viewOptions = _.defaults({
         model: this.groupModel,
         group1Name: this.config.group1Name,
         group2Name: this.config.group2Name,
         config: this.config
-      };
+      }, this.options.viewOptions);
     },
 
     handleConfigure: function () {
@@ -230,15 +240,15 @@ function(app, CommonModels, StateApp) {
     },
 
     assignScore: function (participant) { // template method
-      return 0;
+      participant.set("score", 0);
     },
 
     assignScoreGroup1: function (participant) {
-      return this.assignScore(participant);
+      this.assignScore(participant);
     },
 
     assignScoreGroup2: function (participant) {
-      return this.assignScore(participant);
+      this.assignScore(participant);
     },
 
     assignScores: function () {
@@ -256,7 +266,9 @@ function(app, CommonModels, StateApp) {
 
     logResults: function () { }, // template method
 
-    getOutput: function () { }
+    getOutput: function () {
+      return this.groupModel;
+    }
   });
 
 

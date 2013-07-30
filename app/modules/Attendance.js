@@ -116,6 +116,15 @@ function(app, Common, Participant, StateApp) {
       };
     },
 
+    // if we are coming from a state, let's reset the participants, as this
+    // is common behavior (e.g., attendance is first state and we are returning to it)
+    // can be overridden via "enter" option otherwise
+    onEntry: function (input, prevState) {
+      if (prevState) {
+        this.options.participants.fetch();
+      }
+    },
+
     getOutput: function () {
       var presentParticipants = this.options.participants;
       var notHere = presentParticipants.filter(function (participant) {

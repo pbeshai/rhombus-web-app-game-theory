@@ -3,6 +3,7 @@
 define(["app"],
 	function (app) {
 	"use strict"
+	var debug = false;
 
 	var SocketUtils = {
 
@@ -41,7 +42,7 @@ define(["app"],
 		// creates a typical socket send function
 		sendFunction: function (socketEvent) {
 			return _.bind(function (data) {
-				console.log("sending " + socketEvent + ": ", data);
+				if (debug) { console.log("sending " + socketEvent + ": ", data); }
 				this.socket.emit(socketEvent, data)
 			}, this);
 		},
@@ -49,7 +50,7 @@ define(["app"],
 		// creates a typical socket receive function
 		receiveFunction: function (clientEvent, callback) {
 			return _.bind(function (data) {
-				console.log("receiving " + clientEvent + ": ", data);
+				if (debug) { console.log("receiving " + clientEvent + ": ", data); }
 
 				// run the existing callback function
 				if (callback !== undefined) {

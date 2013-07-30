@@ -23,6 +23,17 @@ function() {
     return Layout;
   }
 
+  CommonMixins.bucketParticipant = function (ParticipantDisplay) {
+    return ParticipantDisplay.extend({
+      cssClass: function (model) {
+        var bucket = model.get("bucket");
+        if (bucket) {
+          return "bucket-" + bucket;
+        }
+      },
+    })
+  }
+
   CommonMixins.gameOver = function (Layout) {
     return Layout.extend({
       serialize: function () {
