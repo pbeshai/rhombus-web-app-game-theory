@@ -156,15 +156,6 @@ function(app, Common, Participant, StateApp, Graphs) {
         this.config.amount, this.config.offerMap);
 
       this.render();
-    }
-  });
-
-  UltimatumGame.States.Results = Common.States.Results.extend({
-    view: UltimatumGame.Views.Results.Layout,
-
-    handleConfigure: function () {
-      UltimatumGame.Util.assignOffers(this.collection,
-        this.config.amount, this.config.offerMap);
     },
 
     assignScore: function (participant) {
@@ -177,6 +168,15 @@ function(app, Common, Participant, StateApp, Graphs) {
         receiver.set("receiverScore", 0);
         giver.set("giverScore", 0)
       }
+    },
+  });
+
+  UltimatumGame.States.Results = Common.States.Results.extend({
+    view: UltimatumGame.Views.Results.Layout,
+
+    handleConfigure: function () {
+      UltimatumGame.Util.assignOffers(this.collection,
+        this.config.amount, this.config.offerMap);
     },
 
     logResults: function () {

@@ -80,11 +80,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   TeamPrisonersDilemma.States.Play = Common.States.GroupPlay.extend({
     view: TeamPrisonersDilemma.Views.Play.Layout,
     defaultChoice: "C", // choice made when a player does not play
-    validChoices: ["C", "D"]
-  });
-
-  TeamPrisonersDilemma.States.Results = Common.States.GroupResults.extend({
-    view: TeamPrisonersDilemma.Views.Results.Layout,
+    validChoices: ["C", "D"],
 
     assignScore: function (participant) {
       var pairChoices = participant.get("choice") + participant.get("partner").get("choice");
@@ -93,6 +89,12 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         "pairChoices": pairChoices
       });
     },
+  });
+
+  TeamPrisonersDilemma.States.Results = Common.States.GroupResults.extend({
+    view: TeamPrisonersDilemma.Views.Results.Layout,
+
+
 
     logResults: function () {
       var modelTransform = function (model) {

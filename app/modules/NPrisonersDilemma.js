@@ -93,11 +93,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     setViewOptions: function () {
       PrisonersDilemma.States.Play.prototype.setViewOptions.call(this);
       this.options.viewOptions.InstructionsModel = NPrisonersDilemma.Instructions;
-    }
-  });
-
-  NPrisonersDilemma.States.Results = Common.States.Results.extend({
-    view: NPrisonersDilemma.Views.Results.Layout,
+    },
 
     assignScores: function () {
       var models = this.collection;
@@ -123,7 +119,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         }
       }, this);
 
-      this.payoff = {
+      this.collection.payoff = {
         cooperatorPayoff: cooperatorPayoff,
         numCooperators: numCooperators,
         defectorPayoff: defectorPayoff,
@@ -131,6 +127,14 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         totalPayoff: totalPayoff,
         maxPayoff: maxPayoff
       };
+    },
+  });
+
+  NPrisonersDilemma.States.Results = Common.States.Results.extend({
+    view: NPrisonersDilemma.Views.Results.Layout,
+
+    processBeforeRender: function () {
+      this.payoff = this.collection.payoff;
     },
 
     setViewOptions: function () {

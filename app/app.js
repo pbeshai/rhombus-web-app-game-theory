@@ -99,7 +99,6 @@ define([
 
     // make an API call
     api: function (options) {
-      console.log("Making API call ",options);
       $.ajax({
         url: "/api/" + options.call,
         type: options.type || "GET",

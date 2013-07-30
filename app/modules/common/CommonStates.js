@@ -35,10 +35,8 @@ function(app, CommonModels, StateApp) {
 
       // re-partners each render
       if (this.pairModels === true) {
-        console.log("pairing models");
         collection.pairModels();
       } else if (this.pairModels === "asymmetric") {
-        console.log("pairing asymmetrically");
         collection.pairModelsAsymmetric();
       }
 
@@ -55,6 +53,13 @@ function(app, CommonModels, StateApp) {
       }, this.options.viewOptions);
     },
 
+
+    assignScore: function (participant) { }, // template method
+
+    assignScores: function () {
+      this.collection.each(this.assignScore, this);
+    },
+
     processOutput: function () { }, // template method
 
     // outputs a participant collection
@@ -66,6 +71,7 @@ function(app, CommonModels, StateApp) {
         }
       }, this);
 
+      this.assignScores();
       this.processOutput();
 
       return this.collection;
@@ -83,7 +89,6 @@ function(app, CommonModels, StateApp) {
 
 
       if (this.validChoices) {
-        console.log("setting valid choices as ", this.validChoices);
         participant.set("validChoices", this.validChoices);
       }
 
@@ -127,6 +132,8 @@ function(app, CommonModels, StateApp) {
         model: this.groupModel,
         group1Name: this.config.group1Name,
         group2Name: this.config.group2Name,
+        group1NameSuffix: this.config.group1NameSuffix,
+        group2NameSuffix: this.config.group2NameSuffix,
         config: this.config
       }, this.options.viewOptions);
     },
@@ -134,6 +141,7 @@ function(app, CommonModels, StateApp) {
     processOutput: function () { }, // template method
 
     prepareParticipantOutput: function (participant) {
+      // set the default choice if configured and the participant hasn't played
       if (participant.get("choice") === undefined && this.defaultChoice) {
         participant.set("choice", this.defaultChoice);
       }
@@ -148,95 +156,15 @@ function(app, CommonModels, StateApp) {
     },
 
     prepareOutputGroup1: function () {
-      // if you haven't played, then you played "A".
       this.groupModel.get("group1").each(this.prepareParticipantOutputGroup1, this);
     },
 
     prepareOutputGroup2: function () {
-      // if you haven't played, then you played "A".
       this.groupModel.get("group2").each(this.prepareParticipantOutputGroup2, this);
     },
 
     handleConfigure: function () {
       this.renderView(); // ensures team names show update
-    },
-
-    // outputs a GroupModel
-    getOutput: function () {
-      this.prepareOutputGroup1();
-      this.prepareOutputGroup2();
-
-      this.processOutput();
-
-      return this.groupModel;
-    }
-  });
-
-  CommonStates.Results = StateApp.State.extend({
-    beforeRender: function () {
-      // this.input is a participant collection
-      this.collection = this.input;
-
-      this.assignScores();
-
-      if (this.bucket) {
-        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
-      }
-
-      this.logResults();
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = _.defaults({
-        collection: this.collection,
-        config: this.config
-      }, this.options.viewOptions);
-    },
-
-    handleConfigure: function () {
-      this.render();
-    },
-
-    assignScore: function (participant) { // template method
-      participant.set("score", 0);
-    },
-
-    assignScores: function () {
-      this.collection.each(this.assignScore, this);
-    },
-
-    logResults: function () { }, // template method
-
-    getOutput: function () {
-      return this.collection;
-    }
-  });
-
-  CommonStates.GroupResults = StateApp.State.extend({
-    beforeRender: function () {
-      // this.input is a GroupModel
-      this.groupModel = this.input;
-
-      this.assignScores();
-
-      if (this.bucket) {
-        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
-      }
-
-      this.logResults();
-    },
-
-    setViewOptions: function () {
-      this.options.viewOptions = _.defaults({
-        model: this.groupModel,
-        group1Name: this.config.group1Name,
-        group2Name: this.config.group2Name,
-        config: this.config
-      }, this.options.viewOptions);
-    },
-
-    handleConfigure: function () {
-      this.render();
     },
 
     assignScore: function (participant) { // template method
@@ -262,6 +190,83 @@ function(app, CommonModels, StateApp) {
 
     assignScoresGroup2: function () {
       this.groupModel.get("group2").each(this.assignScoreGroup2, this);
+    },
+
+    // outputs a GroupModel
+    getOutput: function () {
+      this.prepareOutputGroup1();
+      this.prepareOutputGroup2();
+
+      this.assignScores();
+      this.processOutput();
+
+      return this.groupModel;
+    }
+  });
+
+  CommonStates.Results = StateApp.State.extend({
+    beforeRender: function () {
+      // this.input is a participant collection
+      this.collection = this.input;
+
+      this.processBeforeRender();
+
+      if (this.bucket) {
+        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
+      }
+
+      this.logResults();
+    },
+
+    processBeforeRender: function () { }, // template method
+
+    setViewOptions: function () {
+      this.options.viewOptions = _.defaults({
+        collection: this.collection,
+        config: this.config
+      }, this.options.viewOptions);
+    },
+
+    handleConfigure: function () {
+      this.render();
+    },
+
+    logResults: function () { }, // template method
+
+    getOutput: function () {
+      return this.collection;
+    }
+  });
+
+  CommonStates.GroupResults = StateApp.State.extend({
+    beforeRender: function () {
+      // this.input is a GroupModel
+      this.groupModel = this.input;
+
+      this.processBeforeRender();
+
+      if (this.bucket) {
+        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
+      }
+
+      this.logResults();
+    },
+
+    processBeforeRender: function () { }, // template method
+
+    setViewOptions: function () {
+      this.options.viewOptions = _.defaults({
+        model: this.groupModel,
+        group1Name: this.config.group1Name,
+        group2Name: this.config.group2Name,
+        group1NameSuffix: this.config.group1NameSuffix,
+        group2NameSuffix: this.config.group2NameSuffix,
+        config: this.config
+      }, this.options.viewOptions);
+    },
+
+    handleConfigure: function () {
+      this.render();
     },
 
     logResults: function () { }, // template method

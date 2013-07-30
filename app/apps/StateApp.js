@@ -193,7 +193,7 @@ function(app) {
 
 			if (this.isLastState()) {
 				// save the round output
-				this.roundOutputs[this.roundCounter] = this.roundOutput(output);
+				this.roundOutputs[this.roundCounter - 1] = this.roundOutput(output);
 
 				if (this.isLastRound()) {
 					return State.prototype.next.apply(this, arguments);
@@ -215,7 +215,7 @@ function(app) {
 			this.currentState.beforePrev();
 			if (this.isFirstState()) {
 				// erase round output from this round before leaving it
-				delete this.roundOutputs[this.roundCounter];
+				delete this.roundOutputs[this.roundCounter - 1];
 
 				if (this.isFirstRound()) {
 					return State.prototype.prev.apply(this, arguments);

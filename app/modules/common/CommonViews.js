@@ -164,7 +164,7 @@ function (app, Grid) {
   CommonViews.SimpleLayout = Backbone.View.extend({
     template: "common/simple_layout",
     // properties that can be overridden via options
-    optionProperties: [ "header", "ParticipantView", "ParticipantsView", "PreParticipantsView", "PostParticipantsView", "InstrucitonsModel"],
+    optionProperties: [ "header", "ParticipantView", "ParticipantsView", "PreParticipantsView", "PostParticipantsView", "InstructionsModel"],
     header: "Participants",
     ParticipantView: null,
     ParticipantsView: CommonViews.ParticipantsGrid,
@@ -226,16 +226,18 @@ function (app, Grid) {
     PostGroupsView: null,
     InstructionsModel: null,
     inactive: {},
-    optionProperties: [ "header", "group1Name", "group2Name", "ParticipantView", "ParticipantsView",
-                        "PreParticipantsView", "PostParticipantsView", "PreGroupsView", "PostGroupsView",
-                        "InstructionsModel", "inactive" ],
+    optionProperties: [ "header", "group1Name", "group2Name", "group1NameSuffix", "group2NameSuffix",
+                        "ParticipantView", "ParticipantsView", "PreParticipantsView", "PostParticipantsView",
+                        "PreGroupsView", "PostGroupsView", "InstructionsModel", "inactive" ],
 
     serialize: function () {
       return {
         header: this.header,
         hasPlayers: (this.model.get("participants").length > 0),
         group1Name: this.group1Name,
-        group2Name: this.group2Name
+        group2Name: this.group2Name,
+        group1NameSuffix: this.group1NameSuffix,
+        group2NameSuffix: this.group2NameSuffix
       };
     },
 

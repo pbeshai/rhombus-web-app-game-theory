@@ -280,11 +280,6 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     view: PrisonersDilemma.Views.Play.Layout,
     defaultChoice: "C",
     validChoices: ["C", "D"],
-  });
-
-
-  PrisonersDilemma.States.Results = Common.States.Results.extend({
-    view: PrisonersDilemma.Views.Results.Layout,
 
     assignScore: function (model) {
       var pairChoices = model.get("choice") + model.get("partner").get("choice");
@@ -293,6 +288,11 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
         "pairChoices": pairChoices
       });
     },
+  });
+
+
+  PrisonersDilemma.States.Results = Common.States.Results.extend({
+    view: PrisonersDilemma.Views.Results.Layout,
 
     logResults: function () {
       var results = this.collection.map(function (model) {

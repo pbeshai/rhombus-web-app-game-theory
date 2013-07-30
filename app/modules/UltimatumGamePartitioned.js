@@ -180,16 +180,6 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     prepareParticipantOutputGroup2: function (participant) {
       this.prepareParticipantOutput(participant);
       participant.set("complete", true);
-    }
-  });
-
-
-  UltimatumGamePartitioned.States.Results = Common.States.GroupResults.extend({
-    view: UltimatumGamePartitioned.Views.Results.Layout,
-
-    handleConfigure: function () {
-      UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
-        this.config.amount, this.config.offerMap);
     },
 
     assignScoresGroup1: function () { },
@@ -204,6 +194,16 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         receiver.set("score", 0);
         giver.set("score", 0)
       }
+    },
+  });
+
+
+  UltimatumGamePartitioned.States.Results = Common.States.GroupResults.extend({
+    view: UltimatumGamePartitioned.Views.Results.Layout,
+
+    handleConfigure: function () {
+      UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
+        this.config.amount, this.config.offerMap);
     },
 
     logResults: function () {

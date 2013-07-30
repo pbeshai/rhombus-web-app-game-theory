@@ -129,10 +129,6 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         gameOver: this.config.gameOver,
       });
     },
-  });
-
-  PrisonersDilemmaMulti.States.Results = Common.States.Results.extend({
-    view: PrisonersDilemmaMulti.Views.Results.Layout,
 
     assignScore: function (participant) {
       var pairChoices = participant.get("choice") + participant.get("partner").get("choice");
@@ -153,6 +149,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         }
       }
     },
+  });
+
+  PrisonersDilemmaMulti.States.Results = Common.States.Results.extend({
+    view: PrisonersDilemmaMulti.Views.Results.Layout,
 
     setViewOptions: function () {
       Common.States.Play.prototype.setViewOptions.call(this);

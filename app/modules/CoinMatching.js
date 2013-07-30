@@ -23,7 +23,6 @@ function(app, Common, Participant, StateApp, Graphs) {
     roundsPerPhase: 2,
     group1Name: "Lab 1",
     group2Name: "Lab 2",
-    numRounds: 2, // TODO
   };
 
   CoinMatching.Instructions = Common.Models.Instructions.extend({
@@ -153,15 +152,6 @@ function(app, Common, Participant, StateApp, Graphs) {
         participant.set("role", "row");
         participant.get("partner").set("role", "col");
       });
-    }
-  });
-
-  CoinMatching.States.Results = Common.States.GroupResults.extend({
-    view: CoinMatching.Views.Results.Layout,
-    bucketAttribute: "score",
-    bucket: true,
-
-    handleConfigure: function () {
     },
 
     assignScoreGroup2: function () { }, // do nothing (handled in group1)
@@ -175,25 +165,32 @@ function(app, Common, Participant, StateApp, Graphs) {
       var colWin = [ "AB", "BA", "CD", "DC", "AD", "DA", "CB", "BC" ];
 
       if (_.contains(rowWin, pairChoice) || (choice != null && partnerChoice == null)) {
-        score = 1;
+        score = this.config.pointsPerRound;
       } else if (_.contains(colWin, pairChoice) || (choice == null && partnerChoice != null)) {
-        partnerScore = 1;
+        partnerScore = this.config.pointsPerRound;
       }
 
       participant.set("score", score);
-      participant.set("phaseTotal", participant.get("phaseTotal") + participant.get("score"));
-
       partner.set("score", partnerScore);
-      partner.set("phaseTotal", partner.get("phaseTotal") + partner.get("score"));
     },
 
-    beforePrev: function () {
-      // unassign scores
-      this.groupModel.get("participants").each(function (participant) {
-        participant.set("phaseTotal", participant.get("phaseTotal") - participant.get("score"));
-        participant.set("score", 0);
-      })
-    },
+    processOutput: function () {
+            console.log("ROUND OUTPUTS", this.options.roundOutputs);
+      this.groupModel.get("participants").each(function (participant, i) {
+        // sum up total scores from rounds in this phase
+        var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
+          return roundOutput[i].score + memo;
+        }, 0) + participant.get("score");
+
+        participant.set("phaseTotal", phaseTotal);
+      }, this);
+    }
+  });
+
+  CoinMatching.States.Results = Common.States.GroupResults.extend({
+    view: CoinMatching.Views.Results.Layout,
+    bucketAttribute: "score",
+    bucket: true,
 
     logResults: function () {
       // console.log("ROUND OUTPUTS",  this.options.roundOutputs);
@@ -236,6 +233,10 @@ function(app, Common, Participant, StateApp, Graphs) {
       }, this);
       return this.lastOutput;
     },
+
+    handleConfigure: function () {
+      this.currentState.render();
+    }
   });
 
 
@@ -249,14 +250,17 @@ function(app, Common, Participant, StateApp, Graphs) {
     view: CoinMatching.Views.TotalResults.Layout,
     bucketAttribute: "total",
     bucket: true,
-    assignScore: function (participant) {
-      participant.set("total", 0);
-      for (var i = 0; i < this.options.numPhases; i++) {
-        var phaseTotal = participant.get("phase" + (i + 1) + "Total");
-        if (phaseTotal) {
-          participant.set("total", participant.get("total") + phaseTotal);
+    processBeforeRender: function (participant) {
+      this.groupModel.get("participants").each(function (participant) {
+        participant.set("total", 0);
+        for (var i = 0; i < this.options.numPhases; i++) {
+          var phaseTotal = participant.get("phase" + (i + 1) + "Total");
+          if (phaseTotal) {
+            participant.set("total", participant.get("total") + phaseTotal);
+          }
         }
-      }
+      }, this);
+
     },
 
     beforePrev: function () {

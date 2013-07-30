@@ -22,20 +22,32 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 		version: "1.0",
 		config: CoinMatching.config,
 		phaseConfigs: [
-			{ group1Name: "Lab 1 - Human", group2Name: "Lab 2 - Human" },
-			{ group1Name: "Lab 1 - Human", group2Name: "Lab 2 - Computer" },
-			{ group1Name: "Lab 1 - Computer", group2Name: "Lab 2 - Human" },
-			{ group1Name: "Lab 1 - Computer", group2Name: "Lab 2 - Computer" },
+			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },
+			{ group1NameSuffix: "Human", group2NameSuffix: "Computer" },
+			{ group1NameSuffix: "Computer", group2NameSuffix: "Human" },
+			{ group1NameSuffix: "Computer", group2NameSuffix: "Computer" },
 		],
-
-		handleConfigure: function () {
-			// maybe update individual phase config instead of "overall" one?
-		},
 
 		initConfigs: function () {
 			_.each(this.phaseConfigs, function (phaseConfig) {
 				_.defaults(phaseConfig, this.config)
 			}, this);
+		},
+
+		handleConfigure: function () {
+			// update numrounds in each of the rounds
+			_.each(this.states, function (state) {
+				if (state instanceof StateApp.RoundState) {
+					state.numRounds = this.config.roundsPerPhase;
+				}
+			}, this);
+
+			// update the phase configs
+			_.each(this.phaseConfigs, function (phaseConfig) {
+				_.extend(phaseConfig, this.config);
+			}, this);
+
+			CommonStateApps.BasicApp.prototype.handleConfigure.call(this);
 		},
 
 		defineMainStates: function () {
@@ -51,31 +63,38 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 				};
 			};
 			_.each(this.phaseConfigs, function (phaseConfig, i) {
-				this.states["phase" + (i + 1)] = new CoinMatching.States.Round(_.extend({ config: this.phaseConfigs[i] }, roundStateOptions(i + 1)));
-				this.states["results" + (i + 1)] = new CoinMatching.States.PhaseResults({
+				var phaseNum = i+1;
+
+				var phaseState = this.states["phase" + phaseNum] = new CoinMatching.States.Round(_.extend({ config: this.phaseConfigs[i] }, roundStateOptions(phaseNum)));
+				var resultsState = this.states["results" + phaseNum] = new CoinMatching.States.PhaseResults({
 					config: this.phaseConfigs[i],
 					phase: (i+1),
 					viewOptions: {
-						header: "Results for Phase " + (i + 1)
+						header: "Results for Phase " + phaseNum
 					}
 				});
 
 				if (i === 0) {
-					this.states["phase" + (i + 1)].setPrev(this.states.attendance);
+					phaseState.setPrev(this.states.attendance);
 				} else {
-					this.states["totalResults" + (i + 1)] = new CoinMatching.States.TotalResults({ config: this.config, numPhases: i + 1 });
-					this.states["totalResults" + (i + 1)].setPrev(this.states["results" + (i + 1)]);
+					var totalResultsState = this.states["totalResults" + phaseNum] = new CoinMatching.States.TotalResults({
+						config: this.config,
+						numPhases: i + 1,
+						viewOptions: {
+							header: "Total Results after Phase " + phaseNum
+						}
+					});
+					totalResultsState.setPrev(resultsState);
 					if (i === 1) {
-						this.states["phase" + (i + 1)].setPrev(this.states["results" + i]);
+						// previous results state (no total results after phase 1)
+						phaseState.setPrev(this.states["results" + i]); // only
 					} else {
-						this.states["phase" + (i + 1)].setPrev(this.states["totalResults" + i]);
+						// previous total results
+						phaseState.setPrev(this.states["totalResults" + i]);
 					}
-
 				}
 
-				this.states["results" + (i + 1)].setPrev(this.states["phase" + (i + 1)]);
-
-
+			 	resultsState.setPrev(phaseState);
 
 			}, this);
 		}
