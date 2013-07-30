@@ -21,8 +21,8 @@ function(app, Common, Participant, StateApp, Graphs) {
   CoinMatching.config = {
     pointsPerRound: 1,
     roundsPerPhase: 2,
-    group1Name: "Lab 1",
-    group2Name: "Lab 2",
+    group1Name: "Team 1",
+    group2Name: "Team 2",
   };
 
   CoinMatching.Instructions = Common.Models.Instructions.extend({

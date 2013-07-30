@@ -27,7 +27,7 @@ function() {
     return ParticipantDisplay.extend({
       cssClass: function (model) {
         var bucket = model.get("bucket");
-        if (bucket) {
+        if (bucket != null) {
           return "bucket-" + bucket;
         }
       },

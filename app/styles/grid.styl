@@ -131,23 +131,25 @@
 	display inline
 
 
-.participant.bucket-6
-	background-color: rgb(20,20,20)
-
-.participant.bucket-5
-	background-color: rgb(40,40,40)
-
-.participant.bucket-4
-	background-color: rgb(60,60,60)
-
-.participant.bucket-3
-	background-color: rgb(80,80,80)
-
-.participant.bucket-2
-	background-color: rgb(100,100,100)
-
-.participant.bucket-1
-	background-color: rgb(120,120,120)
+bucket-color = rgb(18, 60, 88)
 
 .participant.bucket-0
-	background-color: rgb(140,140,140)
+	background-color: bucket-color;
+
+.participant.bucket-1
+	background-color: lighten(bucket-color, 5%);
+
+.participant.bucket-2
+	background-color: lighten(bucket-color, 10%);
+
+.participant.bucket-3
+	background-color: lighten(bucket-color, 15%);
+
+.participant.bucket-4
+	background-color: lighten(bucket-color, 20%);
+
+.participant.bucket-5
+	background-color: lighten(bucket-color, 25%);
+
+.participant.bucket-6
+	background-color: lighten(bucket-color, 30%);

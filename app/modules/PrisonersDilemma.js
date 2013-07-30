@@ -44,6 +44,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
   PrisonersDilemma.Views.Play.Participant = Common.Views.ParticipantHiddenPlay;
 
   PrisonersDilemma.Views.Play.Layout = Common.Views.SimpleLayout.extend({
+    header: "Play",
     ParticipantView: PrisonersDilemma.Views.Play.Participant,
     InstructionsModel: PrisonersDilemma.Instructions
   });
@@ -243,6 +244,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
   });
 
   PrisonersDilemma.Views.Results.Layout = Common.Views.SimpleLayout.extend({
+    header: "Results",
     ParticipantView: PrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: PrisonersDilemma.Views.Results.Stats
   });
