@@ -42,27 +42,28 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
         ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
       });
 
+      // TODO: instructor focus??
       // get instructor focus when the window gains focus.
-      $(window).on("focus", function () {
-        if (!app.instructorFocus) {
-          appController.instructorFocus();
-        }
-      });
+      // $(window).on("focus", function () {
+      //   if (!app.instructorFocus) {
+      //     appController.instructorFocus();
+      //   }
+      // });
 
-      appController.on("instructor-focus", function (hasFocus) {
-        app.instructorFocus = hasFocus;
-        if (hasFocus) {
-          $(document.body).addClass("instructor-focus");
-        } else {
-          $(document.body).removeClass("instructor-focus");
-        }
-      });
+      // appController.on("instructor-focus", function (hasFocus) {
+      //   app.instructorFocus = hasFocus;
+      //   if (hasFocus) {
+      //     $(document.body).addClass("instructor-focus");
+      //   } else {
+      //     $(document.body).removeClass("instructor-focus");
+      //   }
+      // });
 
       // setup instructor handling
       participantServer.on("instructor", function (data) {
-        if (!app.instructorFocus) {
-          return;
-        }
+        // if (!app.instructorFocus) {
+        //   return;
+        // }
 
         // for now, only use the first item in the data array (highly unusual to have more than one)
         var choice = data[0].choice;

@@ -16,8 +16,7 @@ define([
 		clientEvents: {
 			appConfig: "app-config",
 			appNext: "app-next",
-			appPrev: "app-prev",
-			instructorFocus: "instructor-focus"
+			appPrev: "app-prev"
 		},
 
 		// events we send across the websocket
@@ -25,11 +24,23 @@ define([
 			appConfig: "app-config",
 			appNext: "app-next",
 			appPrev: "app-prev",
-			instructorFocus: "instructor-focus"
+			appMessage: "app-message"
 		},
 
 		reset: function () {
 			this.clear();
+		},
+
+		sendAppMessage: function (type, message) {
+			var appMessage = {
+				type: type,
+				message: message,
+			}
+			this.socket.emit("app-message", appMessage);
+		},
+
+		appNext: function () {
+			this.sendAppMessage("app-next");
 		},
 
 		appNextCallback: function () {
@@ -40,12 +51,20 @@ define([
 	  	}
 		},
 
+		appPrev: function () {
+			this.sendAppMessage("app-prev");
+		},
+
 		appPrevCallback: function () {
 			var activeApp = this.get("activeApp");
 			if (activeApp) {
 	  		console.log("Prev State: " + activeApp.currentState.prevString());
 	  		activeApp.prev();
 	  	}
+		},
+
+		appConfig: function(config) {
+			this.sendAppMessage("app-config", config);
 		},
 
 		appConfigCallback: function (config) {

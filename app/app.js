@@ -7,6 +7,7 @@ define([
 ], function(io, BaseView) {
   var socketUrl = "http://localhost";
 
+
   // Provide a global location to place configuration settings and module
   // creation.
   var app = {
@@ -21,7 +22,8 @@ define([
       if (this.socket == null) {
         var socket = this.socket = io.connect(socketUrl); // websocket
         socket.on("request-register", function () {
-          socket.emit("register", { type: "controller", app: "app1" });
+          var type = (window.location.search === "?viewer") ? "viewer" : "controller";
+          socket.emit("register", { type: type, app: "app1" }); // TODO type and app
           socket.emit("app-message", "hello!");
         });
       }
