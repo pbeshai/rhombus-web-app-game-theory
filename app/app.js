@@ -19,7 +19,11 @@ define([
     getSocket: function () {
       // lazy load the socket so that handlers can be ready to accept initial events on socket connect.
       if (this.socket == null) {
-        this.socket = io.connect(socketUrl); // websocket
+        var socket = this.socket = io.connect(socketUrl); // websocket
+        socket.on("request-register", function () {
+          socket.emit("register", { type: "viewer", app: "app1" });
+          socket.emit("app-message", "hello!");
+        });
       }
       return this.socket;
     }
