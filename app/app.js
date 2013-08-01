@@ -21,7 +21,7 @@ define([
       if (this.socket == null) {
         var socket = this.socket = io.connect(socketUrl); // websocket
         socket.on("request-register", function () {
-          socket.emit("register", { type: "viewer", app: "app1" });
+          socket.emit("register", { type: "controller", app: "app1" });
           socket.emit("app-message", "hello!");
         });
       }
