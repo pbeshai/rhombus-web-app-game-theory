@@ -8,11 +8,12 @@ define([
   "app",
 
   "modules/Clicker",
+  "apps/Apps",
 
   "util/jquery/jQuery.psToggleButton"
 ],
 
-function(app, Clicker) {
+function(app, Clicker, Apps) {
 
   var Controls = app.module();
 
@@ -69,7 +70,10 @@ function(app, Clicker) {
 
     events: {
       "click .next-state" : "nextState",
-      "click .prev-state" : "prevState"
+      "click .prev-state" : "prevState",
+      "click .load-view" : "loadView",
+      "click .load-view2" : "loadView2",
+      "click .update-view" : "updateView"
     },
 
     serialize: function () {
@@ -85,24 +89,39 @@ function(app, Clicker) {
     },
 
     afterRender: function () {
-      enableChoicesButton(this.$(".enable-choices-button"), app.participantServer);
       if (this.options.appConfigView == null) {
         this.$(".configure").hide();
       }
     },
 
     nextState: function () {
-      app.appController.appNext();
+      app.controller.appController.appNext();
     },
 
     prevState: function () {
-      app.appController.appPrev();
+      app.controller.appController.appPrev();
+    },
+
+    loadView: function () {
+      // TODO: shouldn't be hardcoded values
+      app.controller.appController.loadView("attendance", { participants: app.router.participants }, "Viewer1");
+    },
+
+    loadView2: function () {
+      // TODO: shouldn't be hardcoded values
+      app.controller.appController.loadView("grid", { participants: app.router.participants }, "Viewer1");
+    },
+
+    // TODO: temporary function to test update view
+    updateView: function () {
+      app.router.participants.each(function (p) { p.set("choice", (p.get("choice") === "A") ? "B" : "A"); });
+      app.controller.appController.updateView({ participants: app.router.participants }, "Viewer1");
     }
   });
 
   Controls.ConfigurationModel = Backbone.Model.extend({
     sync: function () {
-      app.appController.appConfig(this.attributes);
+      app.controller.appController.appConfig(this.attributes);
       this.changed = {};
     }
   });
@@ -151,8 +170,34 @@ function(app, Clicker) {
     },
 
     beforeRender: function () {
-      this.insertView(".app-controls", new Controls.Views.AppControls());
-      this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
+      var appSelector = new Apps.Views.Selector();
+      this.setView(".app-selector", appSelector);
+      var controls = this;
+
+      appSelector.on("app-selected", function (selectedApp) {
+        var $appControls = controls.$(".app-controls");
+
+        // save old height to prevent flicker
+        var oldHeight = $appControls.height();
+        $appControls.css("min-height", oldHeight).css({opacity: 0});
+
+        var appControls = new Controls.Views.AppControls({
+          title: selectedApp.title,
+          appConfigView: selectedApp.configView
+        });
+
+        controls.setView(".app-controls", appControls);
+        appControls.on("afterRender", function () {
+          $appControls.css("min-height", "").animate({opacity: 1});
+        });
+        appControls.render();
+      });
+      // this.insertView(".app-controls", new Controls.Views.AppControls());
+      //TODO this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
+    },
+
+    afterRender: function () {
+      enableChoicesButton(this.$(".enable-choices-button"), app.controller.participantServer);
     },
 
     clearDatabase: function () {

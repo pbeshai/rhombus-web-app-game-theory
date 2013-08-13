@@ -82,7 +82,8 @@ function(app, Common, Participant, StateApp) {
       newView.render();
     },
 
-  	initialize: function () {
+  	initialize: function (options) {
+      console.log("init attendance:", options);
       if (this.options.acceptNew) {
         this.prevAcceptNew = this.collection.options.acceptNew;
         this.collection.options.acceptNew = true; // allow new users to be added when data comes from server
@@ -92,18 +93,22 @@ function(app, Common, Participant, StateApp) {
   			"reset": this.render,
         "add": this.add
   		});
-
+      console.log("attendance init successful");
       // listen for data changes
-      app.participantServer.hookCollection(this.collection, this);
+      // app.controller.participantServer.hookCollection(this.collection, this);
   	},
 
     cleanup: function () {
       if (this.options.acceptNew) {
         this.collection.options.acceptNew = this.prevAcceptNew;
       }
-    }
-
+    },
   });
+  // register app views
+  app.views["attendance"] = Attendance.Views.Participants;
+
+
+
 
   // To be used in StateApps
   Attendance.State = StateApp.State.extend({

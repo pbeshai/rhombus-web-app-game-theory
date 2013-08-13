@@ -113,10 +113,9 @@ function(app) {
       this.on("reset", this.initAliasMap);
       this.initAliasMap(models);
       this.on("add", this.addCallback);
-
-      this.participantServer = app.participantServer;
   	},
 
+    // update choices from ParticipantServer
     updateFromServer: function (data) {
       _.each(data.choices, function (choiceData, i) {
         var model = this.aliasMap[choiceData.id];
@@ -128,6 +127,24 @@ function(app) {
           if (this.options.acceptNew) {
             console.log("adding new user");
             model = new Participant.Model({ alias: choiceData.id, choice: choiceData.choice });
+            this.add(model);
+          }
+        }
+      }, this);
+    },
+
+    // TODO: figure this out (to be used for updating via Manager)
+    update: function (data) {
+      _.each(data, function (participant, i) {
+        var model = this.aliasMap[participant.alias];
+        if (model) {
+          model.set({"choice": participant.choice}, { validate: this.options.validateOnChoice });
+        } else {
+          console.log("new user. accept new? ", this.options.acceptNew, this.options);
+          this.trigger("new-user", participant);
+          if (this.options.acceptNew) {
+            console.log("adding new user");
+            model = new Participant.Model(participant);
             this.add(model);
           }
         }
@@ -239,6 +256,14 @@ function(app) {
       });
     }
   });
+
+  Participant.Util = {};
+  Participant.Util.collectionFromArray = function (participants) {
+    var models = _.map(participants, function (p) { return new Participant.Model(p); });
+    console.log(participants[0], models[0]);
+
+    return new Participant.Collection(models);
+  };
 
   Participant.Views.Item = Backbone.View.extend({
   	template: "participant/item",

@@ -16,7 +16,11 @@ define([
 		clientEvents: {
 			appConfig: "app-config",
 			appNext: "app-next",
-			appPrev: "app-prev"
+			appPrev: "app-prev",
+			appMessage: "app-message",
+			viewerList: "viewer-list",
+			viewerConnect: "viewer-connect",
+			viewerDisconnect: "viewer-disconnect",
 		},
 
 		// events we send across the websocket
@@ -24,11 +28,18 @@ define([
 			appConfig: "app-config",
 			appNext: "app-next",
 			appPrev: "app-prev",
-			appMessage: "app-message"
+			appMessage: "app-message",
+			viewerList: "viewer-list",
+			viewerConnect: "viewer-connect",
+			viewerDisconnect: "viewer-disconnect",
 		},
 
 		reset: function () {
 			this.clear();
+		},
+
+		viewerListCallback: function (data) {
+			console.log("viewer list", data);
 		},
 
 		sendAppMessage: function (type, message) {
@@ -37,6 +48,21 @@ define([
 				message: message,
 			}
 			this.socket.emit("app-message", appMessage);
+		},
+
+		appMessageCallback: function (data) {
+			console.log("app message received", data);
+			if (data.type) {
+				this.trigger(data.type, data.message);
+			}
+		},
+
+		loadView: function (view, options, viewer) {
+			this.sendAppMessage("load-view", { view: view, options: options }); // TODO add viewer , viewer: viewer });
+		},
+
+		updateView: function (data) {
+			this.sendAppMessage("update-view", data); // TODO add viewer , viewer: viewer });
 		},
 
 		appNext: function () {
@@ -75,10 +101,15 @@ define([
 	  	}
 		},
 
-		initialize: function () {
+		initialize: function (attrs) {
 			// web socket
-		  this.socket = app.getSocket();
-		  SocketUtils.initSendReceive.call(this);
+		  this.socket = attrs.socket;
+		  SocketUtils.initSendReceive.call(this)
+
+		  this.on("change:socket", function (model, socket) {
+		  	this.socket = socket;
+		  	SocketUtils.bindSocketEvents.call(this);
+		  });
 		},
 	});
 

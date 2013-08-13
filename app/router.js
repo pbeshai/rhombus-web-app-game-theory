@@ -14,20 +14,16 @@ define([
   "modules/Register",
   "modules/Attendance",
   "modules/Clicker",
-
+  "modules/Modes",
   "apps/Apps",
 ],
 
 function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participant, Grid, Controls, Register, Attendance,
-  Clicker, Apps) {
+  Clicker, Modes, Apps) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
-
-      var participantServer = app.participantServer = new ParticipantServer.Model();
-      var appController = app.appController = new AppController.Model();
-
       var collections = {
         // Set up the users.
         participants: new Participant.Collection(),
@@ -39,61 +35,10 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       // Use main layout and set Views.
       app.useLayout("main-layout").setViews({
         ".view-controls": new ViewControls.Views.Controls(),
-        ".server-status": new ParticipantServer.Views.Status({ model: participantServer})
-      });
-
-      // TODO: instructor focus??
-      // get instructor focus when the window gains focus.
-      // $(window).on("focus", function () {
-      //   if (!app.instructorFocus) {
-      //     appController.instructorFocus();
-      //   }
-      // });
-
-      // appController.on("instructor-focus", function (hasFocus) {
-      //   app.instructorFocus = hasFocus;
-      //   if (hasFocus) {
-      //     $(document.body).addClass("instructor-focus");
-      //   } else {
-      //     $(document.body).removeClass("instructor-focus");
-      //   }
-      // });
-
-      // setup instructor handling
-      participantServer.on("instructor", function (data) {
-        // if (!app.instructorFocus) {
-        //   return;
-        // }
-
-        // for now, only use the first item in the data array (highly unusual to have more than one)
-        var choice = data[0].choice;
-        switch (choice) {
-          case "A":
-            console.log("instructor A: toggle polling");
-            if (participantServer.get("acceptingChoices")) {
-              participantServer.disableChoices();
-            } else {
-              participantServer.enableChoices();
-            }
-            break;
-          case "B":
-            console.log("instructor B (unused)");
-            break;
-          case "C":
-            console.log("instructor C: next state");
-            appController.appNext();
-            break;
-          case "D":
-            console.log("instructor D: prev state");
-            appController.appPrev();
-            break;
-          case "E":
-            console.log("instructor E (unused)");
-            break;
-        }
       });
     },
-    apps: Apps,
+
+    apps: Apps.apps,
 
     routes: {
       "": "index",
@@ -104,16 +49,15 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       "clicker": "clicker",
       "apps/:name": "appHandler",
       "apps/:name/controls" : "appControlsHandler",
-      "sandbox": "sandbox"
+      "sandbox": "sandbox",
+      "viewer": "viewer"
     },
 
     index: function () {
       console.log("[router: index]");
       this.reset();
 
-      app.layout.setViews({
-        "#main-content": new Participant.Views.List({ collection: this.participants}),
-      }).render();
+      app.setMainView(new Modes.Views.Selector({ model: app.model }));
     },
 
     grid: function () {
@@ -121,9 +65,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       this.reset();
 
       app.setTitle("Grid");
-      app.layout.setViews({
-        "#main-content": new Grid.Views.Participants({collection: this.participants})
-      }).render();
+      app.setMainView(new Grid.Views.Participants({collection: this.participants}));
     },
 
     controls: function () {
@@ -132,8 +74,17 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
 
       app.setTitle("Controls");
       app.layout.setViews({
-        "#main-content": new Controls.Views.Controls({participants: this.participants})
+        "#main-content": new Controls.Views.Controls({ participants: this.participants }),
+        ".server-status": new ParticipantServer.Views.Status({ model: app.controller.participantServer})
       }).render();
+    },
+
+    viewer: function () {
+      console.log("[router: viewer]");
+      this.reset();
+
+      app.setTitle("Viewer");
+      app.setMainView(new Modes.Views.Viewer());
     },
 
     register: function () {
@@ -141,11 +92,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       this.reset();
 
       app.setTitle("Register");
-      app.layout.setViews({
-        "#main-content": new Register.Views.Register({
-          participants: this.participants
-        })
-      }).render();
+      app.setMainView(new Register.Views.Register({ participants: this.participants }));
     },
 
     attendance: function () {
@@ -153,18 +100,14 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       this.reset();
 
       app.setTitle("Attendance");
-      app.layout.setViews({
-        "#main-content": new Attendance.Views.Participants({collection: this.participants})
-      }).render();
+      app.setMainView(new Attendance.Views.Participants({collection: this.participants}))
     },
 
     clicker: function () {
       console.log("[router: clicker]");
       this.reset();
       app.setTitle("Clickers");
-      app.layout.setViews({
-        "#main-content": new Clicker.Views.Clickers({collection: this.participants})
-      }).render();
+      app.setMainView(new Clicker.Views.Clickers({collection: this.participants}));
     },
 
     appHandler: function (name) {
@@ -193,12 +136,10 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       }
 
       app.setTitle(title);
-      app.layout.setViews({
-        "#main-content": new Controls.Views.AppControls({
+      app.setMainView(new Controls.Views.AppControls({
           title: title,
           appConfigView: configView
-        })
-      }).render();
+      }));
     },
 
     sandbox: function () {
@@ -206,15 +147,13 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       this.reset();
 
       app.setTitle("Sandbox");
-      app.layout.setViews({
-        "#main-content": new Sandbox.Views.Sandbox(),
-      }).render();
+      app.setMainView(new Sandbox.Views.Sandbox());
     },
 
     // reset state
     reset: function () {
       this.participants.fetch({ reset: true });
-      app.appController.reset();
+      // app.reset(); TODO: this was to reset 'activeApp'
     }
   });
 

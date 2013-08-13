@@ -38,10 +38,15 @@ define([
 			submitChoice: "submit-choice"
 		},
 
-		initialize: function () {
+		initialize: function (attrs) {
 			// web socket
-		  this.socket = app.getSocket();
-		  SocketUtils.initSendReceive.call(this);
+		  this.socket = attrs.socket;
+		  SocketUtils.initSendReceive.call(this)
+
+		  this.on("change:socket", function (model, socket) {
+		  	this.socket = socket;
+		  	SocketUtils.bindSocketEvents.call(this);
+		  });
 		},
 
 		// collection must have updateFromServer function

@@ -1,8 +1,3 @@
-/**
-
-A simple module for showing active participants and allowing registration of new ones.
-
-*/
 define(["backbone.layoutmanager"],
 
 function() {

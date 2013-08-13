@@ -63,10 +63,10 @@ function(app, Participant, StateApp) {
   		});
 
       // listen for data changes
-      app.participantServer.hookCollection(this.collection, this);
+      // TODO app.participantServer.hookCollection(this.collection, this);
   	}
-
   });
+  app.views["grid"] = Grid.Views.Participants;
 
   // To be used in StateApps
   Grid.State = StateApp.State.extend({

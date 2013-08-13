@@ -144,6 +144,24 @@ h1 {
 	font-size: .75em;
 }
 
+#browser-id {
+	text-align: center;
+	font-size: 12px;
+	line-height: 12px;
+	padding: 0;
+	margin-top: 2px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	opacity: .6;
+	cursor: default;
+	transition 1s opacity;
+	&:hover {
+		opacity: 1;
+	}
+}
+
+
 /** server status in top bar **/
 .server-status {
 	margin-top: 2px;
@@ -195,13 +213,6 @@ h1 {
 	margin-bottom: 32px;
 }
 
-/* PD */
-.results-participants {
-	margin-bottom: 40px;
-}
-.results-stats table {
-	width: 20em;
-}
 
 /* configuration */
 .configure {
@@ -222,4 +233,65 @@ h1 {
 	background: rgba(0,0,0,.05);
 	padding: 1px 10px;
 	border-radius: 4px;
+}
+
+
+input[type="text"].input-large-text {
+	font-size: 2em;
+	height: 1.2em;
+}
+
+.large-buttons {
+	margin: 20px;
+
+	button {
+		margin: 10px 20px 10px 10px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+}
+
+
+.grid-buttons {
+	button {
+		margin: 10px;
+		width: 220px;
+		height: 90px;
+		transition .4s opacity;
+
+		&.inactive {
+			opacity: .3;
+		}
+	}
+
+	&:hover {
+		button.inactive {
+			opacity: .8; /* make it more readable */
+
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.med-margins {
+	margin: 10px;
+}
+
+/* mode selector */
+.mode-selector {
+	text-align: center;
+}
+
+.viewer-waiting {
+	text-align: center;
+
+	h1 {
+		font-size: 90px;
+		line-height: 90px;
+		margin-top: 1em;
+	}
 }

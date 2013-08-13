@@ -5,29 +5,42 @@ define([
   "backbone.layoutmanager",
   "d3"
 ], function(io, BaseView) {
-  var socketUrl = "http://localhost";
+
 
 
   // Provide a global location to place configuration settings and module
   // creation.
   var app = {
+    socketUrl: "http://localhost",
     // The root path to run the application.
     root: "/",
     BaseView: BaseView, // shortcut to BaseView class
 
     instructorFocus: false,
 
-    getSocket: function () {
-      // lazy load the socket so that handlers can be ready to accept initial events on socket connect.
-      if (this.socket == null) {
-        var socket = this.socket = io.connect(socketUrl); // websocket
-        socket.on("request-register", function () {
-          var type = (window.location.search === "?viewer") ? "viewer" : "controller";
-          socket.emit("register", { type: type, app: "app1" }); // TODO type and app
-          socket.emit("app-message", "hello!");
-        });
+    model: new Backbone.Model({ appId: "app1" }),
+
+    // reset: function () {
+    //   if (this.appController) {
+    //     this.appController.reset();
+    //   }
+    // },
+    views: {}, // all views can register themselves here
+
+    setMainView: function (view, render) {
+      render = (render === undefined) ? true : render;
+
+      app.layout.setViews({
+        "#main-content": view
+      });
+
+      if (render) {
+        app.layout.render();
       }
-      return this.socket;
+    },
+
+    getMainView: function () {
+      return app.layout.getView("#main-content");
     }
   };
 

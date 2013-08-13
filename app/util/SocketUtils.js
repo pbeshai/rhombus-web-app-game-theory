@@ -7,18 +7,20 @@ define(["app"],
 
 	var SocketUtils = {
 
-			/**
-			 *  Sets up the convention of objects having this.socketEvents and this.clientEvents.
-			 *  for each key k in this.socketEvents, a function will be added to this named this.k,
-			 *  and a corresponding callback function will also be added named this.kCallback.
-			 *  this.k takes a data parameter and emits across the socket using the event this.socketEvents[k].
-			 *  this.kCallback takes a data parameter and triggers the client event this.clientEvents[k].
-			 *  If this.kCallback already exists prior to initSendReceive, that code will be run before
-			 *  triggering the client event.
-			 */
+		/**
+		 *  Sets up the convention of objects having this.socketEvents and this.clientEvents.
+		 *  for each key k in this.socketEvents, a function will be added to this named this.k,
+		 *  and a corresponding callback function will also be added named this.kCallback.
+		 *  this.k takes a data parameter and emits across the socket using the event this.socketEvents[k].
+		 *  this.kCallback takes a data parameter and triggers the client event this.clientEvents[k].
+		 *  If this.kCallback already exists prior to initSendReceive, that code will be run before
+		 *  triggering the client event.
+		 */
 
-			// to be called SocketUtils.initSendReceive.call(this);
-			initSendReceive: function () {
+		// to be called SocketUtils.initSendReceive.call(this);
+		initSendReceive: function () {
+			if (!this.socket) return;
+
 			_.each(_.keys(this.socketEvents), function (eventKey) {
 				var func = eventKey;
 				var callbackFunc = eventKey + "Callback";
@@ -31,12 +33,19 @@ define(["app"],
 				}
 				// e.g. add this.statusCallback(data) function
 				this[callbackFunc] = SocketUtils.receiveFunction.apply(this, [this.clientEvents[eventKey], this[callbackFunc]]);
+			}, this);
 
+			SocketUtils.bindSocketEvents.call(this);
+		},
 
+		bindSocketEvents: function () {
+			if (!this.socket) return;
+
+			_.each(_.keys(this.socketEvents), function (eventKey) {
+				var callbackFunc = eventKey + "Callback";
 				// bind the socket event to the callback
 				this.socket.on(this.socketEvents[eventKey], this[callbackFunc]);
 			}, this);
-
 		},
 
 		// creates a typical socket send function
