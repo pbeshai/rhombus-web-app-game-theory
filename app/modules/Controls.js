@@ -169,11 +169,19 @@ function(app, Clicker, Apps) {
       "click .clear-database": "clearDatabase",
     },
 
+    initialize: function () {
+      // TODO: not sure where to put these
+      app.controller.participantServer.hookCollection(this.options.participants, this);
+      this.listenTo(this.options.participants, "change", app.controller.changedParticipant);
+      this.listenTo(this.options.participants, "sync", app.controller.syncParticipants);
+    },
+
     beforeRender: function () {
       var appSelector = new Apps.Views.Selector();
       this.setView(".app-selector", appSelector);
       var controls = this;
 
+      // when an application has been selected
       appSelector.on("app-selected", function (selectedApp) {
         var $appControls = controls.$(".app-controls");
 
@@ -181,6 +189,10 @@ function(app, Clicker, Apps) {
         var oldHeight = $appControls.height();
         $appControls.css("min-height", oldHeight).css({opacity: 0});
 
+        // instantiate the application.
+        app.controller.appController.set("activeApp", selectedApp.instantiate({ participants: controls.options.participants }));
+
+        // show the controls and config for the app
         var appControls = new Controls.Views.AppControls({
           title: selectedApp.title,
           appConfigView: selectedApp.configView
@@ -192,8 +204,8 @@ function(app, Clicker, Apps) {
         });
         appControls.render();
       });
-      // this.insertView(".app-controls", new Controls.Views.AppControls());
-      //TODO this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
+
+      this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
     },
 
     afterRender: function () {

@@ -24,6 +24,9 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     initialize: function() {
+      console.log("TODO REMOVE THIS - app in window (top of router.js)");
+      window.app = app;
+
       var collections = {
         // Set up the users.
         participants: new Participant.Collection(),

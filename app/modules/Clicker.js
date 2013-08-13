@@ -64,7 +64,7 @@ function(app, Participant, StateApp) {
     choose: function (choice) {
       if (this.enabled) {
         console.log(this.id + " chooses " + choice);
-        app.participantServer.submitChoice(this.id, choice);
+        app.controller.participantServer.submitChoice(this.id, choice);
       }
     },
 
@@ -82,7 +82,7 @@ function(app, Participant, StateApp) {
         }
       }
 
-      var participantServer = app.participantServer;
+      var participantServer = app.controller.participantServer;
       // disable when clicks are disabled
       participantServer.on("enable-choices", $.proxy(function (success) {
         if (success) {

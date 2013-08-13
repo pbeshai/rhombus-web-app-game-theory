@@ -79,9 +79,13 @@ function(app) {
 
 		// render the view of the state
 		_render: function () {
-			this.viewInstance = new this.view(this.options.viewOptions);
-			app.layout.setView("#main-content", this.viewInstance);
-			app.layout.render();
+			// render the view on an external viewer
+			// TODO: Viewer1 shouldn't be hardcoded
+			app.controller.appController.loadView(this.view, this.options.viewOptions, "Viewer1");
+
+			// this.viewInstance = new this.view(this.options.viewOptions);
+			// app.layout.setView("#main-content", this.viewInstance);
+			// app.layout.render();
 		},
 
 		renderView: function () {

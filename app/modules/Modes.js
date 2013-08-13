@@ -15,11 +15,38 @@ function(app, ParticipantServer, AppController, Participant) {
 
   var Modes = app.module();
 
+  var ParticipantUpdater = function () {
+    this.participants = [];
+    setInterval(_.bind(this.update, this), this.updateInterval)
+  }
+  _.extend(ParticipantUpdater.prototype, {
+    updateInterval: 150,
+
+    add: function (participant) {
+      this.participants.push(participant);
+    },
+
+    clearBuffer: function () {
+      this.participants.length = 0;
+    },
+
+    update: function () {
+      if (this.participants.length) {
+        console.log("updating with ", this.participants);
+        // TODO: fix Viewer1 and probably the way we get appController
+        app.controller.appController.updateView({ participants: this.participants }, "Viewer1");
+        this.clearBuffer();
+      }
+    }
+  });
+
   Modes.Controller = Backbone.Model.extend({
     initialize: function (attrs) {
+      _.bindAll(this, "handleInstructor", "changedParticipant", "syncParticipants");
       console.log("init controller mode");
       this.participantServer = new ParticipantServer.Model({ socket: attrs.socket });
       this.appController = new AppController.Model({ socket: attrs.socket });
+      this.participantUpdater = new ParticipantUpdater();
 
       this.handleInstructor();
     },
@@ -56,6 +83,19 @@ function(app, ParticipantServer, AppController, Participant) {
             break;
         }
       });
+    },
+
+    // add a changed participant to the buffer to be updated on the views
+    changedParticipant: function (participant, options) {
+      console.log("changed", participant);
+      if (participant.hasChanged() || participant.isNew()) {
+        this.participantUpdater.add(participant);
+      }
+    },
+
+    syncParticipants: function (collection, participants) {
+      console.log("synced");
+      collection.each(this.participantUpdater.add, this.participantUpdater);
     }
   });
 
@@ -74,8 +114,7 @@ function(app, ParticipantServer, AppController, Participant) {
       // handle participants/collection as a special case since it is so common.
       // (reconstruct the array into a Participant.Collection object)
       if (data.options.participants) {
-        data.options.collection = Participant.Util.collectionFromArray(data.options.participants);
-        delete data.options.participants;
+        data.options.participants = data.options.collection = Participant.Util.collectionFromArray(data.options.participants);
       }
       // TODO: interpret the load view command to load the appropriate view
       app.setMainView(new app.views[data.view](data.options));
@@ -127,7 +166,7 @@ function(app, ParticipantServer, AppController, Participant) {
 
       // get the viewer/controller id
       socket.on("registered", function (data) {
-        console.log("registered", data);
+        console.log("registered browser window", data);
         if (mode === "controller") {
           app.controller = new Modes.Controller({ id: data.id, socket: socket });
           app.router.controls();

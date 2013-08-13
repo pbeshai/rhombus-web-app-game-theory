@@ -112,13 +112,15 @@ function(app, Common, Participant, StateApp) {
 
   // To be used in StateApps
   Attendance.State = StateApp.State.extend({
-    view: Attendance.Views.Participants,
+    // view: Attendance.Views.Participants,
+    view: "attendance", // key in app.views map
 
     initialize: function () {
       this.options.viewOptions = {
-        collection: this.options.participants,
+        participants: this.options.participants,
         acceptNew: this.options.acceptNew
       };
+      console.log("initialized attendance view options: ", this.options.viewOptions);
     },
 
     // if we are coming from a state, let's reset the participants, as this

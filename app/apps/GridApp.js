@@ -39,22 +39,21 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		},
 
 		transitions: {
-	  		attendance_grid: function () {
-	  			console.log("going from attendance to grid");
-	  		},
+  		attendance_grid: function () {
+  			console.log("going from attendance to grid");
+  		},
 
-	  		grid_attendance: function () {
-				  console.log("going from grid to attendance");
-				  this.options.participants.fetch();
-	  		}
+  		grid_attendance: function () {
+			  console.log("going from grid to attendance");
+			  this.options.participants.fetch();
+  		}
 		}
 	});
 
 	// description for use in router
 	GridApp.app = {
-		instantiate: function (router) {
-			var app = new GridApp({ participants: router.participants });
-			return app;
+		instantiate: function (options) {
+			return new GridApp(options);
 		},
 		configView: undefined,
 		title: "Grid App"

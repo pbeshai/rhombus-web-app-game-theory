@@ -47,7 +47,6 @@ function (app, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisoner
 			$btn.removeClass("inactive").addClass("active");
 			this.$("button").not($btn).addClass("inactive").removeClass("active");
 			this.trigger("app-selected", selectedApp);
-			// selectedApp.instantiate(app.router);
 		},
 	});
 	return Apps;
