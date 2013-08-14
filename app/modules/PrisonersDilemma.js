@@ -43,11 +43,11 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
   PrisonersDilemma.Views.Play.Participant = Common.Views.ParticipantHiddenPlay;
 
-  PrisonersDilemma.Views.Play.Layout = Common.Views.SimpleLayout.extend({
+  PrisonersDilemma.Views.Play.Layout = app.registerView("pd::play", Common.Views.SimpleLayout.extend({
     header: "Play",
     ParticipantView: PrisonersDilemma.Views.Play.Participant,
     InstructionsModel: PrisonersDilemma.Instructions
-  });
+  }));
 
   PrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
     template: "pd/results/participant",
@@ -243,11 +243,11 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   });
 
-  PrisonersDilemma.Views.Results.Layout = Common.Views.SimpleLayout.extend({
+  PrisonersDilemma.Views.Results.Layout = app.registerView("pd::results", Common.Views.SimpleLayout.extend({
     header: "Results",
     ParticipantView: PrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: PrisonersDilemma.Views.Results.Stats
-  });
+  }));
 
   PrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "pd/configure",
@@ -279,7 +279,8 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
   // To be used in StateApps
   PrisonersDilemma.States = {};
   PrisonersDilemma.States.Play = Common.States.Play.extend({
-    view: PrisonersDilemma.Views.Play.Layout,
+    // view: PrisonersDilemma.Views.Play.Layout,
+    view: "pd::play",
     defaultChoice: "C",
     validChoices: ["C", "D"],
 
@@ -294,7 +295,8 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
 
   PrisonersDilemma.States.Results = Common.States.Results.extend({
-    view: PrisonersDilemma.Views.Results.Layout,
+    // view: PrisonersDilemma.Views.Results.Layout,
+    view: "pd::results",
 
     logResults: function () {
       var results = this.collection.map(function (model) {

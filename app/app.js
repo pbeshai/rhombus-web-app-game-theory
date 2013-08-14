@@ -18,7 +18,7 @@ define([
 
     instructorFocus: false,
 
-    model: new Backbone.Model({ appId: "app1" }),
+    model: new Backbone.Model({ appId: "app1", browserId: "" }),
 
     // reset: function () {
     //   if (this.appController) {
@@ -26,6 +26,14 @@ define([
     //   }
     // },
     views: {}, // all views can register themselves here
+    registerView: function (name, view) {
+      if (this.views[name] !== undefined) {
+        console.log("Warning! Redefining view with " + name);
+      }
+      this.views[name] = view;
+
+      return view;
+    },
 
     setMainView: function (view, render) {
       render = (render === undefined) ? true : render;
@@ -101,7 +109,10 @@ define([
 
       // Create a new Layout with options.
       var layout = new Backbone.Layout(_.extend({
-        el: "#main"
+        el: "#main",
+        serialize: function () {
+          return app.model.attributes;
+        }
       }, options));
 
       // Cache the refererence.

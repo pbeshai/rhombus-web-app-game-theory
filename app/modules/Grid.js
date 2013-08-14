@@ -46,7 +46,7 @@ function(app, Participant, StateApp) {
   	}
   });
 
-  Grid.Views.Participants = Backbone.View.extend({
+  Grid.Views.Participants = app.registerView("grid", Backbone.View.extend({
     tagName: "div",
     className: "participant-grid",
 
@@ -65,8 +65,7 @@ function(app, Participant, StateApp) {
       // listen for data changes
       // TODO app.participantServer.hookCollection(this.collection, this);
   	}
-  });
-  app.views["grid"] = Grid.Views.Participants;
+  }));
 
   // To be used in StateApps
   Grid.State = StateApp.State.extend({

@@ -48,7 +48,7 @@ function(app, CommonModels, StateApp) {
 
     setViewOptions: function () {
       this.options.viewOptions = _.defaults({
-        collection: this.collection,
+        participants: this.collection,
         config: this.config
       }, this.options.viewOptions);
     },
@@ -222,7 +222,7 @@ function(app, CommonModels, StateApp) {
 
     setViewOptions: function () {
       this.options.viewOptions = _.defaults({
-        collection: this.collection,
+        participants: this.collection,
         config: this.config
       }, this.options.viewOptions);
     },
@@ -275,7 +275,6 @@ function(app, CommonModels, StateApp) {
       return this.groupModel;
     }
   });
-
 
   return CommonStates;
 })

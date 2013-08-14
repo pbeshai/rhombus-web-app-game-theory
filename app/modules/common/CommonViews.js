@@ -156,7 +156,7 @@ function (app, Grid) {
 
     initialize: function (options) {
       handleOptions(this, options);
-      this.listenTo(this.collection, "reset", this.render);
+      // this.listenTo(this.collection, "reset", this.render);
     }
   });
 
@@ -208,7 +208,7 @@ function (app, Grid) {
 
     initialize: function (options) {
       handleOptions(this, options);
-      app.participantServer.hookCollection(this.collection, this);
+      // app.participantServer.hookCollection(this.collection, this);
     },
   });
 

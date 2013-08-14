@@ -71,9 +71,13 @@ function(app) {
 		},
 
 		render: function () {
+			// ignore any changes up until render since we will call loadView with the current set of participants
+			app.controller.participantUpdater.ignore = true;
 			this.beforeRender();
 			this.setViewOptions();
 			this._render();
+
+			app.controller.participantUpdater.ignore = false;
 			this.afterRender();
 		},
 

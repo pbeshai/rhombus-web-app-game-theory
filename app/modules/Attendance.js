@@ -58,7 +58,7 @@ function(app, Common, Participant, StateApp) {
   	}
   });
 
-  Attendance.Views.Participants = Backbone.View.extend({
+  Attendance.Views.Participants = app.registerView("attendance", Backbone.View.extend({
     template: "attendance/layout",
     options: {
       acceptNew: false,
@@ -76,14 +76,12 @@ function(app, Common, Participant, StateApp) {
   	},
 
     add: function (participant) {
-      console.log("register view add", arguments);
       var newView = new Attendance.Views.Participant({ model: participant })
       this.insertView(".participant-grid", newView);
       newView.render();
     },
 
   	initialize: function (options) {
-      console.log("init attendance:", options);
       if (this.options.acceptNew) {
         this.prevAcceptNew = this.collection.options.acceptNew;
         this.collection.options.acceptNew = true; // allow new users to be added when data comes from server
@@ -93,7 +91,6 @@ function(app, Common, Participant, StateApp) {
   			"reset": this.render,
         "add": this.add
   		});
-      console.log("attendance init successful");
       // listen for data changes
       // app.controller.participantServer.hookCollection(this.collection, this);
   	},
@@ -103,12 +100,7 @@ function(app, Common, Participant, StateApp) {
         this.collection.options.acceptNew = this.prevAcceptNew;
       }
     },
-  });
-  // register app views
-  app.views["attendance"] = Attendance.Views.Participants;
-
-
-
+  }));
 
   // To be used in StateApps
   Attendance.State = StateApp.State.extend({
@@ -120,7 +112,6 @@ function(app, Common, Participant, StateApp) {
         participants: this.options.participants,
         acceptNew: this.options.acceptNew
       };
-      console.log("initialized attendance view options: ", this.options.viewOptions);
     },
 
     // if we are coming from a state, let's reset the participants, as this

@@ -109,7 +109,7 @@ function(app, Clicker, Apps) {
 
     loadView2: function () {
       // TODO: shouldn't be hardcoded values
-      app.controller.appController.loadView("grid", { participants: app.router.participants }, "Viewer1");
+      app.controller.appController.loadView("pd::play", { participants: app.router.participants }, "Viewer1");
     },
 
     // TODO: temporary function to test update view
@@ -182,30 +182,32 @@ function(app, Clicker, Apps) {
       var controls = this;
 
       // when an application has been selected
-      appSelector.on("app-selected", function (selectedApp) {
-        var $appControls = controls.$(".app-controls");
-
-        // save old height to prevent flicker
-        var oldHeight = $appControls.height();
-        $appControls.css("min-height", oldHeight).css({opacity: 0});
-
-        // instantiate the application.
-        app.controller.appController.set("activeApp", selectedApp.instantiate({ participants: controls.options.participants }));
-
-        // show the controls and config for the app
-        var appControls = new Controls.Views.AppControls({
-          title: selectedApp.title,
-          appConfigView: selectedApp.configView
-        });
-
-        controls.setView(".app-controls", appControls);
-        appControls.on("afterRender", function () {
-          $appControls.css("min-height", "").animate({opacity: 1});
-        });
-        appControls.render();
-      });
+      appSelector.on("app-selected", _.bind(this.appSelected, this));
 
       this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
+    },
+
+    appSelected: function (selectedApp) {
+      var $appControls = this.$(".app-controls");
+
+      // save old height to prevent flicker
+      var oldHeight = $appControls.height();
+      $appControls.css("min-height", oldHeight).css({opacity: 0});
+
+      // instantiate the application.
+      app.controller.appController.set("activeApp", selectedApp.instantiate({ participants: this.options.participants }));
+
+      // show the this and config for the app
+      var appControls = new Controls.Views.AppControls({
+        title: selectedApp.title,
+        appConfigView: selectedApp.configView
+      });
+
+      this.setView(".app-controls", appControls);
+      appControls.on("afterRender", function () {
+        $appControls.css("min-height", "").animate({opacity: 1});
+      });
+      appControls.render();
     },
 
     afterRender: function () {

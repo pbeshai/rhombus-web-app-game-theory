@@ -35,7 +35,6 @@ function (app, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisoner
 		events: { "click button" : "selectApp" },
 
 		serialize: function () {
-			console.log("serializing ", Apps.apps);
 			return { apps: Apps.apps };
 		},
 

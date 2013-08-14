@@ -20,6 +20,20 @@ function(app) {
       "complete": false,
       "validChoices": [ "A", "B", "C", "D", "E" ] // if null, all choices are accepted
     },
+
+    toJSON: function () {
+      var result = Backbone.Model.prototype.toJSON.call(this);
+
+      // prevent infinite recursion due to circular reference.
+      // TODO: see if we should just always store partners as aliases instead of references...
+      // or if this is a sufficient fix.
+      if (result.partner) {
+        result.partner = result.partner.get("alias");
+      }
+
+      return result;
+    },
+
     initialize: function () {
       // assumes choice is set with validate:true option
       this.on("change:choice", function (model, choice) {
@@ -258,11 +272,21 @@ function(app) {
   });
 
   Participant.Util = {};
-  Participant.Util.collectionFromArray = function (participants) {
+  // participants is the an array of objects (basically from Participant.Collection.toJSON())
+  // partners have been replaced by their alias and need their references replaced
+  Participant.Util.collectionFromJSON = function (participants) {
     var models = _.map(participants, function (p) { return new Participant.Model(p); });
-    console.log(participants[0], models[0]);
 
-    return new Participant.Collection(models);
+    var collection = new Participant.Collection(models);
+
+    // convert partner from alias to reference
+    collection.each(function (p) {
+      if (p.get("partner")) {
+        p.set("partner", collection.aliasMap[p.get("partner")]);
+      }
+    });
+
+    return collection;
   };
 
   Participant.Views.Item = Backbone.View.extend({

@@ -47,6 +47,7 @@ define([
 				type: type,
 				message: message,
 			}
+
 			this.socket.emit("app-message", appMessage);
 		},
 
@@ -58,10 +59,18 @@ define([
 		},
 
 		loadView: function (view, options, viewer) {
+			console.log("load view", view, options);
+			if (options.participants && options.participants instanceof Backbone.Collection) {
+				options.participants = options.participants.toJSON();
+			}
 			this.sendAppMessage("load-view", { view: view, options: options }); // TODO add viewer , viewer: viewer });
 		},
 
 		updateView: function (data) {
+			console.log("update view", data);
+			if (data.participants && data.participants instanceof Backbone.Collection) {
+				data.participants = data.participants.toJSON();
+			}
 			this.sendAppMessage("update-view", data); // TODO add viewer , viewer: viewer });
 		},
 
