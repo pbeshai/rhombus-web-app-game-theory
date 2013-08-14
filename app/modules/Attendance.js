@@ -38,22 +38,30 @@ function(app, Common, Participant, StateApp) {
   		return { model: this.model };
   	},
 
-    rendering: {
-      fadeIn: true,
+    beforeRender: function () {
+      if (this.initialRender) {
+        this.$el.hide();
+      }
 
-      before: function () {
-        var choice = this.model.get("choice");
+      var choice = this.model.get("choice");
 
-        // remove old choice classes and set new one
-        if (choice !== undefined) {
-          this.$el.addClass(this.hereClass);
-        } else {
-          this.$el.removeClass(this.hereClass);
-        }
+      // remove old choice classes and set new one
+      if (choice != null) {
+        this.$el.addClass(this.hereClass);
+      } else {
+        this.$el.removeClass(this.hereClass);
       }
     },
 
+    afterRender: function () {
+      if (this.initialRender) {
+        this.$el.fadeIn(200);
+      }
+      app.BaseView.prototype.afterRender.apply(this);
+    },
+
   	initialize: function () {
+      app.BaseView.prototype.initialize.apply(this, arguments);
   		this.listenTo(this.model, "change", this.render);
   	}
   });
@@ -65,11 +73,11 @@ function(app, Common, Participant, StateApp) {
     },
 
   	serialize: function () {
-  		return { collection: this.options.participants };
+  		return { collection: this.participants };
   	},
 
   	beforeRender: function () {
-      this.collection.each(function (participant) {
+      this.participants.each(function (participant) {
   			this.insertView(".participant-grid", new Attendance.Views.Participant({ model: participant }));
   		}, this);
       this.insertView(new Common.Views.Instructions({ model: new Attendance.Instructions() }));
@@ -82,22 +90,22 @@ function(app, Common, Participant, StateApp) {
     },
 
   	initialize: function (options) {
+      app.BaseView.prototype.initialize.apply(this, arguments);
+
       if (this.options.acceptNew) {
-        this.prevAcceptNew = this.collection.options.acceptNew;
-        this.collection.options.acceptNew = true; // allow new users to be added when data comes from server
+        this.prevAcceptNew = this.participants.options.acceptNew;
+        this.participants.options.acceptNew = true; // allow new users to be added when data comes from server
       }
 
-      this.listenTo(this.collection, {
+      this.listenTo(this.participants, {
   			"reset": this.render,
         "add": this.add
   		});
-      // listen for data changes
-      // app.controller.participantServer.hookCollection(this.collection, this);
   	},
 
     cleanup: function () {
       if (this.options.acceptNew) {
-        this.collection.options.acceptNew = this.prevAcceptNew;
+        this.participants.options.acceptNew = this.prevAcceptNew;
       }
     },
   }));
@@ -126,7 +134,7 @@ function(app, Common, Participant, StateApp) {
     getOutput: function () {
       var presentParticipants = this.options.participants;
       var notHere = presentParticipants.filter(function (participant) {
-        return participant.get("choice") === undefined;
+        return participant.get("choice") == null;
       });
       presentParticipants.remove(notHere);
 

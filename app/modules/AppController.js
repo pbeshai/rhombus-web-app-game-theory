@@ -15,8 +15,6 @@ define([
 		// events we trigger to clients
 		clientEvents: {
 			appConfig: "app-config",
-			// appNext: "app-next",
-			// appPrev: "app-prev",
 			appMessage: "app-message",
 			viewerList: "viewer-list",
 			viewerConnect: "viewer-connect",
@@ -26,8 +24,6 @@ define([
 		// events we send across the websocket
 		socketEvents:  {
 			appConfig: "app-config",
-			// appNext: "app-next",
-			// appPrev: "app-prev",
 			appMessage: "app-message",
 			viewerList: "viewer-list",
 			viewerConnect: "viewer-connect",
@@ -60,75 +56,60 @@ define([
 
 		loadView: function (view, options, viewer) {
 			console.log("load view", view, options);
-			if (options.participants && options.participants instanceof Backbone.Collection) {
-				options.participants = options.participants.toJSON();
-			}
+			// make JSON friendly
+			_.each(_.keys(options), function (key) {
+				if (options[key] && options[key].toJSON) {
+					options[key] = options[key].toJSON();
+				}
+			});
+
 			this.sendAppMessage("load-view", { view: view, options: options }); // TODO add viewer , viewer: viewer });
 		},
 
 		updateView: function (data) {
 			console.log("update view", data);
-			if (data.participants && data.participants instanceof Backbone.Collection) {
-				data.participants = data.participants.toJSON();
-			}
+			// make JSON friendly
+			_.each(_.keys(data), function (key) {
+				if (data[key] && data[key].toJSON) {
+					data[key] = data[key].toJSON();
+				}
+			});
 			this.sendAppMessage("update-view", data); // TODO add viewer , viewer: viewer });
 		},
 
 		appNext: function () {
-			// this.sendAppMessage("app-next");
 			var activeApp = this.get("activeApp");
 			if (activeApp) {
-				console.log("Next State: " + activeApp.currentState.nextString());
-	  		activeApp.next();
-	  	}
+				console.log("Next State:" + activeApp.currentState.nextString());
+				activeApp.next();
+			}
 		},
-
-		// appNextCallback: function () {
-		// 	var activeApp = this.get("activeApp");
-		// 	if (activeApp) {
-		// 		console.log("Next State: " + activeApp.currentState.nextString());
-	 //  		activeApp.next();
-	 //  	}
-		// },
 
 		appPrev: function () {
-			// this.sendAppMessage("app-prev");
-				var activeApp = this.get("activeApp");
-			if (activeApp) {
-	  		console.log("Prev State: " + activeApp.currentState.prevString());
-	  		activeApp.prev();
-	  	}
-		},
-
-		// appPrevCallback: function () {
-		// 	var activeApp = this.get("activeApp");
-		// 	if (activeApp) {
-	 //  		console.log("Prev State: " + activeApp.currentState.prevString());
-	 //  		activeApp.prev();
-	 //  	}
-		// },
-
-		appConfig: function(config) {
-			this.sendAppMessage("app-config", config);
-		},
-
-		appConfigCallback: function (config) {
 			var activeApp = this.get("activeApp");
 			if (activeApp) {
-	  		console.log("App Config", config, activeApp);
-	  		activeApp.configure(config);
-	  	}
+				console.log("Prev State:" + activeApp.currentState.prevString());
+				activeApp.prev();
+			}
+		},
+
+		appConfig: function(config) {
+			var activeApp = this.get("activeApp");
+			if (activeApp) {
+				console.log("App Config", config, activeApp);
+				activeApp.configure(config);
+			}
 		},
 
 		initialize: function (attrs) {
 			// web socket
-		  this.socket = attrs.socket;
-		  SocketUtils.initSendReceive.call(this)
+			this.socket = attrs.socket;
+			SocketUtils.initSendReceive.call(this)
 
-		  this.on("change:socket", function (model, socket) {
-		  	this.socket = socket;
-		  	SocketUtils.bindSocketEvents.call(this);
-		  });
+			this.on("change:socket", function (model, socket) {
+				this.socket = socket;
+				SocketUtils.bindSocketEvents.call(this);
+			});
 		},
 	});
 

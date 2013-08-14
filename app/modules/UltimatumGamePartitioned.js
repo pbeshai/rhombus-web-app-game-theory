@@ -52,7 +52,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     },
   })
 
-  UltimatumGamePartitioned.Views.GiverPlay.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGamePartitioned.Views.GiverPlay.Layout = app.registerView("ugp::giver-play", Common.Views.GroupLayout.extend({
     header: "Givers Play",
     inactive: {
       group2: true
@@ -63,7 +63,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
       group2: UltimatumGamePartitioned.Views.GiverPlay.Receiver
     },
     InstructionsModel: UltimatumGame.Instructions.GiverPlay
-  });
+  }));
 
   UltimatumGamePartitioned.Views.ReceiverPlay = {};
 
@@ -75,7 +75,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     messageAttribute: "offer"
   });
 
-  UltimatumGamePartitioned.Views.ReceiverPlay.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGamePartitioned.Views.ReceiverPlay.Layout = app.registerView("ugp::receiver-play", Common.Views.GroupLayout.extend({
     header: "Receivers Play",
     inactive: {
       group1: true
@@ -86,7 +86,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
       group2: UltimatumGamePartitioned.Views.ReceiverPlay.Receiver
     },
     InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
-  });
+  }));
 
   UltimatumGamePartitioned.Views.Results = {};
 
@@ -118,11 +118,11 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     }
   });
 
-  UltimatumGamePartitioned.Views.Results.Layout = Common.Views.GroupLayout.extend({
+  UltimatumGamePartitioned.Views.Results.Layout = app.registerView("ugp::results", Common.Views.GroupLayout.extend({
     header: "Results",
     PreGroupsView: UltimatumGamePartitioned.Views.PreGroups,
     ParticipantView: UltimatumGamePartitioned.Views.Results.Score
-  });
+  }));
 
   UltimatumGamePartitioned.Util = {};
   UltimatumGamePartitioned.Util.assignOffers = function (givers, amount, offerMap) {
@@ -139,7 +139,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   // To be used in StateApps
   UltimatumGamePartitioned.States = {};
   UltimatumGamePartitioned.States.GiverPlay = Common.States.GroupPlay.extend({
-    view: UltimatumGamePartitioned.Views.GiverPlay.Layout,
+    view: "ugp::giver-play",
 
     handleConfigure: function () {
       this.render();
@@ -155,7 +155,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   });
 
   UltimatumGamePartitioned.States.ReceiverPlay = Common.States.GroupPlay.extend({
-    view: UltimatumGamePartitioned.Views.ReceiverPlay.Layout,
+    view: "ugp::receiver-play",
 
     handleConfigure: function () {
       this.render();
@@ -199,7 +199,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
 
 
   UltimatumGamePartitioned.States.Results = Common.States.GroupResults.extend({
-    view: UltimatumGamePartitioned.Views.Results.Layout,
+    view: "ugp::results",
 
     handleConfigure: function () {
       UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),

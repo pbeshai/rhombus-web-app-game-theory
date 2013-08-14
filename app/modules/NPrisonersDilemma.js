@@ -28,6 +28,11 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
+  // can't pass the instructions model over the socket, so override it instead of using a view option
+  NPrisonersDilemma.Views.Play = app.registerView("npd::play", PrisonersDilemma.Views.Play.Layout.extend({
+    InstructionsModel: NPrisonersDilemma.Instructions
+  }));
+
   NPrisonersDilemma.Views.Results = {};
 
   NPrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
@@ -36,7 +41,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
-  NPrisonersDilemma.Views.Results.Stats = Backbone.View.extend({
+  NPrisonersDilemma.Views.Results.Stats = app.BaseView.extend({
     template: "npd/results/stats",
 
     serialize: function () {
@@ -46,16 +51,16 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     },
 
     beforeRender: function () {
-      if (this.collection.length) {
-        this.setView(".results-stats", new PrisonersDilemma.Views.Results.Stats({ collection: this.collection }));
+      if (this.participants.length) {
+        this.setView(".results-stats", new PrisonersDilemma.Views.Results.Stats({ participants: this.participants }));
       }
     },
   });
 
-  NPrisonersDilemma.Views.Results.Layout = Common.Views.SimpleLayout.extend({
+  NPrisonersDilemma.Views.Results.Layout = app.registerView("npd::results", Common.Views.SimpleLayout.extend({
     ParticipantView: NPrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: NPrisonersDilemma.Views.Results.Stats
-  });
+  }));
 
   NPrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "npd/configure",
@@ -90,13 +95,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   // To be used in StateApps
   NPrisonersDilemma.States = {};
   NPrisonersDilemma.States.Play = PrisonersDilemma.States.Play.extend({
-    setViewOptions: function () {
-      PrisonersDilemma.States.Play.prototype.setViewOptions.call(this);
-      this.options.viewOptions.InstructionsModel = NPrisonersDilemma.Instructions;
-    },
+    view: "npd::play",
 
     assignScores: function () {
-      var models = this.collection;
+      var models = this.participants;
       // See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
       var R = this.config.Rratio*(models.length - 1); // 0 < R < N-1, closer to 1 means more incentive for cooperation
       var H = this.config.H; // score increment when gaining 1 more cooperator
@@ -119,7 +121,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         }
       }, this);
 
-      this.collection.payoff = {
+      this.participants.payoff = {
         cooperatorPayoff: cooperatorPayoff,
         numCooperators: numCooperators,
         defectorPayoff: defectorPayoff,
@@ -131,10 +133,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   });
 
   NPrisonersDilemma.States.Results = Common.States.Results.extend({
-    view: NPrisonersDilemma.Views.Results.Layout,
+    view: "npd::results",
 
     processBeforeRender: function () {
-      this.payoff = this.collection.payoff;
+      this.payoff = this.participants.payoff;
     },
 
     setViewOptions: function () {
@@ -143,7 +145,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     },
 
     logResults: function () {
-      var results = this.collection.map(function (model) {
+      var results = this.participants.map(function (model) {
         return {
           alias: model.get("alias"),
           choice: model.get("choice"),

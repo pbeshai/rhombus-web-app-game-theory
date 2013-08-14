@@ -194,6 +194,11 @@ function(app, Clicker, Apps) {
       var oldHeight = $appControls.height();
       $appControls.css("min-height", oldHeight).css({opacity: 0});
 
+
+      // reset the participants if there was another app running previously
+      this.options.participants.fetch({ reset: true });
+
+
       // instantiate the application.
       app.controller.appController.set("activeApp", selectedApp.instantiate({ participants: this.options.participants }));
 

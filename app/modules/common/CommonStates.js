@@ -8,7 +8,7 @@ function(app, CommonModels, StateApp) {
   var CommonStates = {};
 
   CommonStates.Play = StateApp.State.extend({
-    botCheck: function (collection) { return collection.length === 1; },
+    botCheck: function (participants) { return participants.length === 1; },
     pairModels: true,
     defaultChoice: "A", // choice made when a player does not play
 
@@ -26,29 +26,40 @@ function(app, CommonModels, StateApp) {
       }
     },
 
-    // this.input is a participant collection.
+    // this.input is a participant participants.
     beforeRender: function () {
-      var collection = this.collection = this.input;
-      if (this.botCheck && this.botCheck(collection)) {
-        collection.addBot();
+      var participants = this.participants = this.input;
+      if (this.botCheck && this.botCheck(participants)) {
+        participants.addBot();
       }
 
       // re-partners each render
       if (this.pairModels === true) {
-        collection.pairModels();
+        participants.pairModels();
       } else if (this.pairModels === "asymmetric") {
-        collection.pairModelsAsymmetric();
+        participants.pairModelsAsymmetric();
       }
 
+      // listen for setting play
+      this.stopListening();
+      this.listenTo(participants, "change:choice", function (participant, choice) {
+        console.log("!!! change choice in play state", arguments);
+        participant.set("played", choice != null);
+
+        if (participant.get("complete")) { // only update choice if it isn't complete.
+          participant.attributes.choice = participant.previous("choice");
+        }
+      });
+
       // reset played and choices
-      collection.each(this.prepareParticipant, this);
+      participants.each(this.prepareParticipant, this);
 
       this.processBeforeRender();
     },
 
     setViewOptions: function () {
       this.options.viewOptions = _.defaults({
-        participants: this.collection,
+        participants: this.participants,
         config: this.config
       }, this.options.viewOptions);
     },
@@ -57,15 +68,15 @@ function(app, CommonModels, StateApp) {
     assignScore: function (participant) { }, // template method
 
     assignScores: function () {
-      this.collection.each(this.assignScore, this);
+      this.participants.each(this.assignScore, this);
     },
 
     processOutput: function () { }, // template method
 
-    // outputs a participant collection
+    // outputs a participant participants
     getOutput: function () {
       // if you haven't played, then you played "A".
-      this.collection.each(function (participant) {
+      this.participants.each(function (participant) {
         if (participant.get("choice") === undefined && this.defaultChoice) {
           participant.set("choice", this.defaultChoice);
         }
@@ -74,7 +85,7 @@ function(app, CommonModels, StateApp) {
       this.assignScores();
       this.processOutput();
 
-      return this.collection;
+      return this.participants;
     }
   });
 
@@ -114,12 +125,24 @@ function(app, CommonModels, StateApp) {
     },
 
     beforeRender: function () {
-      // could receive input as participant collection or as a group model (if returning from receive play)
+      // could receive input as participant participants or as a group model (if returning from receive play)
       if (this.input instanceof CommonModels.GroupModel) {
         this.groupModel = this.input;
-      } else { // input is a collection, so create group model
+      } else { // input is a participants, so create group model
         this.groupModel = new CommonModels.GroupModel({ participants: this.input }, this.groupModelOptions);
       }
+
+            // listen for setting play
+      this.stopListening();
+      this.listenTo(this.groupModel.get("participants"), "change:choice", function (participant, choice) {
+        console.log("!!! change choice in play state", arguments);
+        participant.set("played", choice != null);
+
+        if (participant.get("complete")) { // only update choice if it isn't complete.
+          participant.attributes.choice = participant.previous("choice");
+        }
+      });
+
 
       this.beforeRenderGroup1();
       this.beforeRenderGroup2();
@@ -206,8 +229,8 @@ function(app, CommonModels, StateApp) {
 
   CommonStates.Results = StateApp.State.extend({
     beforeRender: function () {
-      // this.input is a participant collection
-      this.collection = this.input;
+      // this.input is a participant participants
+      this.participants = this.input;
 
       this.processBeforeRender();
 
@@ -222,7 +245,7 @@ function(app, CommonModels, StateApp) {
 
     setViewOptions: function () {
       this.options.viewOptions = _.defaults({
-        participants: this.collection,
+        participants: this.participants,
         config: this.config
       }, this.options.viewOptions);
     },
@@ -234,7 +257,7 @@ function(app, CommonModels, StateApp) {
     logResults: function () { }, // template method
 
     getOutput: function () {
-      return this.collection;
+      return this.participants;
     }
   });
 

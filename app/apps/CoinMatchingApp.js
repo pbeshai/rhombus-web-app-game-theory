@@ -102,8 +102,8 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 
 	// description for use in router
 	CoinMatchingApp.app = {
-		instantiate: function (router) {
-			return new CoinMatchingApp({ participants: router.participants });
+		instantiate: function (options) {
+			return new CoinMatchingApp(options);
 		},
 		configView: CoinMatching.Views.Configure,
 		title: "Coin Matching Game"

@@ -26,8 +26,8 @@ function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
 
 	// description for use in router
 	NPrisonersDilemmaApp.app = {
-		instantiate: function (router) {
-			return new NPrisonersDilemmaApp({ participants: router.participants });
+		instantiate: function (options) {
+			return new NPrisonersDilemmaApp(options);
 		},
 		configView: NPrisonersDilemma.Views.Configure,
 		title: "N-Person Prisoner's Dilemma"

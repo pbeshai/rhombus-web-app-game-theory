@@ -71,12 +71,12 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
   })
 
-  UltimatumGame.Views.GiverPlay.Layout = Common.Views.SimpleLayout.extend({
+  UltimatumGame.Views.GiverPlay.Layout = app.registerView("ug::giver-play", Common.Views.SimpleLayout.extend({
     header: "Givers Play",
     PreParticipantsView: UltimatumGame.Views.PreParticipants,
     ParticipantView: UltimatumGame.Views.GiverPlay.Giver,
     InstructionsModel: UltimatumGame.Instructions.GiverPlay
-  });
+  }));
 
   UltimatumGame.Views.ReceiverPlay = {};
 
@@ -84,12 +84,12 @@ function(app, Common, Participant, StateApp, Graphs) {
     messageAttribute: "offer"
   });
 
-  UltimatumGame.Views.ReceiverPlay.Layout = Common.Views.SimpleLayout.extend({
+  UltimatumGame.Views.ReceiverPlay.Layout = app.registerView("ug::receiver-play", Common.Views.SimpleLayout.extend({
     header: "Receivers Play",
     PreParticipantsView: UltimatumGame.Views.PreParticipants,
     ParticipantView: UltimatumGame.Views.ReceiverPlay.Receiver,
     InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
-  });
+  }));
 
   UltimatumGame.Views.Results = {};
 
@@ -108,12 +108,12 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-  UltimatumGame.Views.Results.Layout = Common.Views.SimpleLayout.extend({
+  UltimatumGame.Views.Results.Layout = app.registerView("ug::results", Common.Views.SimpleLayout.extend({
     header: "Results",
     className: "ultimatum-results",
     PreParticipantsView: UltimatumGame.Views.PreParticipants,
     ParticipantView: UltimatumGame.Views.Results.Score
-  });
+  }));
 
   UltimatumGame.Util = {};
   UltimatumGame.Util.assignOffers = function (givers, amount, offerMap) {
@@ -129,7 +129,7 @@ function(app, Common, Participant, StateApp, Graphs) {
   // To be used in StateApps
   UltimatumGame.States = {};
   UltimatumGame.States.GiverPlay = Common.States.Play.extend({
-    view: UltimatumGame.Views.GiverPlay.Layout,
+    view: "ug::giver-play",
     pairModels: "asymmetric",
     handleConfigure: function () {
       this.render();
@@ -137,13 +137,13 @@ function(app, Common, Participant, StateApp, Graphs) {
 
     // outputs a participant collection
     processOutput: function () {
-      UltimatumGame.Util.assignOffers(this.collection,
+      UltimatumGame.Util.assignOffers(this.participants,
         this.config.amount, this.config.offerMap);
     }
   });
 
   UltimatumGame.States.ReceiverPlay = Common.States.Play.extend({
-    view: UltimatumGame.Views.ReceiverPlay.Layout,
+    view: "ug::receiver-play",
     pairModels: false,
     botCheck: false,
 
@@ -152,7 +152,7 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
 
     handleConfigure: function () {
-      UltimatumGame.Util.assignOffers(this.collection,
+      UltimatumGame.Util.assignOffers(this.participants,
         this.config.amount, this.config.offerMap);
 
       this.render();
@@ -172,15 +172,15 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
 
   UltimatumGame.States.Results = Common.States.Results.extend({
-    view: UltimatumGame.Views.Results.Layout,
+    view: "ug::results",
 
     handleConfigure: function () {
-      UltimatumGame.Util.assignOffers(this.collection,
+      UltimatumGame.Util.assignOffers(this.participants,
         this.config.amount, this.config.offerMap);
     },
 
     logResults: function () {
-      var results = this.collection.map(function (model) {
+      var results = this.participants.map(function (model) {
         return {
           alias: model.get("alias"),
           giverOffer: model.get("keep"),

@@ -3,7 +3,7 @@
 define(["app"],
 	function (app) {
 	"use strict"
-	var debug = true;
+	var debug = false;
 
 	var SocketUtils = {
 

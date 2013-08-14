@@ -29,8 +29,8 @@ function(app, StateApp, CommonStateApps, UltimatumGame) {
 
 	// description for use in router
 	UltimatumGameApp.app = {
-		instantiate: function (router) {
-			return new UltimatumGameApp({ participants: router.participants });
+		instantiate: function (options) {
+			return new UltimatumGameApp(options);
 		},
 		configView: UltimatumGame.Views.Configure,
 		title: "Ultimatum Game"

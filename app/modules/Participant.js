@@ -16,6 +16,7 @@ function(app) {
     urlRoot: "/api/participants",
 
     defaults: {
+      "choice": null,
       "played": false,
       "complete": false,
       "validChoices": [ "A", "B", "C", "D", "E" ] // if null, all choices are accepted
@@ -25,32 +26,22 @@ function(app) {
       var result = Backbone.Model.prototype.toJSON.call(this);
 
       // prevent infinite recursion due to circular reference.
-      // TODO: see if we should just always store partners as aliases instead of references...
-      // or if this is a sufficient fix.
       if (result.partner) {
         result.partner = result.partner.get("alias");
+      }
+      if (result.partnerBackward) {
+        result.partnerBackward = result.partnerBackward.get("alias");
       }
 
       return result;
     },
 
     initialize: function () {
-      // assumes choice is set with validate:true option
-      this.on("change:choice", function (model, choice) {
-        this.set("played", choice != null);
-
-        if (this.get("complete")) { // only update choice if it isn't complete.
-          this.attributes.choice = this.previous("choice");
-        }
-      });
     },
 
     // resets choice related attributes (retains alias)
     reset: function () {
-      this.unset("complete", { silent: true });
-      this.unset("played", { silent: true });
-      this.unset("choice", { silent: true });
-      this.set("validChoices", this.defaults.validChoices, { silent: true });
+      this.set(this.defaults, { silent: true });
     },
 
     validate: function (attrs, options) {
@@ -58,8 +49,10 @@ function(app) {
         return "cannot have empty alias"
       }
 
-      if (this.get("validChoices") != null && attrs.choice != null && !_.contains(this.get("validChoices"), attrs.choice)) {
-        return "invalid choice " + attrs.choice + ", valid choices are " + this.get("validChoices").join(", ");
+      if (attrs.choice != null && this.get("validChoices") != null && !_.contains(this.get("validChoices"), attrs.choice)) {
+        var msg = "invalid choice " + attrs.choice + ", valid choices are " + this.get("validChoices").join(", ");
+        console.log(msg);
+        return msg;
       }
     }
   });
@@ -119,6 +112,11 @@ function(app) {
       validateOnChoice: true,
     },
 
+    fetch : function () {
+      console.log("fetching participants ...");
+      Backbone.Collection.prototype.fetch.call(this, { success: function () { console.log("fetch complete."); }});
+    },
+
   	initialize: function (models, options) {
       _.bind(this.updateFromServer, this);
 
@@ -151,8 +149,18 @@ function(app) {
     update: function (data) {
       _.each(data, function (participant, i) {
         var model = this.aliasMap[participant.alias];
+
+        // handle partners as a special case (interpret from alias to reference)
         if (model) {
-          model.set({"choice": participant.choice}, { validate: this.options.validateOnChoice });
+          if (participant.partner) {
+            participant.partner = this.aliasMap[participant.partner];
+          }
+
+          if (participant.partnerBackward) {
+            participant.partnerBackward = this.aliasMap[participant.partnerBackward];
+          }
+
+          model.set(participant, { validate: this.options.validateOnChoice });
         } else {
           console.log("new user. accept new? ", this.options.acceptNew, this.options);
           this.trigger("new-user", participant);
@@ -202,6 +210,10 @@ function(app) {
           this.aliasMap[alias] = model;
         }
       }
+    },
+
+    findByAlias: function (alias) {
+      return this.aliasMap[alias];
     },
 
     // matches each model with another, but not in a symmetric way.
@@ -282,7 +294,11 @@ function(app) {
     // convert partner from alias to reference
     collection.each(function (p) {
       if (p.get("partner")) {
-        p.set("partner", collection.aliasMap[p.get("partner")]);
+        p.set("partner", collection.findByAlias(p.get("partner")));
+      }
+
+      if (p.get("partnerBackward")) {
+        p.set("partnerBackward", collection.findByAlias(p.get("partnerBackward")));
       }
     });
 

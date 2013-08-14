@@ -29,8 +29,8 @@ function(app, StateApp, CommonStateApps, UltimatumGamePartitioned) {
 
 	// description for use in router
 	UltimatumGamePartitionedApp.app = {
-		instantiate: function (router) {
-			return new UltimatumGamePartitionedApp({ participants: router.participants });
+		instantiate: function (options) {
+			return new UltimatumGamePartitionedApp(options);
 		},
 		configView: UltimatumGamePartitioned.Views.Configure,
 		title: "Ultimatum Game (Partitioned)"

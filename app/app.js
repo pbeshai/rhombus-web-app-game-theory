@@ -20,11 +20,6 @@ define([
 
     model: new Backbone.Model({ appId: "app1", browserId: "" }),
 
-    // reset: function () {
-    //   if (this.appController) {
-    //     this.appController.reset();
-    //   }
-    // },
     views: {}, // all views can register themselves here
     registerView: function (name, view) {
       if (this.views[name] !== undefined) {

@@ -46,24 +46,19 @@ function(app, Participant, StateApp) {
   	}
   });
 
-  Grid.Views.Participants = app.registerView("grid", Backbone.View.extend({
+  Grid.Views.Participants = app.registerView("grid", app.BaseView.extend({
     tagName: "div",
     className: "participant-grid",
 
   	beforeRender: function () {
-      this.collection.each(function (participant) {
+      this.participants.each(function (participant) {
   			this.insertView(new Grid.Views.Participant({ model: participant }));
   		}, this);
   	},
 
 
   	initialize: function () {
-      this.listenTo(this.collection, {
-  			"reset": this.render
-  		});
-
-      // listen for data changes
-      // TODO app.participantServer.hookCollection(this.collection, this);
+      app.BaseView.prototype.initialize.apply(this, arguments);
   	}
   }));
 
@@ -73,12 +68,10 @@ function(app, Participant, StateApp) {
     view: "grid",
 
     initialize: function () {
-      console.log("grid state init");
       this.options.viewOptions = { participants: this.options.participants }
     },
 
     beforeRender: function () {
-      console.log("grid state before render");
       if (this.input) {
         this.options.viewOptions = { participants: this.input };
       }

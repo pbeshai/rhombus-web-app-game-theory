@@ -42,7 +42,6 @@ function (app, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisoner
 			var $btn = $(evt.target);
 			var selectedApp = Apps.apps[$btn.data("key")];
 
-
 			$btn.removeClass("inactive").addClass("active");
 			this.$("button").not($btn).addClass("inactive").removeClass("active");
 			this.trigger("app-selected", selectedApp);

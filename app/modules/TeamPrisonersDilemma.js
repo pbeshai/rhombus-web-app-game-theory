@@ -32,11 +32,11 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   TeamPrisonersDilemma.TeamsModel = Common.Models.GroupModel;
 
-  TeamPrisonersDilemma.Views.Play.Layout = Common.Views.GroupLayout.extend({
+  TeamPrisonersDilemma.Views.Play.Layout = app.registerView("teampd::play", Common.Views.GroupLayout.extend({
     header: "Play",
     ParticipantView: PrisonersDilemma.Views.Play.Participant,
     InstructionsModel: PrisonersDilemma.Instructions
-  });
+  }));
 
   TeamPrisonersDilemma.Views.Results.TeamStats = PrisonersDilemma.Views.Results.Stats.extend({
     template: "teampd/results/team_stats",
@@ -47,12 +47,12 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
-  TeamPrisonersDilemma.Views.Results.Layout = Common.Views.GroupLayout.extend({
+  TeamPrisonersDilemma.Views.Results.Layout = app.registerView("teampd::results", Common.Views.GroupLayout.extend({
     header: "Results",
     ParticipantView: PrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: TeamPrisonersDilemma.Views.Results.TeamStats,
     PostGroupsView: PrisonersDilemma.Views.Results.Stats
-  });
+  }));
 
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({
     template: "teampd/configure",
@@ -78,7 +78,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   // To be used in StateApps
   TeamPrisonersDilemma.States = {};
   TeamPrisonersDilemma.States.Play = Common.States.GroupPlay.extend({
-    view: TeamPrisonersDilemma.Views.Play.Layout,
+    view: "teampd::play",
     defaultChoice: "C", // choice made when a player does not play
     validChoices: ["C", "D"],
 
@@ -92,9 +92,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   });
 
   TeamPrisonersDilemma.States.Results = Common.States.GroupResults.extend({
-    view: TeamPrisonersDilemma.Views.Results.Layout,
-
-
+    view: "teampd::results",
 
     logResults: function () {
       var modelTransform = function (model) {

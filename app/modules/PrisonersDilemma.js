@@ -56,7 +56,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   })
 
-  PrisonersDilemma.Views.Results.Stats = Backbone.View.extend({
+  PrisonersDilemma.Views.Results.Stats = app.BaseView.extend({
     template: "pd/results/stats",
 
     tooltipTemplate: '<h3><%= label %></h3>'
@@ -66,9 +66,9 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
       + '<div class="count"><%= count %> <% if (count === 1) { print("person") } else { print("people") } %></div>',
 
     calculateStatsFromHistory: function () {
-      if (this.collection.at(0).get("history") == null) return null;
+      if (this.participants.at(0).get("history") == null) return null;
 
-      var histories = this.collection.map(function (model) { return model.get("history"); });
+      var histories = this.participants.map(function (model) { return model.get("history"); });
       var historySize = (histories[0] == null) ? 0 : histories[0].length;
       var byRound = _.zip.apply(this, histories);
 
@@ -112,7 +112,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
     calculateStatsFromChoice: function () {
       // models partitioned by choice
-      var groups = this.collection.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
+      var groups = this.participants.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
       groups.cooperate || (groups.cooperate = []);
       groups.defect || (groups.defect = []);
 
@@ -131,8 +131,8 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
           average: average(groups.defect)
         },
         total: {
-          count: this.collection.length,
-          average: average(this.collection.models)
+          count: this.participants.length,
+          average: average(this.participants.models)
         }
       }
     },
@@ -238,9 +238,6 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
         }
       });
     },
-
-    initialize: function () {
-    }
   });
 
   PrisonersDilemma.Views.Results.Layout = app.registerView("pd::results", Common.Views.SimpleLayout.extend({
@@ -299,7 +296,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     view: "pd::results",
 
     logResults: function () {
-      var results = this.collection.map(function (model) {
+      var results = this.participants.map(function (model) {
         return {
           alias: model.get("alias"),
           choice: model.get("choice"),

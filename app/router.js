@@ -155,7 +155,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
 
     // reset state
     reset: function () {
-      this.participants.fetch({ reset: true });
+      // this.participants.fetch({ reset: true });
       // app.reset(); TODO: this was to reset 'activeApp'
     }
   });

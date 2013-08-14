@@ -8,7 +8,6 @@ function (app, Participant) {
 
   CommonModels.GroupModel = Backbone.Model.extend({
     url: null,
-    GroupCollection: Participant.Collection,
     partnerUp: true, // if so, will partner people from group1 with those in group2
 
     // 'participants' is an array of models
@@ -17,28 +16,58 @@ function (app, Participant) {
         forceEven: false
       }, options);
 
-      this.set("group1", new this.GroupCollection());
-      this.set("group2", new this.GroupCollection());
+      var participants;
+
+      if (options.fromJSON) {
+        // special initialization when deserializing from JSON obj
+
+        var jsonModel = options.jsonModel;
+        participants = Participant.Util.collectionFromJSON(jsonModel.participants)
+
+        // convert from JSON object to actual models in the participants collection
+        var group1Participants = _.map(jsonModel.group1, function (group1ParticipantAlias) {
+          return participants.findByAlias(group1ParticipantAlias);
+        });
+        this.set("group1", new Participant.Collection(group1Participants));
+
+        // convert from JSON object to actual models in the participants collection
+        var group2Participants = _.map(jsonModel.group2, function (group2ParticipantAlias) {
+          return participants.findByAlias(group2ParticipantAlias);
+        });
+        this.set("group2", new Participant.Collection(group2Participants));
+      } else {
+        // normal initialization
+
+        if (attrs.participants instanceof Backbone.Collection) {
+          participants = attrs.participants;
+        } else {
+          participants = new Participant.Collection(attrs.participants);
+        }
+
+        // ensure we have even number of participants by adding a bot
+        if (this.options.forceEven && participants.length % 2 === 1) {
+          this.addBot(participants)
+        }
+
+        this.set("group1", new Participant.Collection());
+        this.set("group2", new Participant.Collection());
+        this.assignGroups(participants);
+      }
+
+      this.set("participants", participants);
       this.on("reset", this.assignGroups);
-
-      var participants = attrs.participants;
-      if (participants instanceof Backbone.Collection) {
-        participants = participants.models;
-      }
-
-      var collection = new this.GroupCollection(participants);
-      // ensure we have even number of participants by adding a bot
-
-      if (this.options.forceEven && collection.length % 2 === 1) {
-        this.addBot(collection)
-      }
-
-      this.set("participants", collection);
-      this.listenTo(collection, "reset", this.assignGroups);
-      this.assignGroups(collection);
+      this.listenTo(participants, "reset", this.assignGroups);
     },
 
-    // TODO: maybe this can be an option to override it instead of just overriding...
+    toJSON: function () {
+      return {
+        group1: this.get("group1").pluck("alias"),
+        group2: this.get("group2").pluck("alias"),
+        participants: this.get("participants").toJSON()
+      };
+    },
+
+
     // can be overridden by subclasses to change type of bot added
     addBot: function (collection) {
       collection.add(new Participant.Bot());
@@ -71,6 +100,11 @@ function (app, Participant) {
       }
     },
   });
+  // deserialize from JSON
+  CommonModels.GroupModel.fromJSON = function (jsonModel) {
+    var model = new CommonModels.GroupModel(undefined, { fromJSON: true, jsonModel: jsonModel });
+    return model;
+  }
 
   CommonModels.Instructions = Backbone.Model.extend({
     initialize: function (attrs, options) {

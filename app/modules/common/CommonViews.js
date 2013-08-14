@@ -143,25 +143,25 @@ function (app, Grid) {
   });
 
 
-  CommonViews.ParticipantsGrid = Backbone.View.extend({
+  CommonViews.ParticipantsGrid = app.BaseView.extend({
     className: "participant-grid",
     ParticipantView: Grid.Views.Participant,
     optionProperties: [ "ParticipantView" ],
 
     beforeRender: function () {
-      this.collection.each(function (participant) {
+      this.participants.each(function (participant) {
         this.insertView(new this.ParticipantView({ model: participant }));
       }, this);
     },
 
     initialize: function (options) {
+      app.BaseView.prototype.initialize.apply(this, arguments);
       handleOptions(this, options);
-      // this.listenTo(this.collection, "reset", this.render);
     }
   });
 
   // uses a Participant collection
-  CommonViews.SimpleLayout = Backbone.View.extend({
+  CommonViews.SimpleLayout = app.BaseView.extend({
     template: "common/simple_layout",
     // properties that can be overridden via options
     optionProperties: [ "header", "ParticipantView", "ParticipantsView", "PreParticipantsView", "PostParticipantsView", "InstructionsModel"],
@@ -175,13 +175,13 @@ function (app, Grid) {
     serialize: function () {
       return {
         header: this.header,
-        hasPlayers: (this.collection.length > 0),
+        hasPlayers: (this.participants.length > 0),
       };
     },
 
     beforeRender: function () {
       var viewOptions = _.extend({
-        collection: this.collection
+        participants: this.participants
       }, this.options);
 
       if (this.ParticipantView != null) {
@@ -207,8 +207,8 @@ function (app, Grid) {
     },
 
     initialize: function (options) {
+      app.BaseView.prototype.initialize.apply(this, arguments);
       handleOptions(this, options);
-      // app.participantServer.hookCollection(this.collection, this);
     },
   });
 
@@ -244,7 +244,7 @@ function (app, Grid) {
     beforeRender: function () {
       function addGroup(groupNum) {
         var viewOptions = _.extend({
-          collection: this.model.get("group" + groupNum)
+          participants: this.model.get("group" + groupNum)
         }, this.options);
         // only specify ParticipantView if it is set.
         if (this.ParticipantView != null) {
@@ -269,7 +269,7 @@ function (app, Grid) {
       addGroup.apply(this, [2]);
 
       var viewOptions = _.extend({
-        collection: this.model.get("participants")
+        participants: this.model.get("participants")
       }, this.options);
 
       if (this.PreGroupsView != null) {
@@ -296,7 +296,6 @@ function (app, Grid) {
 
     initialize: function (options) {
       handleOptions(this, options);
-      app.participantServer.hookCollection(this.model.get("participants"), this);
     },
   });
 
