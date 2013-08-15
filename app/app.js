@@ -18,7 +18,7 @@ define([
 
     instructorFocus: false,
 
-    model: new Backbone.Model({ appId: "app1", browserId: "" }),
+    model: new Backbone.Model({ browserId: "", screenName: "" }),
 
     views: {}, // all views can register themselves here
     registerView: function (name, view) {

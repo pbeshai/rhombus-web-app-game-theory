@@ -45,36 +45,78 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
 
     routes: {
       "": "index",
-      "grid": "grid",
-      "controls": "controls",
+      ":managerId/controller" : "controller",
+      ":managerId/viewer/:name": "viewer",
       "register": "register",
-      "attendance": "attendance",
-      "clicker": "clicker",
-      "apps/:name": "appHandler",
-      "apps/:name/controls" : "appControlsHandler",
       "sandbox": "sandbox",
-      "viewer": "viewer"
+
+    },
+
+    // selects the mode and connects the websocket
+    selectMode: function (mode, managerId, name) {
+      if (app.controller || app.viewer) {
+        console.log("already connected and registered. aborting", arguments);
+        return;
+      }
+
+      // need to force new connection in case we have connected and disconnected before
+      // (e.g., back button took us back to index and now we choose again)
+      var socket = io.connect(app.socketUrl, { "force new connection": true });
+
+      // register the viewer/controller
+      socket.on("connect", function () {
+        socket.emit("register", { type: mode, manager: managerId, name: name });
+      });
+
+      var router = this;
+
+      // set the screen name
+      var screenName = managerId + "." + mode;
+      if (name) screenName += "." + name;
+      app.model.set("screenName", screenName);
+
+      // get the viewer/controller id
+      socket.on("registered", function (data) {
+        app.model.set("browserId", data.id);
+        console.log("Registered with ID " + data.id);
+
+        if (mode === "controller") {
+          app.controller = new Modes.Controller({ id: data.id, socket: socket });
+          router.loadControllerView();
+        } else {
+          app.viewer = new Modes.Viewer({ id: data.id, socket: socket, name: name });
+          router.loadViewerView();
+        }
+      });
+    },
+
+    reset: function () {
+      // reset everything
+      if (app.viewer) {
+        app.viewer.get("socket").disconnect();
+        delete app.viewer;
+      }
+      if (app.controller) {
+        app.controller.get("socket").disconnect();
+        delete app.controller;
+      }
+      app.model.set({ browserId: "", screenName: "" });
     },
 
     index: function () {
       console.log("[router: index]");
+
       this.reset();
 
       app.setMainView(new Modes.Views.Selector({ model: app.model }));
     },
 
-    grid: function () {
-      console.log("[router: grid]");
-      this.reset();
-
-      app.setTitle("Grid");
-      app.setMainView(new Grid.Views.Participants({collection: this.participants}));
+    controller: function (managerId) {
+      console.log("[router: controls]", managerId);
+      this.selectMode("controller", managerId);
     },
 
-    controls: function () {
-      console.log("[router: controls]");
-      this.reset();
-
+    loadControllerView: function () {
       app.setTitle("Controls");
       app.layout.setViews({
         "#main-content": new Controls.Views.Controls({ participants: this.participants }),
@@ -82,81 +124,28 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
       }).render();
     },
 
-    viewer: function () {
-      console.log("[router: viewer]");
-      this.reset();
+    viewer: function (managerId, viewerName) {
+      console.log("[router: viewer]", managerId, viewerName);
+      this.selectMode("viewer", managerId, viewerName);
+    },
 
+    loadViewerView: function () {
       app.setTitle("Viewer");
       app.setMainView(new Modes.Views.Viewer());
     },
 
     register: function () {
       console.log("[router: register]");
-      this.reset();
 
       app.setTitle("Register");
       app.setMainView(new Register.Views.Register({ participants: this.participants }));
     },
 
-    attendance: function () {
-      console.log("[router: attendance]");
-      this.reset();
-
-      app.setTitle("Attendance");
-      app.setMainView(new Attendance.Views.Participants({collection: this.participants}))
-    },
-
-    clicker: function () {
-      console.log("[router: clicker]");
-      this.reset();
-      app.setTitle("Clickers");
-      app.setMainView(new Clicker.Views.Clickers({collection: this.participants}));
-    },
-
-    appHandler: function (name) {
-      console.log("[router: apps/"+name+"]");
-      this.reset();
-
-      var activeApp = this.apps[name];
-
-      if (activeApp) {
-        app.setTitle(activeApp.title);
-        app.appController.set("activeApp", activeApp.instantiate(this));
-      } else {
-        console.log("no app found matching " + name);
-      }
-    },
-
-    appControlsHandler: function (name) {
-      console.log("[router: apps/"+name+"/controls]");
-      this.reset();
-      var configView, title;
-
-      var activeApp = this.apps[name];
-      if (activeApp) {
-        configView = activeApp.configView
-        title = activeApp.title + " Controls";
-      }
-
-      app.setTitle(title);
-      app.setMainView(new Controls.Views.AppControls({
-          title: title,
-          appConfigView: configView
-      }));
-    },
-
     sandbox: function () {
       console.log("[router: sandbox]");
-      this.reset();
 
       app.setTitle("Sandbox");
       app.setMainView(new Sandbox.Views.Sandbox());
-    },
-
-    // reset state
-    reset: function () {
-      // this.participants.fetch({ reset: true });
-      // app.reset(); TODO: this was to reset 'activeApp'
     }
   });
 

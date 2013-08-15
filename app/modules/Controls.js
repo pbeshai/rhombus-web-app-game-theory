@@ -71,9 +71,6 @@ function(app, Clicker, Apps) {
     events: {
       "click .next-state" : "nextState",
       "click .prev-state" : "prevState",
-      "click .load-view" : "loadView",
-      "click .load-view2" : "loadView2",
-      "click .update-view" : "updateView"
     },
 
     serialize: function () {
@@ -95,33 +92,17 @@ function(app, Clicker, Apps) {
     },
 
     nextState: function () {
-      app.controller.appController.appNext();
+      app.controller.appNext();
     },
 
     prevState: function () {
-      app.controller.appController.appPrev();
+      app.controller.appPrev();
     },
-
-    loadView: function () {
-      // TODO: shouldn't be hardcoded values
-      app.controller.appController.loadView("attendance", { participants: app.router.participants }, "Viewer1");
-    },
-
-    loadView2: function () {
-      // TODO: shouldn't be hardcoded values
-      app.controller.appController.loadView("pd::play", { participants: app.router.participants }, "Viewer1");
-    },
-
-    // TODO: temporary function to test update view
-    updateView: function () {
-      app.router.participants.each(function (p) { p.set("choice", (p.get("choice") === "A") ? "B" : "A"); });
-      app.controller.appController.updateView({ participants: app.router.participants }, "Viewer1");
-    }
   });
 
   Controls.ConfigurationModel = Backbone.Model.extend({
     sync: function () {
-      app.controller.appController.appConfig(this.attributes);
+      app.controller.appConfig(this.attributes);
       this.changed = {};
     }
   });
@@ -160,8 +141,19 @@ function(app, Clicker, Apps) {
     }
   });
 
+  Controls.Views.Viewers = Backbone.View.extend({
+    template: "controls/viewers",
+
+    serialize: function () {
+      return { viewers: app.controller.get("viewers") };
+    },
+
+    initialize: function () {
+      this.listenTo(app.controller, "change:viewers", this.render);
+    }
+  });
+
   Controls.Views.Controls = Backbone.View.extend({
-    tagName: "div",
     className: "controls",
     template: "controls/controls",
 
@@ -185,6 +177,8 @@ function(app, Clicker, Apps) {
       appSelector.on("app-selected", _.bind(this.appSelected, this));
 
       this.insertView(".clicker-panel", new Clicker.Views.Clickers({ collection: this.options.participants}));
+
+      this.setView(".viewers", new Controls.Views.Viewers());
     },
 
     appSelected: function (selectedApp) {
@@ -200,7 +194,7 @@ function(app, Clicker, Apps) {
 
 
       // instantiate the application.
-      app.controller.appController.set("activeApp", selectedApp.instantiate({ participants: this.options.participants }));
+      app.controller.set("activeApp", selectedApp.instantiate({ participants: this.options.participants }));
 
       // show the this and config for the app
       var appControls = new Controls.Views.AppControls({

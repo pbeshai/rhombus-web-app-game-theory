@@ -61,6 +61,27 @@ function(app, ParticipantServer, AppController, Common, Participant) {
       this.participantUpdater = new ParticipantUpdater();
 
       this.handleInstructor();
+      this.handleViewers();
+    },
+
+    handleViewers: function () {
+      this.set("viewers", []);
+      var controller = this;
+      this.appController.on("viewer-list", function (data) {
+        controller.set("viewers", data.viewers);
+      });
+
+      this.appController.on("viewer-connect", function (viewer) {
+        var viewers = controller.get("viewers") || [];
+        viewers.push(viewer);
+        controller.set("viewers", viewers);
+        controller.trigger("change:viewers");
+      });
+
+      this.appController.on("viewer-disconnect", function (viewer) {
+        var reducedViewers = _.reject(controller.get("viewers"), function (v) { return v.id === viewer.id });
+        controller.set("viewers", reducedViewers);
+      });
     },
 
     // setup instructor handling
@@ -100,9 +121,37 @@ function(app, ParticipantServer, AppController, Common, Participant) {
       this.participantUpdater.add(participant);
     },
 
+    // when the participants collection is synced (e.g., fetch is called), signal the updater
     syncParticipants: function (collection, participants) {
       collection.each(this.participantUpdater.add, this.participantUpdater);
-    }
+    },
+
+    // go to next state in app
+    appNext: function () {
+      var activeApp = this.get("activeApp");
+      if (activeApp) {
+        console.log("Next State:" + activeApp.currentState.nextString());
+        activeApp.next();
+      }
+    },
+
+    // go to prev state in app
+    appPrev: function () {
+      var activeApp = this.get("activeApp");
+      if (activeApp) {
+        console.log("Prev State:" + activeApp.currentState.prevString());
+        activeApp.prev();
+      }
+    },
+
+    // udpate app config
+    appConfig: function(config) {
+      var activeApp = this.get("activeApp");
+      if (activeApp) {
+        console.log("App Config", config, activeApp);
+        activeApp.configure(config);
+      }
+    },
   });
 
   Modes.Viewer = Backbone.Model.extend({
@@ -160,47 +209,22 @@ function(app, ParticipantServer, AppController, Common, Participant) {
     events: {
       "click #btn-controller" : "selectController",
       "click #btn-viewer" : "selectViewer",
-      "change #app-id-input" : "updateAppId"
-    },
-
-    // selects the mode and connects the websocket
-    selectMode: function (mode, appId) {
-      if (app.controller || app.viewer) {
-        console.log("already connected and registered. aborting new registration", arguments);
-        return;
-      }
-
-      var socket = io.connect(app.socketUrl);
-
-      // register the viewer/controller
-      socket.on("connect", function () {
-        socket.emit("register", { type: mode, app: appId });
-      });
-
-      // get the viewer/controller id
-      socket.on("registered", function (data) {
-        app.model.set("browserId", data.id);
-
-        if (mode === "controller") {
-          app.controller = new Modes.Controller({ id: data.id, socket: socket });
-          app.router.controls();
-        } else {
-          app.viewer = new Modes.Viewer({ id: data.id, socket: socket });
-          app.router.viewer();
-        }
-      });
+      "change #manager-id-input" : "updateManagerId"
     },
 
     selectController: function () {
-      this.selectMode("controller", this.model.get("appId"));
+      var managerId = this.model.get("managerId") || "m1";
+      app.router.navigate("/" + managerId + "/controller", { trigger: true });
     },
 
     selectViewer: function () {
-      this.selectMode("viewer", this.model.get("appId"));
+      var managerId = this.model.get("managerId") || "m1";
+      var viewerName = this.model.get("viewerName") || "main";
+      app.router.navigate("/" + managerId + "/viewer/" + viewerName, { trigger: true });
     },
 
-    updateAppId: function () {
-      this.model.set("appId", this.$("#app-id-input").val());
+    updateManagerId: function () {
+      this.model.set("managerId", this.$("#manager-id-input").val());
     },
 
   	serialize: function () {
@@ -214,13 +238,9 @@ function(app, ParticipantServer, AppController, Common, Participant) {
 
     serialize: function () {
       return {
-        viewerId: app.viewer.id,
+        name: app.viewer.get("name")
       }
     },
-
-    initialize: function () {
-      console.log("init viewer view");
-    }
   });
 
   return Modes;

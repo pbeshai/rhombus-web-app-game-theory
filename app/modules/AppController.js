@@ -14,7 +14,6 @@ define([
 	AppController.Model = Backbone.Model.extend({
 		// events we trigger to clients
 		clientEvents: {
-			appConfig: "app-config",
 			appMessage: "app-message",
 			viewerList: "viewer-list",
 			viewerConnect: "viewer-connect",
@@ -23,7 +22,6 @@ define([
 
 		// events we send across the websocket
 		socketEvents:  {
-			appConfig: "app-config",
 			appMessage: "app-message",
 			viewerList: "viewer-list",
 			viewerConnect: "viewer-connect",
@@ -32,10 +30,6 @@ define([
 
 		reset: function () {
 			this.clear();
-		},
-
-		viewerListCallback: function (data) {
-			console.log("viewer list", data);
 		},
 
 		sendAppMessage: function (type, message) {
@@ -75,30 +69,6 @@ define([
 				}
 			});
 			this.sendAppMessage("update-view", data); // TODO add viewer , viewer: viewer });
-		},
-
-		appNext: function () {
-			var activeApp = this.get("activeApp");
-			if (activeApp) {
-				console.log("Next State:" + activeApp.currentState.nextString());
-				activeApp.next();
-			}
-		},
-
-		appPrev: function () {
-			var activeApp = this.get("activeApp");
-			if (activeApp) {
-				console.log("Prev State:" + activeApp.currentState.prevString());
-				activeApp.prev();
-			}
-		},
-
-		appConfig: function(config) {
-			var activeApp = this.get("activeApp");
-			if (activeApp) {
-				console.log("App Config", config, activeApp);
-				activeApp.configure(config);
-			}
 		},
 
 		initialize: function (attrs) {
