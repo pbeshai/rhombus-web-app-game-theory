@@ -18,9 +18,13 @@ function(app, StateApp, Attendance, Common) {
 
     initialize: function () {
       this.prependStates = [];
+      this.States || (this.States = []);
       this.stateOptions || (this.stateOptions = []);
+      this.initStateOptions();
       StateApp.App.prototype.initialize.call(this);
     },
+
+    initStateOptions: function () { },
 
     defineStates: function () {
       this.states = {};
@@ -38,20 +42,25 @@ function(app, StateApp, Attendance, Common) {
     definePrependStates: function () {
       // add in attendance unless false
       if (this.prepend.attendance) {
-        var attendanceOptions = _.extend({ participants: this.get("participants") }, this.attendanceOptions)
-        this.prependStates.push({ state: Attendance.State, options: attendanceOptions });
+        this.attendanceOptions = _.extend({ participants: this.get("participants") }, this.attendanceOptions)
+        this.prependStates.push({ state: Attendance.State, options: this.attendanceOptions });
       }
     },
 
     defineMainStates: function () {
       _.each(this.States, function (State, i) {
         var state = new State(_.extend({ config: this.config }, this.stateOptions[i]), this);
-        console.log("adding state", state.name);
         this.states["state-" + (i + 1)] = state;
         if (i > 0) {
           state.setPrev(this.states["state-" + i]);
         }
       }, this);
+    },
+
+    // helper for those that override defineMainStates
+    addAttendance: function () {
+      var attendanceState = new Attendance.State(this.attendanceOptions, this);
+      this.states["attendance"] = attendanceState;
     },
   });
 
@@ -76,6 +85,48 @@ function(app, StateApp, Attendance, Common) {
       if (this.prepend.group) {
         this.prependStates.push({ state: Common.States.Group, options: this.groupOptions });
       }
+    },
+  });
+
+
+  CommonStateApps.PhaseGame = CommonStateApps.BasicGame.extend({
+    PhaseStates: null,
+    phaseConfigs: null,
+
+    initialize: function () {
+      this.phaseConfigs || (this.phaseConfigs = []);
+      _.each(this.phaseConfigs, function (phaseConfig) {
+        _.defaults(phaseConfig, this.config)
+      }, this);
+
+      CommonStateApps.BasicGame.prototype.initialize.apply(this, arguments);
+    },
+
+    getPhaseStateOptions: function (phaseIndex, stateIndex) { }, // template method
+
+    addPhaseStates: function () {
+      // for each phase
+      _.each(this.PhaseStates, function (SinglePhaseStates, i) {
+        // for each state in the phase
+        _.each(SinglePhaseStates, function (State, j) {
+          this.States.push(State);
+          this.stateOptions.push(this.getPhaseStateOptions(i, j));
+        }, this);
+      }, this);
+    },
+
+    defineMainStates: function () {
+      this.addPhaseStates();
+      CommonStateApps.BasicGame.prototype.defineMainStates.call(this);
+    },
+
+    handleConfigure: function () {
+      // update the phase configs
+      _.each(this.phaseConfigs, function (phaseConfig) {
+        _.extend(phaseConfig, this.config);
+      }, this);
+
+      CommonStateApps.BasicGame.prototype.handleConfigure.call(this);
     },
   });
 

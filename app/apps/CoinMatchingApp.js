@@ -18,9 +18,16 @@ define([
 function(app, StateApp, CommonStateApps, CoinMatching) {
 
 	// Attendance -> Phase 1 (Play) -> Phase 1 (Results) -> Phase 2 Play -> Phase 2 Results -> Total Results -> ...
-	var CoinMatchingApp = CommonStateApps.BasicApp.extend({
+	var CoinMatchingApp = CommonStateApps.PhaseGame.extend({
 		version: "1.0",
 		config: CoinMatching.config,
+		prepend: { attendance: true, botCheck: true, group: true },
+		PhaseStates: [
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseResults ],
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+		],
 		phaseConfigs: [
 			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },
 			{ group1NameSuffix: "Human", group2NameSuffix: "Computer" },
@@ -28,10 +35,35 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 			{ group1NameSuffix: "Computer", group2NameSuffix: "Computer" },
 		],
 
-		initConfigs: function () {
-			_.each(this.phaseConfigs, function (phaseConfig) {
-				_.defaults(phaseConfig, this.config)
-			}, this);
+		getPhaseStateOptions: function (phaseIndex, stateIndex) {
+			var phaseNum = phaseIndex + 1;
+			switch (stateIndex) {
+				case 0: // options for Round
+					return _.extend({
+						config: this.phaseConfigs[phaseIndex],
+						stateOptions:
+						[
+							{ viewOptions: { header: "Play Phase " + phaseNum } },
+							{ viewOptions: { header: "Results Phase " + phaseNum } }
+						]
+					});
+				case 1: // options for phase results
+					return {
+						config: this.phaseConfigs[phaseIndex],
+						phase: phaseNum,
+						viewOptions: {
+							header: "Results for Phase " + phaseNum
+						}
+					};
+				case 2: // options for total results
+					return {
+						config: this.config,
+						numPhases: phaseNum,
+						viewOptions: {
+							header: "Total Results after Phase " + phaseNum
+						}
+					};
+			}
 		},
 
 		handleConfigure: function () {
@@ -42,62 +74,8 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 				}
 			}, this);
 
-			// update the phase configs
-			_.each(this.phaseConfigs, function (phaseConfig) {
-				_.extend(phaseConfig, this.config);
-			}, this);
-
-			CommonStateApps.BasicApp.prototype.handleConfigure.call(this);
+			CommonStateApps.PhaseGame.prototype.handleConfigure.call(this);
 		},
-
-		defineMainStates: function () {
-			this.initConfigs();
-
-			var roundStateOptions = function (phaseNum) {
-				return {
-					stateOptions:
-					[
-						{ viewOptions: { header: "Play Phase " + phaseNum } },
-						{ viewOptions: { header: "Results Phase " + phaseNum } }
-					]
-				};
-			};
-			_.each(this.phaseConfigs, function (phaseConfig, i) {
-				var phaseNum = i+1;
-
-				var phaseState = this.states["phase" + phaseNum] = new CoinMatching.States.Round(_.extend({ config: this.phaseConfigs[i] }, roundStateOptions(phaseNum)));
-				var resultsState = this.states["results" + phaseNum] = new CoinMatching.States.PhaseResults({
-					config: this.phaseConfigs[i],
-					phase: (i+1),
-					viewOptions: {
-						header: "Results for Phase " + phaseNum
-					}
-				});
-
-				if (i === 0) {
-					phaseState.setPrev(this.states.attendance);
-				} else {
-					var totalResultsState = this.states["totalResults" + phaseNum] = new CoinMatching.States.TotalResults({
-						config: this.config,
-						numPhases: i + 1,
-						viewOptions: {
-							header: "Total Results after Phase " + phaseNum
-						}
-					});
-					totalResultsState.setPrev(resultsState);
-					if (i === 1) {
-						// previous results state (no total results after phase 1)
-						phaseState.setPrev(this.states["results" + i]); // only
-					} else {
-						// previous total results
-						phaseState.setPrev(this.states["totalResults" + i]);
-					}
-				}
-
-			 	resultsState.setPrev(phaseState);
-
-			}, this);
-		}
 	});
 
 	// description for use in router

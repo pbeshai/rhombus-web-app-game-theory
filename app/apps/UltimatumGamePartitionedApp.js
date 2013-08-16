@@ -25,7 +25,7 @@ function(app, StateApp, CommonStateApps, UltimatumGamePartitioned) {
 		config: UltimatumGamePartitioned.config,
 		States: [ UltimatumGamePartitioned.States.GiverPlay, UltimatumGamePartitioned.States.ReceiverPlay,
 							UltimatumGamePartitioned.States.Score, UltimatumGamePartitioned.States.Results ],
-		prepend: { attendance: true, botCheck: true, partner: false, group: true }
+		prepend: { attendance: true, botCheck: true, group: true }
 	});
 
 	// description for use in router

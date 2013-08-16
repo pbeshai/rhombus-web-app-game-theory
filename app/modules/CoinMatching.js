@@ -154,7 +154,9 @@ function(app, Common, Participant, StateApp, Graphs) {
         participant.get("partner").set("role", "col");
       });
     },
+  });
 
+  CoinMatching.States.Score = Common.States.GroupScore.extend({
     assignScoreGroup2: function () { }, // do nothing (handled in group1)
     // group 1 is row, group2 is col
     assignScoreGroup1: function (participant) {
@@ -213,7 +215,8 @@ function(app, Common, Participant, StateApp, Graphs) {
 
 
   CoinMatching.States.Round = StateApp.RoundState.extend({
-    states: [ CoinMatching.States.Play, CoinMatching.States.Results ],
+    name: "phase",
+    states: [ CoinMatching.States.Play, CoinMatching.States.Score, CoinMatching.States.Results ],
     numRounds: CoinMatching.config.roundsPerPhase,
 
     // what is saved between each round
@@ -244,14 +247,15 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
-
   CoinMatching.States.PhaseResults = Common.States.GroupResults.extend({
+    name: "phase-results",
     view: "coin-matching::phase-results",
     bucketAttribute: "phaseTotal",
     bucket: true,
   });
 
   CoinMatching.States.TotalResults = Common.States.GroupResults.extend({
+    name: "total-results",
     view: "coin-matching::total-results",
     bucketAttribute: "total",
     bucket: true,

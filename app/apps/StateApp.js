@@ -9,7 +9,7 @@ define([
 ],
 
 function(app) {
-	var debug = false;
+	var debug = true;
 
 	// define the State prototype object
 	var State = function (options, stateApp) {
@@ -62,6 +62,7 @@ function(app) {
 			}
 
 			var autoFlow = this.run();
+			console.log("autoflow is ", autoFlow, this.flow);
 			if (autoFlow !== false) {
 				if (prevState === this.flow.next) {
 					return this.prev();
@@ -189,7 +190,7 @@ function(app) {
 	// a collection of states that is run through repeatedly before exiting
 	var RoundState = ViewState.extend({
 		initialize: function () {
-			ViewState.prototype.initalize.apply(this, arguments);
+			ViewState.prototype.initialize.apply(this, arguments);
 			this.stateCounter = 1;
 			this.roundCounter = 1;
 			this.currentState = null;

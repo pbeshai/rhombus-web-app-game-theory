@@ -21,7 +21,7 @@ function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 		version: "1.0",
 		config: TeamPrisonersDilemma.config,
 		States: [ TeamPrisonersDilemma.States.Play, TeamPrisonersDilemma.States.Score, TeamPrisonersDilemma.States.Results ],
-		prepend: { attendance: true, botCheck: true, partner: false, group: true }
+		prepend: { attendance: true, botCheck: true, group: true }
 	});
 
 	// description for use in router
