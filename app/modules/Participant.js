@@ -112,7 +112,7 @@ function(app) {
       validateOnChoice: true,
     },
 
-    fetch : function () {
+    fetchTODO : function () {
       console.log("fetching participants ...");
       Backbone.Collection.prototype.fetch.call(this, { success: function () { console.log("fetch complete."); }});
     },

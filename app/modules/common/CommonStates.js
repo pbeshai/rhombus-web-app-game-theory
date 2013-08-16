@@ -7,12 +7,93 @@ define([
 function(app, CommonModels, StateApp) {
   var CommonStates = {};
 
-  CommonStates.Play = StateApp.State.extend({
-    botCheck: function (participants) { return participants.length === 1; },
-    pairModels: true,
-    defaultChoice: "A", // choice made when a player does not play
+  /***** NON-VIEW STATES *********************************************************************/
 
-    processBeforeRender: function () { }, // template method
+  // add a bot if necessary
+  CommonStates.BotCheck = StateApp.State.extend({
+    name: "botcheck",
+    rules: {
+      "at-least-two": function (participants) { return participants.length === 1; },
+      "even": function (participants) { return (participants.length % 2) === 1; },
+    },
+
+    defaults: {
+      activeRules: [ "at-least-two", "even" ],
+    },
+
+    run: function () {
+      var participants = this.input;
+
+      var botsRequired = _.some(this.options.activeRules, function (rule) {
+        var result = this.rules[rule](participants);
+        return result;
+      }, this);
+
+      if (botsRequired) {
+        participants.addBot();
+      }
+    }
+  })
+
+  // partner participants
+  CommonStates.Partner = StateApp.State.extend({
+    name: "partner",
+    defaults: {
+      symmetric: true,
+    },
+
+    run: function () {
+      var participants = this.input;
+
+      if (this.options.symmetric) {
+        participants.pairModels();
+      } else {
+        participants.pairModelsAsymmetric();
+      }
+    }
+  });
+
+  // score participants
+  CommonStates.Score = StateApp.State.extend({
+    name: "score",
+    assignScore: function (participant) { // template method
+      participant.set("score", -94);
+    },
+
+    assignScores: function (participants) {
+      participants.each(this.assignScore, this);
+    },
+
+    run: function () {
+      var participants = this.input;
+
+      this.assignScores(participants);
+    }
+  });
+
+
+  // buckets participants
+  CommonStates.Bucket = StateApp.State.extend({
+    name: "bucket",
+    bucketAttribute: "score",
+    numBuckets: 2,
+
+    run: function () {
+      var participants = this.input;
+      if (participants instanceof CommonModels.GroupModel) {
+        participants = participants.get("participants");
+      }
+
+      participants.bucket(this.bucketAttribute, this.numBuckets);
+    }
+  });
+
+
+  /***** VIEW STATES *************************************************************************/
+
+  CommonStates.Play = StateApp.ViewState.extend({
+    name: "play",
+    defaultChoice: "A", // choice made when a player does not play
 
     prepareParticipant: function (participant) {
       participant.reset();
@@ -29,21 +110,10 @@ function(app, CommonModels, StateApp) {
     // this.input is a participant participants.
     beforeRender: function () {
       var participants = this.participants = this.input;
-      if (this.botCheck && this.botCheck(participants)) {
-        participants.addBot();
-      }
-
-      // re-partners each render
-      if (this.pairModels === true) {
-        participants.pairModels();
-      } else if (this.pairModels === "asymmetric") {
-        participants.pairModelsAsymmetric();
-      }
 
       // listen for setting play
       this.stopListening();
       this.listenTo(participants, "change:choice", function (participant, choice) {
-        console.log("!!! change choice in play state", arguments);
         participant.set("played", choice != null);
 
         if (participant.get("complete")) { // only update choice if it isn't complete.
@@ -53,47 +123,32 @@ function(app, CommonModels, StateApp) {
 
       // reset played and choices
       participants.each(this.prepareParticipant, this);
-
-      this.processBeforeRender();
     },
 
-    setViewOptions: function () {
-      this.options.viewOptions = _.defaults({
+    viewOptions: function () {
+      return {
         participants: this.participants,
         config: this.config
-      }, this.options.viewOptions);
+      };
     },
-
-
-    assignScore: function (participant) { }, // template method
-
-    assignScores: function () {
-      this.participants.each(this.assignScore, this);
-    },
-
-    processOutput: function () { }, // template method
 
     // outputs a participant participants
-    getOutput: function () {
-      // if you haven't played, then you played "A".
+    onExit: function () {
+      // if you haven't played, then you played the default choice.
       this.participants.each(function (participant) {
-        if (participant.get("choice") === undefined && this.defaultChoice) {
+        if (participant.get("choice") == null && this.defaultChoice) {
           participant.set("choice", this.defaultChoice);
         }
       }, this);
-
-      this.assignScores();
-      this.processOutput();
 
       return this.participants;
     }
   });
 
-  CommonStates.GroupPlay = StateApp.State.extend({
+  CommonStates.GroupPlay = StateApp.ViewState.extend({
+    name: "group-play",
     defaultChoice: "A",
     groupModelOptions: { forceEven: true },
-
-    processBeforeRender: function () { }, // template method
 
     prepareParticipant: function (participant) {
       participant.reset();
@@ -132,10 +187,9 @@ function(app, CommonModels, StateApp) {
         this.groupModel = new CommonModels.GroupModel({ participants: this.input }, this.groupModelOptions);
       }
 
-            // listen for setting play
+      // listen for setting play
       this.stopListening();
       this.listenTo(this.groupModel.get("participants"), "change:choice", function (participant, choice) {
-        console.log("!!! change choice in play state", arguments);
         participant.set("played", choice != null);
 
         if (participant.get("complete")) { // only update choice if it isn't complete.
@@ -143,29 +197,24 @@ function(app, CommonModels, StateApp) {
         }
       });
 
-
       this.beforeRenderGroup1();
       this.beforeRenderGroup2();
-
-      this.processBeforeRender();
     },
 
-    setViewOptions: function () {
-      this.options.viewOptions = _.defaults({
+    viewOptions: function () {
+      return {
         model: this.groupModel,
         group1Name: this.config.group1Name,
         group2Name: this.config.group2Name,
         group1NameSuffix: this.config.group1NameSuffix,
         group2NameSuffix: this.config.group2NameSuffix,
         config: this.config
-      }, this.options.viewOptions);
+      };
     },
-
-    processOutput: function () { }, // template method
 
     prepareParticipantOutput: function (participant) {
       // set the default choice if configured and the participant hasn't played
-      if (participant.get("choice") === undefined && this.defaultChoice) {
+      if (participant.get("choice") == null && this.defaultChoice) {
         participant.set("choice", this.defaultChoice);
       }
     },
@@ -187,7 +236,7 @@ function(app, CommonModels, StateApp) {
     },
 
     handleConfigure: function () {
-      this.renderView(); // ensures team names show update
+      app.controller.appController.updateView({ config: this.config }, "Viewer1"); // TODO: "Viewer1"
     },
 
     assignScore: function (participant) { // template method
@@ -216,38 +265,32 @@ function(app, CommonModels, StateApp) {
     },
 
     // outputs a GroupModel
-    getOutput: function () {
+    onExit: function () {
       this.prepareOutputGroup1();
       this.prepareOutputGroup2();
 
       this.assignScores();
-      this.processOutput();
 
       return this.groupModel;
     }
   });
 
-  CommonStates.Results = StateApp.State.extend({
+  CommonStates.Results = StateApp.ViewState.extend({
+    name: "results",
     beforeRender: function () {
-      // this.input is a participant participants
+      // this.input is a participant collection
       this.participants = this.input;
+    },
 
-      this.processBeforeRender();
-
-      if (this.bucket) {
-        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
-      }
-
+    afterRender: function () {
       this.logResults();
     },
 
-    processBeforeRender: function () { }, // template method
-
-    setViewOptions: function () {
-      this.options.viewOptions = _.defaults({
+    viewOptions: function () {
+      return {
         participants: this.participants,
         config: this.config
-      }, this.options.viewOptions);
+      };
     },
 
     handleConfigure: function () {
@@ -256,36 +299,31 @@ function(app, CommonModels, StateApp) {
 
     logResults: function () { }, // template method
 
-    getOutput: function () {
+    onExit: function () {
       return this.participants;
     }
   });
 
-  CommonStates.GroupResults = StateApp.State.extend({
+  CommonStates.GroupResults = StateApp.ViewState.extend({
+    name: "group-results",
     beforeRender: function () {
       // this.input is a GroupModel
       this.groupModel = this.input;
+    },
 
-      this.processBeforeRender();
-
-      if (this.bucket) {
-        this.groupModel.get("participants").bucket(this.bucketAttribute, this.numBuckets);
-      }
-
+    afterRender: function () {
       this.logResults();
     },
 
-    processBeforeRender: function () { }, // template method
-
-    setViewOptions: function () {
-      this.options.viewOptions = _.defaults({
+    viewOptions: function () {
+      return {
         model: this.groupModel,
         group1Name: this.config.group1Name,
         group2Name: this.config.group2Name,
         group1NameSuffix: this.config.group1NameSuffix,
         group2NameSuffix: this.config.group2NameSuffix,
         config: this.config
-      }, this.options.viewOptions);
+      };
     },
 
     handleConfigure: function () {
@@ -294,7 +332,7 @@ function(app, CommonModels, StateApp) {
 
     logResults: function () { }, // template method
 
-    getOutput: function () {
+    onExit: function () {
       return this.groupModel;
     }
   });

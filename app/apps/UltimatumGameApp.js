@@ -23,8 +23,9 @@ function(app, StateApp, CommonStateApps, UltimatumGame) {
 	var UltimatumGameApp = CommonStateApps.BasicGame.extend({
 		version: "1.0",
 		config: UltimatumGame.config,
-		PlayStates: [ UltimatumGame.States.GiverPlay, UltimatumGame.States.ReceiverPlay ],
-		ResultsState: UltimatumGame.States.Results,
+		partnerOptions: { symmetric: false },
+		botCheckOptions: false, // disable bots
+		States: [ UltimatumGame.States.GiverPlay, UltimatumGame.States.ReceiverPlay, UltimatumGame.States.Score, UltimatumGame.States.Results ]
 	});
 
 	// description for use in router

@@ -63,19 +63,13 @@ function(app, Participant, StateApp) {
   }));
 
   // To be used in StateApps
-  Grid.State = StateApp.State.extend({
+  Grid.State = StateApp.ViewState.extend({
     // view: Grid.Views.Participants,
     view: "grid",
 
-    initialize: function () {
-      this.options.viewOptions = { participants: this.options.participants }
+    viewOptions: function () {
+      return { participants: this.input || this.options.participants }
     },
-
-    beforeRender: function () {
-      if (this.input) {
-        this.options.viewOptions = { participants: this.input };
-      }
-    }
   });
 
   return Grid;

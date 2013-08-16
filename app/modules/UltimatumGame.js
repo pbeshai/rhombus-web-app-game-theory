@@ -1,7 +1,5 @@
 /**
-
-	A simple grid app for displaying choices
-
+The ultimatum game
 */
 define([
   // Application.
@@ -129,25 +127,29 @@ function(app, Common, Participant, StateApp, Graphs) {
   // To be used in StateApps
   UltimatumGame.States = {};
   UltimatumGame.States.GiverPlay = Common.States.Play.extend({
+    name: "giver-play",
     view: "ug::giver-play",
-    pairModels: "asymmetric",
     handleConfigure: function () {
       this.render();
     },
 
     // outputs a participant collection
-    processOutput: function () {
+    onExit: function () {
+      var result = Common.States.Play.prototype.onExit.call(this);
+
       UltimatumGame.Util.assignOffers(this.participants,
         this.config.amount, this.config.offerMap);
+
+      return result;
     }
   });
 
   UltimatumGame.States.ReceiverPlay = Common.States.Play.extend({
+    name: "receiver-play",
     view: "ug::receiver-play",
-    pairModels: false,
-    botCheck: false,
 
     initialize: function () {
+      Common.States.Play.prototype.initialize.call(this);
       this.validChoices = [this.config.acceptChoice, this.config.rejectChoice];
     },
 
@@ -157,7 +159,9 @@ function(app, Common, Participant, StateApp, Graphs) {
 
       this.render();
     },
+  });
 
+  UltimatumGame.States.Score = Common.States.Score.extend({
     assignScore: function (participant) {
       var receiver = participant;
       var giver = receiver.get("partner");
@@ -168,8 +172,8 @@ function(app, Common, Participant, StateApp, Graphs) {
         receiver.set("receiverScore", 0);
         giver.set("giverScore", 0)
       }
-    },
-  });
+    }
+  })
 
   UltimatumGame.States.Results = Common.States.Results.extend({
     view: "ug::results",

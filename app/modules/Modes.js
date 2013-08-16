@@ -130,7 +130,6 @@ function(app, ParticipantServer, AppController, Common, Participant) {
     appNext: function () {
       var activeApp = this.get("activeApp");
       if (activeApp) {
-        console.log("Next State:" + activeApp.currentState.nextString());
         activeApp.next();
       }
     },
@@ -139,7 +138,6 @@ function(app, ParticipantServer, AppController, Common, Participant) {
     appPrev: function () {
       var activeApp = this.get("activeApp");
       if (activeApp) {
-        console.log("Prev State:" + activeApp.currentState.prevString());
         activeApp.prev();
       }
     },

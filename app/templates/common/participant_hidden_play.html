@@ -1,2 +1,2 @@
 <div class="medium-text"><%= model.get("played") ? "Played" : ""%></div>
-<div class="id-text"><%= model.get("alias") %></div>
+<div class="id-text"><%= model.get("alias") %> <%= model.get("partner").get("alias") %></div>

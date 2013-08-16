@@ -2,65 +2,73 @@ define([
   "app",
   "apps/StateApp",
   "modules/Attendance",
+  "modules/common/Common",
 ],
-function(app, StateApp, Attendance) {
+function(app, StateApp, Attendance, Common) {
   var CommonStateApps = {};
 
   CommonStateApps.BasicApp = StateApp.App.extend({
+    stateOptions: undefined,
+    States: null,
     attendanceOptions: {
       acceptNew: true,
       saveNew: false
     },
 
+    initialize: function () {
+      this.prependStates = [];
+      this.stateOptions || (this.stateOptions = []);
+      StateApp.App.prototype.initialize.call(this);
+    },
+
     defineStates: function () {
       this.states = {};
+      // add in the prepend states
 
-      var attendanceState = new Attendance.State(_.extend({
-          participants: this.options.participants
-        }, this.attendanceOptions));
-      this.states.attendance = attendanceState;
+      this.definePrependStates();
+      if (this.prependStates.length) {
+        this.States = _.pluck(this.prependStates, "state").concat(this.States);
+        this.stateOptions = _.pluck(this.prependStates, "options").concat(this.stateOptions);
+      }
 
       this.defineMainStates();
     },
 
-    defineMainStates: function () { }
-  });
-
-
-  // attendance -> play [-> play2 ... ]-> results
-  CommonStateApps.BasicGame = CommonStateApps.BasicApp.extend({
-    PlayStates: null,
-    ResultsState: null,
-    playOptions: undefined,
-    resultsOptions: undefined,
-
-    initialize: function () {
-      this.playOptions || (this.playOptions = []);
-      CommonStateApps.BasicApp.prototype.initialize.call(this);
+    definePrependStates: function () {
+      // add in attendance unless false
+      if (this.attendanceOptions !== false) {
+        var attendanceOptions = _.extend({ participants: this.get("participants") }, this.attendanceOptions)
+        this.prependStates.push({ state: Attendance.State, options: attendanceOptions });
+      }
     },
 
     defineMainStates: function () {
-      var resultsState = new this.ResultsState(_.extend({
-        config: this.config
-      }, this.resultsOptions));
-      this.states.results = resultsState;
-
-
-      _.each(this.PlayStates, function (PlayState, i) {
-        var state = new PlayState(_.extend({ config: this.config }, this.playOptions[i]));
-
-        // save the state as play1, play2, ... playn
-        this.states["play" + (i + 1)] = state;
-        if (i === 0) { // attendance -> play1
-          state.setPrev(this.states.attendance)
-        } else if (i > 0) { // playi -> playi+1
-          state.setPrev(this.states["play" + i]);
+      _.each(this.States, function (State, i) {
+        var state = new State(_.extend({ config: this.config }, this.stateOptions[i]), this);
+        console.log("adding state", state.name);
+        this.states["state-" + (i + 1)] = state;
+        if (i > 0) {
+          state.setPrev(this.states["state-" + i]);
         }
-        if (i === this.PlayStates.length - 1) { // playn -> results
-          state.setNext(resultsState);
-        }
-        return state;
       }, this);
+    },
+  });
+
+  // attendance -> play [-> play2 ... ]-> results
+  CommonStateApps.BasicGame = CommonStateApps.BasicApp.extend({
+    partnerOptions: undefined, // set to false to disable partnering
+    botCheckOptions: undefined, // set to false to disable bot checking
+
+    definePrependStates: function () {
+      CommonStateApps.BasicApp.prototype.definePrependStates.call(this);
+
+      if (this.botCheckOptions !== false) {
+        this.prependStates.push({ state: Common.States.BotCheck, options: this.botCheckOptions });
+      }
+
+      if (this.partnerOptions !== false) {
+        this.prependStates.push({ state: Common.States.Partner, options: this.partnerOptions });
+      }
     },
   });
 

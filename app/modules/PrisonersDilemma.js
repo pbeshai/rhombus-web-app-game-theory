@@ -275,12 +275,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
   // To be used in StateApps
   PrisonersDilemma.States = {};
-  PrisonersDilemma.States.Play = Common.States.Play.extend({
-    // view: PrisonersDilemma.Views.Play.Layout,
-    view: "pd::play",
-    defaultChoice: "C",
-    validChoices: ["C", "D"],
-
+  PrisonersDilemma.States.Score = Common.States.Score.extend({
     assignScore: function (model) {
       var pairChoices = model.get("choice") + model.get("partner").get("choice");
       model.set({
@@ -288,8 +283,14 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
         "pairChoices": pairChoices
       });
     },
-  });
+  })
 
+  PrisonersDilemma.States.Play = Common.States.Play.extend({
+    // view: PrisonersDilemma.Views.Play.Layout,
+    view: "pd::play",
+    defaultChoice: "C",
+    validChoices: ["C", "D"],
+  });
 
   PrisonersDilemma.States.Results = Common.States.Results.extend({
     // view: PrisonersDilemma.Views.Results.Layout,

@@ -1,7 +1,6 @@
 /**
 
-	A simple grid app for displaying choices
-
+	The ultimatum game with partitioned roles
 */
 define([
   // Application.
@@ -147,10 +146,14 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     // do not modify group2
     prepareOutputGroup2: function () { },
 
-    processOutput: function () {
+    onExit: function () {
       // assign offers
+      var result = Common.States.GroupPlay.prototype.onExit.call(this);
+
       UltimatumGamePartitioned.Util.assignOffers(this.groupModel.get("group1"),
         this.config.amount, this.config.offerMap);
+
+      return result;
     }
   });
 

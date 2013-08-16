@@ -73,15 +73,20 @@ function(app, Clicker, Apps) {
       "click .prev-state" : "prevState",
     },
 
+    initialize: function () {
+      this.listenTo(this.options.activeApp, "change:currentState", this.render);
+    },
     serialize: function () {
       return {
-        title: this.options.title
+        title: this.options.title,
+        states: this.options.activeApp.states,
+        currentState: this.options.activeApp.get("currentState")
       }
     },
 
     beforeRender: function () {
       if (this.options.appConfigView) {
-        this.insertView(".configure", new Controls.Views.Configure({ appConfigView: this.options.appConfigView }));
+        this.setView(".configure", new Controls.Views.Configure({ appConfigView: this.options.appConfigView }));
       }
     },
 
@@ -98,6 +103,7 @@ function(app, Clicker, Apps) {
     prevState: function () {
       app.controller.appPrev();
     },
+
   });
 
   Controls.ConfigurationModel = Backbone.Model.extend({
@@ -166,6 +172,26 @@ function(app, Clicker, Apps) {
       app.controller.participantServer.hookCollection(this.options.participants, this);
       this.listenTo(this.options.participants, "change", app.controller.changedParticipant);
       this.listenTo(this.options.participants, "sync", app.controller.syncParticipants);
+
+      // TODO: temporary keyboard shortcuts for faster debugging
+      $(document.body).on("keypress", function (evt) {
+        if (evt.ctrlKey) {
+          switch (evt.which) {
+            case 49: // ctrl-1
+              console.log("prev state");
+              $(".prev-state").click();
+              break;
+            case 50: // ctrl-2
+              console.log("next state");
+              $(".next-state").click();
+              break;
+            case 51: // ctrl-3
+              console.log("random votes");
+              $(".random-votes").click();
+              break;
+          }
+        }
+      })
     },
 
     beforeRender: function () {
@@ -199,7 +225,8 @@ function(app, Clicker, Apps) {
       // show the this and config for the app
       var appControls = new Controls.Views.AppControls({
         title: selectedApp.title,
-        appConfigView: selectedApp.configView
+        appConfigView: selectedApp.configView,
+        activeApp: app.controller.get("activeApp")
       });
 
       this.setView(".app-controls", appControls);

@@ -9,26 +9,26 @@ define([
 ],
 
 function(app) {
+	var debug = false;
 
 	// define the State prototype object
 	var State = function (options, stateApp) {
-		this.name = "untitled state";
-		this.stateApp = stateApp;
-		this.flow = { next: undefined, prev: undefined };
-    this.options = _.defaults({}, options, this.defaults);
-    if (this.options.enter) {
-    	this.onEntry = this.options.enter;
-    }
-    this.view = this.view || this.options.view;
-    this.config = this.options.config;
-    this.initialize();
+		this.options = _.defaults({}, options, this.defaults);
+    this.stateApp = stateApp;
+		this.initialize();
 	};
 	State.extend = Backbone.Model.extend; // use Backbone's extend for subclassing
 	_.extend(State.prototype, Backbone.Events, {
-		initialize: function () { },
-		getOutput: function () { }, // no-op
-		beforeRender: function () { }, // no-op
-		afterRender: function () { }, // no-op
+		type: "state",
+		initialize: function () {
+			this.id = undefined;
+			this.flow = { next: undefined, prev: undefined };
+	    if (this.options.enter) {
+	    	this.onEntry = this.options.enter;
+	    }
+	    this.view = this.view || this.options.view;
+	    this.config = this.options.config;
+		},
 
 		setNext: function(nextState, mutual) {
 			mutual = (mutual === undefined) ? true : mutual; // default to mutual
@@ -52,6 +52,7 @@ function(app) {
 
 		// enter the state
 		enter: function (input, prevState) {
+			if (debug) { console.log("[state:"+this.toString()+"] enter" + ((prevState !== undefined) ? " from " + prevState.toString() : "" )); }
 			var result = this.onEntry(input, prevState);
 			if (result !== undefined) {
 				input = result;
@@ -60,14 +61,110 @@ function(app) {
 				this.input = input;
 			}
 
-			this.render();
+			var autoFlow = this.run();
+			if (autoFlow !== false) {
+				if (prevState === this.flow.next) {
+					return this.prev();
+				} else {
+					return this.next();
+				}
+			}
 
 			return this;
 		},
 
-		// called at the start of _render, and renderView (to be overridden by subclasses)
+		run: function () { }, // return false to not automatically go to next state
+
+		exit: function () {
+			if (debug) { console.log("[state:"+this.toString()+"] exit"); }
+			var output = this.onExit() || this.input;
+			return output;
+		},
+
+		onExit: function () {  }, // this can return a value to modify the output (default is the input)
+
+		beforeNext: function () { },
+		beforePrev: function () { },
+		validateNext: function () { return true; },
+		validatePrev: function () { return true; },
+
+		// go to the next state
+		next: function () {
+			if (!this.validateNext()) {
+				return false;
+			}
+			this.beforeNext();
+
+			if (this.flow.next) {
+				return this.flow.next.enter(this.exit(), this);
+			}
+			return this.flow.next;
+		},
+
+		// go to the previous state
+		prev: function () {
+			if (!this.validatePrev()) {
+				return false;
+			}
+
+			this.beforePrev();
+
+			if (this.flow.prev) {
+				return this.flow.prev.enter(undefined, this);
+			}
+			return this.flow.prev;
+		},
+
+		// for debugging / logging
+		nextString: function () {
+			var nextState = this.flow.next ? this.flow.next.toString() : "#";
+	  	return this.toString() + " -> " + nextState;
+		},
+
+		// for debugging / logging
+		prevString: function () {
+			var prevState = this.flow.prev ? this.flow.prev.toString() : "#";
+	  	return prevState + " <- " + this.toString();
+		},
+
+		toString: function () {
+			return this.name || this.id;
+		},
+
+		// commonly used to log results via an API call
+		log: function (apiCall, data) {
+      var logData = _.extend({
+        config: this.config,
+        version: this.stateApp.version,
+      }, data);
+
+      console.log("Logging", logData);
+      app.api({ call: apiCall, type: "post", data: logData });
+    },
+
+		// can be called when a state app configures itself (perhaps a new config is set)
+		handleConfigure: function () {}
+	});
+
+	// a state with a view to render
+	var ViewState = State.extend({
+		type: "view-state",
+		beforeRender: function () { }, // no-op
+		afterRender: function () { }, // no-op
+
+		// called at the start of _render after beforeRender
 		setViewOptions: function () {
-		/* this.options.viewOptions = { } */
+			this.options.viewOptions = _.extend(this.options.viewOptions || {}, this.viewOptions());
+		},
+
+		// called at the start of _render after beforeRender (to be overridden by subclasses)
+		viewOptions: function () {
+			/* return { }; */
+		},
+
+		run: function () {
+			this.render();
+			return false; // do not go to next state automatically
 		},
 
 		render: function () {
@@ -86,89 +183,13 @@ function(app) {
 			// render the view on an external viewer
 			// TODO: Viewer1 shouldn't be hardcoded
 			app.controller.appController.loadView(this.view, this.options.viewOptions, "Viewer1");
-
-			// this.viewInstance = new this.view(this.options.viewOptions);
-			// app.layout.setView("#main-content", this.viewInstance);
-			// app.layout.render();
 		},
-
-		renderView: function () {
-			if (this.viewInstance) {
-				// update options
-				this.setViewOptions();
-				_.extend(this.viewInstance.options, this.options.viewOptions);
-				this.viewInstance.render();
-			} else {
-				throw "render view with no view instance";
-			}
-		},
-
-		beforeNext: function () { },
-		beforePrev: function () { },
-		validateNext: function () { return true; },
-		validatePrev: function () { return true; },
-
-		// go to the next state
-		next: function (output) {
-			if (!this.validateNext()) {
-				return false;
-			}
-			this.beforeNext();
-
-			if (this.flow.next) {
-				this.flow.next.enter(output || this.getOutput(), this);
-			}
-			return this.flow.next;
-		},
-
-		// go to the previous state
-		prev: function (output) {
-			if (!this.validatePrev()) {
-				return false;
-			}
-
-			this.beforePrev();
-
-			if (this.flow.prev) {
-				this.flow.prev.enter(output || this.getOutput(), this);
-			}
-			return this.flow.prev;
-		},
-
-		// for debugging / logging
-		nextString: function () {
-			var nextState = this.flow.next ? this.flow.next.toString() : "#";
-	  	return this.toString() + " -> " + nextState;
-		},
-
-		// for debugging / logging
-		prevString: function () {
-			var prevState = this.flow.prev ? this.flow.prev.toString() : "#";
-	  	return prevState + " <- " + this.toString();
-		},
-
-		toString: function () {
-			return this.name;
-		},
-
-		// commonly used to log results via an API call
-		log: function (apiCall, data) {
-      var logData = _.extend({
-        config: this.config,
-        version: this.stateApp.version,
-      }, data);
-
-      console.log("Logging", logData);
-      app.api({ call: apiCall, type: "post", data: logData });
-    },
-
-		// can be called when a state app configures itself (perhaps a new config is set)
-		handleConfigure: function () {}
 	});
 
 	// a collection of states that is run through repeatedly before exiting
-	var RoundState = State.extend({
+	var RoundState = ViewState.extend({
 		initialize: function () {
+			ViewState.prototype.initalize.apply(this, arguments);
 			this.stateCounter = 1;
 			this.roundCounter = 1;
 			this.currentState = null;
@@ -197,7 +218,7 @@ function(app) {
 
 		next: function () {
 			this.currentState.beforeNext();
-			var output = this.lastOutput = this.currentState.getOutput();
+			var output = this.lastOutput = this.currentState.exit();
 
 			if (this.isLastState()) {
 				// save the round output
@@ -237,7 +258,7 @@ function(app) {
 				this.stateCounter -= 1;
 			}
 
-			this.enter(this.currentState.getOutput(), this.currentState);
+			this.enter(this.currentState.exit(), this.currentState);
 			return this;
 		},
 
@@ -262,12 +283,9 @@ function(app) {
 			this.currentState.render();
 		},
 
-		renderView: function () {
-			this.currentState.renderView();
-		},
 
-		getOutput: function () {
-			return this.currentState.getOutput();
+		onExit: function () {
+			return this.currentState.exit();
 		},
 
 		// for debugging / logging
@@ -288,7 +306,7 @@ function(app) {
 		},
 
 		stateString: function (stateCounter, roundCounter) {
-			return this.name + "[" + roundCounter + "][" + stateCounter + "]";
+			return this.id + "[" + roundCounter + "][" + stateCounter + "]";
 		},
 
 		// for debugging / logging
@@ -309,23 +327,15 @@ function(app) {
 		},
 
 		toString: function () {
-			return this.name + "["+this.numRounds+" rounds, "+this.states.length+" states]";
+			return (this.name || this.id) + "["+this.numRounds+" rounds, "+this.states.length+" states]";
 		},
 	});
 
 	/**
 	 * State App - prototype object
 	 */
-	var StateApp = function (options) {
-		this.options = options || {};
-		if (this.options.autoInit !== false) {
-			this.initialize();
-		}
-	};
-	StateApp.extend = Backbone.Model.extend; // use Backbone's extend function for subclassing
-	_.extend(StateApp.prototype, {
-		initialize: function () {
-
+	var StateApp = Backbone.Model.extend({
+		initialize: function (attrs, options) {
 			if (this.defineStates) {
 				this.defineStates();
 			} else {
@@ -335,45 +345,42 @@ function(app) {
 
 			// set up the states
 			if (stateKeys.length > 0) {
-				// save the key of the state in the name property
+				// save the key of the state in the id property
 				// and add a reference to the state app
 				_.each(stateKeys, function (key) {
-					this.states[key].name = key;
+					this.states[key].id = key;
 					this.states[key].stateApp = this;
 				}, this);
 
-				this.initialState = this.currentState = this.states[stateKeys[0]];
+				this.initialState = this.states[stateKeys[0]];
+				this.set("currentState", this.states[stateKeys[0]]);
+				this.loadState(this.initialState.id);
 			}
-
-			if (this.options.initialize) {
-				this.options.initialize.call(this);
-			}
-
-			this.loadState(this.initialState.name);
-			var that = this;
 		},
 
-		loadState: function (name) {
-			var state = this.states[name];
+		loadState: function (id) {
+			var state = this.states[id];
 			if (state) {
 				state.enter();
-				this.currentState = state;
+				this.set("currentState", state);
 			} else {
-				console.log("Could not load state ", name);
+				console.log("Could not load state ", id);
 			}
 		},
 
 		next: function () {
-			var result = this.currentState.next();
+      console.log("Next State:" + this.get("currentState").nextString());
+			var result = this.get("currentState").next();
 			if (result) { // only update current state if we reached a state (not null/undefined)
-				this.currentState = result;
+				this.set("currentState", result);
 			}
 		},
 
 		prev: function () {
-			var result = this.currentState.prev();
+			console.log("Prev State:" + this.get("currentState").prevString());
+			var result = this.get("currentState").prev();
 			if (result) {
-				this.currentState = result;
+				this.set("currentState", result);
 			}
 		},
 
@@ -385,12 +392,13 @@ function(app) {
 		},
 
 		handleConfigure: function () {
-			this.currentState.handleConfigure();
+			this.get("currentState").handleConfigure();
 		}
 	});
 
 	return {
 		State: State,
+		ViewState: ViewState,
 		RoundState: RoundState,
 		App: StateApp,
 	};

@@ -96,9 +96,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   NPrisonersDilemma.States = {};
   NPrisonersDilemma.States.Play = PrisonersDilemma.States.Play.extend({
     view: "npd::play",
+  });
 
-    assignScores: function () {
-      var models = this.participants;
+  NPrisonersDilemma.States.Score = Common.States.Score.extend({
+    assignScores: function (models) {
       // See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
       var R = this.config.Rratio*(models.length - 1); // 0 < R < N-1, closer to 1 means more incentive for cooperation
       var H = this.config.H; // score increment when gaining 1 more cooperator
@@ -121,7 +122,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         }
       }, this);
 
-      this.participants.payoff = {
+      models.payoff = {
         cooperatorPayoff: cooperatorPayoff,
         numCooperators: numCooperators,
         defectorPayoff: defectorPayoff,
@@ -135,13 +136,15 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   NPrisonersDilemma.States.Results = Common.States.Results.extend({
     view: "npd::results",
 
-    processBeforeRender: function () {
+    beforeRender: function () {
+      Common.States.Results.prototype.beforeRender.call(this);
       this.payoff = this.participants.payoff;
     },
 
-    setViewOptions: function () {
-      Common.States.Results.prototype.setViewOptions.call(this);
-      this.options.viewOptions.payoff = this.payoff;
+    viewOptions: function () {
+      var options = Common.States.Results.prototype.viewOptions.call(this);
+      options.payoff = this.payoff;
+      return options;
     },
 
     logResults: function () {

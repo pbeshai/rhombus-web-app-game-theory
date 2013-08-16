@@ -20,8 +20,7 @@ function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
 	var NPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
 		version: "1.0",
 		config: NPrisonersDilemma.config,
-		PlayStates: [ NPrisonersDilemma.States.Play ],
-		ResultsState: NPrisonersDilemma.States.Results,
+		States: [ NPrisonersDilemma.States.Play, NPrisonersDilemma.States.Score, NPrisonersDilemma.States.Results]
 	});
 
 	// description for use in router

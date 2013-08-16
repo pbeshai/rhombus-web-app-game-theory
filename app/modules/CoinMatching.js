@@ -130,7 +130,7 @@ function(app, Common, Participant, StateApp, Graphs) {
     view: "coin-matching::play",
     defaultChoice: null,
     validChoices: ["A", "B", "C", "D"],
-    onEntry: function (input, prevState) {
+    onEntry: function (input, prevState) { // TODO: this is probably broken now that "input" will be undefined coming from the next state (e.g. you prev'd to arrive here)
       if (prevState) {
         if (prevState.name === "attendance") {
           input.each(function (participant) {
@@ -147,7 +147,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       }
     },
 
-    processBeforeRender: function () {
+    beforeRender: function () {
+      Common.States.GroupPlay.prototype.beforeRender.call(this);
       this.groupModel.get("group1").each(function (participant) {
         participant.set("role", "row");
         participant.get("partner").set("role", "col");
@@ -174,8 +175,10 @@ function(app, Common, Participant, StateApp, Graphs) {
       partner.set("score", partnerScore);
     },
 
-    processOutput: function () {
-            console.log("ROUND OUTPUTS", this.options.roundOutputs);
+    onExit: function () {
+      var result = Common.States.GroupPlay.prototype.onExit.call(this);
+
+      console.log("ROUND OUTPUTS", this.options.roundOutputs);
       this.groupModel.get("participants").each(function (participant, i) {
         // sum up total scores from rounds in this phase
         var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
@@ -184,6 +187,8 @@ function(app, Common, Participant, StateApp, Graphs) {
 
         participant.set("phaseTotal", phaseTotal);
       }, this);
+
+      return result;
     }
   });
 
@@ -225,7 +230,7 @@ function(app, Common, Participant, StateApp, Graphs) {
       });
     },
 
-    getOutput: function () {
+    onExit: function () {
       // save the phase results
       // console.log("ROUND OUTPUT", this.roundOutputs);
       this.lastOutput.get("participants").each(function (participant) {
@@ -250,7 +255,9 @@ function(app, Common, Participant, StateApp, Graphs) {
     view: "coin-matching::total-results",
     bucketAttribute: "total",
     bucket: true,
-    processBeforeRender: function (participant) {
+    beforeRender: function () {
+      Common.States.GroupResults.prototype.beforeRender.call(this);
+
       this.groupModel.get("participants").each(function (participant) {
         participant.set("total", 0);
         for (var i = 0; i < this.options.numPhases; i++) {

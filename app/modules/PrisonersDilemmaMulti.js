@@ -1,6 +1,6 @@
 /**
 
-	A simple grid app for displaying choices
+	Multiround prisoner's dilemma
 
 */
 define([
@@ -192,7 +192,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
       this.log("apps/pdm/results", { results: results, round: this.stateApp.round });
     },
 
-    getOutput: function () {
+    onExit: function () {
       return this.collection;
     }
   })

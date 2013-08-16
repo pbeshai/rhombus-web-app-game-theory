@@ -111,12 +111,13 @@ function(app, Common, Participant, StateApp) {
   }));
 
   // To be used in StateApps
-  Attendance.State = StateApp.State.extend({
+  Attendance.State = StateApp.ViewState.extend({
+    name: "attendance",
     // view: Attendance.Views.Participants,
     view: "attendance", // key in app.views map
 
-    initialize: function () {
-      this.options.viewOptions = {
+    viewOptions: function () {
+      return {
         participants: this.options.participants,
         acceptNew: this.options.acceptNew
       };
@@ -131,7 +132,7 @@ function(app, Common, Participant, StateApp) {
       }
     },
 
-    getOutput: function () {
+    onExit: function () {
       var presentParticipants = this.options.participants;
       var notHere = presentParticipants.filter(function (participant) {
         return participant.get("choice") == null;
@@ -142,7 +143,6 @@ function(app, Common, Participant, StateApp) {
       if (this.options.acceptNew && this.options.saveNew) {
         presentParticipants.saveNew();
       }
-
       return presentParticipants;
     }
   });

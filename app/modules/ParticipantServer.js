@@ -24,7 +24,6 @@ define([
 			enableChoices: "enable-choices",
 			disableChoices: "disable-choices",
 			status: "status",
-			instructor: "instructor"
 		},
 
 		// events we send across the websocket
