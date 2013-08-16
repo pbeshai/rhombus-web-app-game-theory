@@ -29,8 +29,6 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     },
     group1Name: "Givers",
     group2Name: "Receivers",
-    acceptChoice: "A", // choice a receiver makes to accept
-    rejectChoice: "B", // choice a receiver makes to reject
   };
 
   UltimatumGamePartitioned.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
@@ -138,6 +136,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   // To be used in StateApps
   UltimatumGamePartitioned.States = {};
   UltimatumGamePartitioned.States.GiverPlay = Common.States.GroupPlay.extend({
+    name: "giver-play",
     view: "ugp::giver-play",
 
     handleConfigure: function () {
@@ -158,14 +157,11 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   });
 
   UltimatumGamePartitioned.States.ReceiverPlay = Common.States.GroupPlay.extend({
+    name: "receiver-play",
     view: "ugp::receiver-play",
-
+    validChoices: ["A", "B"],
     handleConfigure: function () {
       this.render();
-    },
-
-    initialize: function () {
-      this.validChoices = [this.config.acceptChoice, this.config.rejectChoice];
     },
 
     handleConfigure: function () {
@@ -184,19 +180,22 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
       this.prepareParticipantOutput(participant);
       participant.set("complete", true);
     },
+  });
 
+  UltimatumGamePartitioned.States.Score = Common.States.GroupScore.extend({
     assignScoresGroup1: function () { },
 
     // assign score by iterating over receivers with this function
     assignScoreGroup2: function (receiver) {
       var giver = receiver.get("partner");
-      if (receiver.get("choice") === this.config.acceptChoice) {
+      if (receiver.get("choice") === "A") {
         receiver.set("score", receiver.get("offer"));
         giver.set("score", giver.get("keep"));
       } else {
         receiver.set("score", 0);
         giver.set("score", 0)
       }
+      console.log("set score to ", receiver.get("score"));
     },
   });
 

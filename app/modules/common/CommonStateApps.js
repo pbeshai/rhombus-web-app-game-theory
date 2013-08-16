@@ -10,6 +10,7 @@ function(app, StateApp, Attendance, Common) {
   CommonStateApps.BasicApp = StateApp.App.extend({
     stateOptions: undefined,
     States: null,
+    prepend: { attendance: true },
     attendanceOptions: {
       acceptNew: true,
       saveNew: false
@@ -36,7 +37,7 @@ function(app, StateApp, Attendance, Common) {
 
     definePrependStates: function () {
       // add in attendance unless false
-      if (this.attendanceOptions !== false) {
+      if (this.prepend.attendance) {
         var attendanceOptions = _.extend({ participants: this.get("participants") }, this.attendanceOptions)
         this.prependStates.push({ state: Attendance.State, options: attendanceOptions });
       }
@@ -56,18 +57,24 @@ function(app, StateApp, Attendance, Common) {
 
   // attendance -> play [-> play2 ... ]-> results
   CommonStateApps.BasicGame = CommonStateApps.BasicApp.extend({
-    partnerOptions: undefined, // set to false to disable partnering
-    botCheckOptions: undefined, // set to false to disable bot checking
+    partnerOptions: undefined,
+    botCheckOptions: undefined,
+    groupOptions: undefined,
+    prepend: { attendance: true, partner: true, botCheck: true, group: false },
 
     definePrependStates: function () {
       CommonStateApps.BasicApp.prototype.definePrependStates.call(this);
 
-      if (this.botCheckOptions !== false) {
+      if (this.prepend.botCheck) {
         this.prependStates.push({ state: Common.States.BotCheck, options: this.botCheckOptions });
       }
 
-      if (this.partnerOptions !== false) {
+      if (this.prepend.partner) {
         this.prependStates.push({ state: Common.States.Partner, options: this.partnerOptions });
+      }
+
+      if (this.prepend.group) {
+        this.prependStates.push({ state: Common.States.Group, options: this.groupOptions });
       }
     },
   });

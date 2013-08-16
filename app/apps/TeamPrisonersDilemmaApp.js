@@ -20,8 +20,8 @@ function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 	var TeamPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
 		version: "1.0",
 		config: TeamPrisonersDilemma.config,
-		PlayStates: [ TeamPrisonersDilemma.States.Play ],
-		ResultsState: TeamPrisonersDilemma.States.Results,
+		States: [ TeamPrisonersDilemma.States.Play, TeamPrisonersDilemma.States.Score, TeamPrisonersDilemma.States.Results ],
+		prepend: { attendance: true, botCheck: true, partner: false, group: true }
 	});
 
 	// description for use in router

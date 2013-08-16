@@ -23,8 +23,9 @@ function(app, StateApp, CommonStateApps, UltimatumGamePartitioned) {
 	var UltimatumGamePartitionedApp = CommonStateApps.BasicGame.extend({
 		version: "1.0",
 		config: UltimatumGamePartitioned.config,
-		PlayStates: [ UltimatumGamePartitioned.States.GiverPlay, UltimatumGamePartitioned.States.ReceiverPlay ],
-		ResultsState: UltimatumGamePartitioned.States.Results,
+		States: [ UltimatumGamePartitioned.States.GiverPlay, UltimatumGamePartitioned.States.ReceiverPlay,
+							UltimatumGamePartitioned.States.Score, UltimatumGamePartitioned.States.Results ],
+		prepend: { attendance: true, botCheck: true, partner: false, group: true }
 	});
 
 	// description for use in router

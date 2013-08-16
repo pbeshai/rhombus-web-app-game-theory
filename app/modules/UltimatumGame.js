@@ -27,8 +27,6 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
     group1Name: "Givers",
     group2Name: "Receivers",
-    acceptChoice: "A", // choice a receiver makes to accept
-    rejectChoice: "B", // choice a receiver makes to reject
   };
 
   UltimatumGame.Instructions = {};
@@ -46,10 +44,9 @@ function(app, Common, Participant, StateApp, Graphs) {
   });
   UltimatumGame.Instructions.ReceiverPlay = Common.Models.Instructions.extend({
     header: "Receiver Instructions",
-    configInit: function (config) {
-      var buttonConfig = this.attributes.buttonConfig = {};
-      buttonConfig[config.acceptChoice] = { description: "Accept offer" };
-      buttonConfig[config.rejectChoice] = { description: "Reject offer" };
+    buttonConfig: {
+      A: { description: "Accept offer" },
+      B: { description: "Reject offer" },
     }
   });
 
@@ -147,11 +144,7 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.States.ReceiverPlay = Common.States.Play.extend({
     name: "receiver-play",
     view: "ug::receiver-play",
-
-    initialize: function () {
-      Common.States.Play.prototype.initialize.call(this);
-      this.validChoices = [this.config.acceptChoice, this.config.rejectChoice];
-    },
+    validChoices: ["C", "D"],
 
     handleConfigure: function () {
       UltimatumGame.Util.assignOffers(this.participants,

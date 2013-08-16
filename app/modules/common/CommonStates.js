@@ -53,6 +53,26 @@ function(app, CommonModels, StateApp) {
     }
   });
 
+  // form groups out of the participants (default partners them across teams as well)
+  CommonStates.Group = StateApp.State.extend({
+    name: "group",
+    groupModelOptions: {
+      partnerUp: true
+    },
+
+    run: function () {
+      if (this.input instanceof CommonModels.GroupModel) { // already grouped; do nothing
+        return;
+      }
+
+      this.groupModel = new CommonModels.GroupModel({ participants: this.input }, this.groupModelOptions);
+    },
+
+    onExit: function () {
+      return this.groupModel;
+    }
+  })
+
   // score participants
   CommonStates.Score = StateApp.State.extend({
     name: "score",
@@ -68,6 +88,41 @@ function(app, CommonModels, StateApp) {
       var participants = this.input;
 
       this.assignScores(participants);
+    }
+  });
+
+  // score participants
+  CommonStates.GroupScore = StateApp.State.extend({
+    name: "group-score",
+    assignScore: function (participant) { // template method
+      participant.set("score", -94);
+    },
+
+    assignScoreGroup1: function (participant) {
+      this.assignScore(participant);
+    },
+
+    assignScoreGroup2: function (participant) {
+      this.assignScore(participant);
+    },
+
+    assignScoresGroup1: function (group1) {
+      group1.each(this.assignScoreGroup1, this);
+    },
+
+    assignScoresGroup2: function (group2) {
+      group2.each(this.assignScoreGroup2, this);
+    },
+
+    assignScores: function (groupModel) {
+      this.assignScoresGroup1(groupModel.get("group1"));
+      this.assignScoresGroup2(groupModel.get("group2"));
+    },
+
+    run: function () {
+      this.groupModel = this.input;
+
+      this.assignScores(this.groupModel);
     }
   });
 
@@ -148,7 +203,6 @@ function(app, CommonModels, StateApp) {
   CommonStates.GroupPlay = StateApp.ViewState.extend({
     name: "group-play",
     defaultChoice: "A",
-    groupModelOptions: { forceEven: true },
 
     prepareParticipant: function (participant) {
       participant.reset();
@@ -171,21 +225,16 @@ function(app, CommonModels, StateApp) {
       this.prepareParticipant(participant);
     },
 
-    beforeRenderGroup1: function() {
-      this.groupModel.get("group1").each(this.prepareParticipantGroup1, this);
+    beforeRenderGroup1: function(group1) {
+      group1.each(this.prepareParticipantGroup1, this);
     },
 
-    beforeRenderGroup2: function() {
-      this.groupModel.get("group2").each(this.prepareParticipantGroup2, this);
+    beforeRenderGroup2: function(group2) {
+      group2.each(this.prepareParticipantGroup2, this);
     },
 
     beforeRender: function () {
-      // could receive input as participant participants or as a group model (if returning from receive play)
-      if (this.input instanceof CommonModels.GroupModel) {
-        this.groupModel = this.input;
-      } else { // input is a participants, so create group model
-        this.groupModel = new CommonModels.GroupModel({ participants: this.input }, this.groupModelOptions);
-      }
+      this.groupModel = this.input // input must be a group model
 
       // listen for setting play
       this.stopListening();
@@ -197,8 +246,8 @@ function(app, CommonModels, StateApp) {
         }
       });
 
-      this.beforeRenderGroup1();
-      this.beforeRenderGroup2();
+      this.beforeRenderGroup1(this.groupModel.get("group1"));
+      this.beforeRenderGroup2(this.groupModel.get("group2"));
     },
 
     viewOptions: function () {
@@ -239,37 +288,10 @@ function(app, CommonModels, StateApp) {
       app.controller.appController.updateView({ config: this.config }, "Viewer1"); // TODO: "Viewer1"
     },
 
-    assignScore: function (participant) { // template method
-      participant.set("score", 0);
-    },
-
-    assignScoreGroup1: function (participant) {
-      this.assignScore(participant);
-    },
-
-    assignScoreGroup2: function (participant) {
-      this.assignScore(participant);
-    },
-
-    assignScores: function () {
-      this.assignScoresGroup1();
-      this.assignScoresGroup2();
-    },
-
-    assignScoresGroup1: function () {
-      this.groupModel.get("group1").each(this.assignScoreGroup1, this);
-    },
-
-    assignScoresGroup2: function () {
-      this.groupModel.get("group2").each(this.assignScoreGroup2, this);
-    },
-
     // outputs a GroupModel
     onExit: function () {
       this.prepareOutputGroup1();
       this.prepareOutputGroup2();
-
-      this.assignScores();
 
       return this.groupModel;
     }

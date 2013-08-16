@@ -77,11 +77,15 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   // To be used in StateApps
   TeamPrisonersDilemma.States = {};
+  TeamPrisonersDilemma.States.Group = Common.States.Group;
+
   TeamPrisonersDilemma.States.Play = Common.States.GroupPlay.extend({
     view: "teampd::play",
     defaultChoice: "C", // choice made when a player does not play
     validChoices: ["C", "D"],
+  });
 
+  TeamPrisonersDilemma.States.Score = Common.States.GroupScore.extend({
     assignScore: function (participant) {
       var pairChoices = participant.get("choice") + participant.get("partner").get("choice");
       participant.set({
