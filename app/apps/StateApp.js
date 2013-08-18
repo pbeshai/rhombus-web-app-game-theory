@@ -53,7 +53,7 @@ function(app) {
 		// enter the state
 		enter: function (input, prevState) {
 			if (debug) { console.log("[state:"+this.toString()+"] enter" + ((prevState !== undefined) ? " from " + prevState.toString() : "" )); }
-			var result = this.onEntry(input, prevState);
+			var result = this.onEntry(input || this.input, prevState);
 			if (result !== undefined) {
 				input = result;
 			}
@@ -352,7 +352,7 @@ function(app) {
 					return State.prototype.prevString.call(this);
 				}
 			}
-			var stateCounter = _.indexOf(this.states, this.currentState);
+			var stateCounter = _.indexOf(this.states, this.currentState) + 1;
 
 			var prevStateCounter = (stateCounter === 1) ? this.states.length : stateCounter - 1;
 			var prevRoundCounter = (stateCounter > prevStateCounter) ? this.roundCounter : this.roundCounter - 1;

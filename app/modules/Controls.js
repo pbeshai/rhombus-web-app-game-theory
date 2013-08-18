@@ -189,6 +189,10 @@ function(app, Clicker, Apps) {
               console.log("random votes");
               $(".random-votes").click();
               break;
+            case 52: // ctrl-4
+              console.log("random AB votes");
+              $(".random-votes-ab").click();
+              break;
           }
         }
       })

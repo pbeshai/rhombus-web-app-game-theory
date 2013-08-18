@@ -130,29 +130,13 @@ function(app, Common, Participant, StateApp, Graphs) {
     view: "coin-matching::play",
     defaultChoice: null,
     validChoices: ["A", "B", "C", "D"],
-    onEntry: function (input, prevState) { // TODO: this is probably broken now that "input" will be undefined coming from the next state (e.g. you prev'd to arrive here)
-      if (prevState) {
-        if (prevState.name === "attendance") {
-          input.each(function (participant) {
-            participant.set("total", 0);
-            participant.set("phaseTotal", 0);
-          });
-        } else if (prevState instanceof CoinMatching.States.PhaseResults
-          || prevState instanceof CoinMatching.States.TotalResults) {
-          input.get("participants").each(function (participant) {
-            participant.set("total", 0);
-            participant.set("phaseTotal", 0);
-          });
-        }
-      }
-    },
 
-    beforeRender: function () {
-      Common.States.GroupPlay.prototype.beforeRender.call(this);
-      this.groupModel.get("group1").each(function (participant) {
-        participant.set("role", "row");
-        participant.get("partner").set("role", "col");
-      });
+    // TODO: this only needs to be done once at the start of the game.
+    prepareParticipantGroup1: function (participant) {
+      this.prepareParticipant(participant);
+      console.log("assigning roles");
+      participant.set("role", "row");
+      participant.get("partner").set("role", "col");
     },
   });
 
@@ -196,8 +180,6 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   CoinMatching.States.Results = Common.States.GroupResults.extend({
     view: "coin-matching::results",
-    bucketAttribute: "score",
-    bucket: true,
 
     logResults: function () {
       // console.log("ROUND OUTPUTS",  this.options.roundOutputs);
@@ -216,7 +198,7 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   CoinMatching.States.Round = StateApp.RoundState.extend({
     name: "phase",
-    States: [ CoinMatching.States.Play, CoinMatching.States.Score, CoinMatching.States.Results ],
+    States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
     numRounds: CoinMatching.config.roundsPerPhase,
 
     // what is saved between each round
@@ -233,13 +215,10 @@ function(app, Common, Participant, StateApp, Graphs) {
       });
     },
 
-    onExit: function () {
-      // save the phase results
-      // console.log("ROUND OUTPUT", this.roundOutputs);
-      this.lastOutput.get("participants").each(function (participant) {
-        participant.set(this.name + "Total", participant.get("phaseTotal"));
-      }, this);
-      return this.lastOutput;
+    onEntry: function (input, prevState) {
+      input.get("participants").each(function (participant) {
+        participant.set({ "total": 0, "phaseTotal": 0});
+      });
     },
 
     handleConfigure: function () {
@@ -247,25 +226,39 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   });
 
+  CoinMatching.States.PhaseTotalBucket = Common.States.Bucket.extend({
+    bucketAttribute: "phaseTotal",
+    run: function () {
+      // assign phase total
+      var phaseNum = this.options.phase;
+      console.log("bucketing phase totals for phase " + phaseNum, this);
+      this.input.get("participants").each(function (p) {
+        p.set("phase" + phaseNum + "Total", p.get("phaseTotal"));
+      });
+
+      Common.States.Bucket.prototype.run.call(this);
+
+
+    }
+  });
+  CoinMatching.States.TotalBucket = Common.States.Bucket.extend({ bucketAttribute: "total" });
+
   CoinMatching.States.PhaseResults = Common.States.GroupResults.extend({
     name: "phase-results",
     view: "coin-matching::phase-results",
-    bucketAttribute: "phaseTotal",
-    bucket: true,
   });
 
   CoinMatching.States.TotalResults = Common.States.GroupResults.extend({
     name: "total-results",
     view: "coin-matching::total-results",
-    bucketAttribute: "total",
-    bucket: true,
+
     beforeRender: function () {
       Common.States.GroupResults.prototype.beforeRender.call(this);
 
       this.groupModel.get("participants").each(function (participant) {
         participant.set("total", 0);
         for (var i = 0; i < this.options.numPhases; i++) {
-          var phaseTotal = participant.get("phase" + (i + 1) + "Total");
+          var phaseTotal = participant.get("phase" + (i+1) + "Total");
           if (phaseTotal) {
             participant.set("total", participant.get("total") + phaseTotal);
           }

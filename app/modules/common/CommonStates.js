@@ -131,7 +131,12 @@ function(app, CommonModels, StateApp) {
   CommonStates.Bucket = StateApp.State.extend({
     name: "bucket",
     bucketAttribute: "score",
-    numBuckets: 2,
+    numBuckets: 6,
+
+    initialize: function () {
+      StateApp.State.prototype.initialize.apply(this, arguments);
+      this.name = this.name + ":" + this.bucketAttribute;
+    },
 
     run: function () {
       var participants = this.input;
