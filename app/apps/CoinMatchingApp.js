@@ -44,6 +44,7 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 						stateOptions:
 						[
 							{ viewOptions: { header: "Play Phase " + phaseNum } },
+							undefined, // score
 							{ viewOptions: { header: "Results Phase " + phaseNum } }
 						]
 					});

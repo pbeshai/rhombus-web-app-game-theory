@@ -191,15 +191,33 @@ function(app) {
 	var RoundState = ViewState.extend({
 		initialize: function () {
 			ViewState.prototype.initialize.apply(this, arguments);
-			this.stateCounter = 1;
-			this.roundCounter = 1;
-			this.currentState = null;
+			this.roundCounter = 0;
+			this.config.round = 0;
 			this.roundOutputs = [];
 			this.numRounds || (this.numRounds = 1);
+
+			this.stateCounter = 0;
+			this.currentState = null;
+
+			// initialize substates
+			this.states = [];
+			_.each(this.States, function (State, i) {
+				var state = new State(_.extend({
+					config: this.config,
+					roundOutputs: this.roundOutputs,
+				}, this.options.stateOptions[i]));
+
+				this.states.push(state);
+
+				// link the states
+				if (i > 0) {
+					state.setPrev(this.states[i - 1]);
+				}
+			}, this);
 		},
 
 		isFirstState: function () {
-			return this.stateCounter === 1;
+			return this.currentState === this.states[0];
 		},
 
 		isFirstRound: function () {
@@ -207,7 +225,7 @@ function(app) {
 		},
 
 		isLastState: function () {
-			return this.stateCounter === this.states.length;
+			return this.currentState === this.states[this.states.length - 1];
 		},
 
 		isLastRound: function () {
@@ -218,65 +236,81 @@ function(app) {
 		roundOutput: function (output) { },
 
 		next: function () {
-			this.currentState.beforeNext();
-			var output = this.lastOutput = this.currentState.exit();
-
 			if (this.isLastState()) {
-				// save the round output
-				this.roundOutputs[this.roundCounter - 1] = this.roundOutput(output);
+				this.endRound();
 
+				// final state, final round -> leave the round state
 				if (this.isLastRound()) {
 					return State.prototype.next.apply(this, arguments);
 				} else {
 					// start new round
-					this.stateCounter = 1;
-					this.roundCounter += 1;
-					this.config.round = this.roundCounter;
+					this.newRound(this.lastOutput);
 				}
-			} else {
-				this.stateCounter += 1;
+			} else { // not final state in round, so go to next
+				this.currentState = this.currentState.next();
 			}
 
-			this.enter(output, this.currentState);
 			return this;
 		},
 
 		prev: function () {
-			this.currentState.beforePrev();
 			if (this.isFirstState()) {
-				// erase round output from this round before leaving it
-				delete this.roundOutputs[this.roundCounter - 1];
+				this.undoEndRound();
 
+				// first state, first round -> leave the round state
 				if (this.isFirstRound()) {
 					return State.prototype.prev.apply(this, arguments);
 				} else {
-					// return to previous round
-					this.stateCounter = this.states.length;
-					this.roundCounter -= 1;
-					this.config.round = this.roundCounter;
+					this.undoNewRound();
 				}
 			} else {
-				this.stateCounter -= 1;
+				this.currentState = this.currentState.prev();
 			}
 
-			this.enter(this.currentState.exit(), this.currentState);
 			return this;
 		},
 
-		enter: function (input, prevState) {
-			var result = this.onEntry(input, prevState);
-			if (result) {
-				input = result;
+		// used when prev'ing into an old round
+		undoEndRound: function () {
+			// put lastOutput as the previous rounds output
+			this.lastOutput = this.roundOutputs[this.roundOutputs.length - 2]
+
+			if (this.roundOutputs.length) {
+				// delete the old round output
+				delete this.roundOutputs[this.roundOutputs.length - 1];
+				this.roundOutputs.length -= 1;
 			}
+		},
+
+		// after last state in round
+		endRound: function () {
+			// exit the final state
+			this.lastOutput = this.currentState.exit();
+
+			// save the round output
+			this.roundOutputs.push(this.roundOutput(this.lastOutput));
+		},
+
+		// used when prev'ing into an old round
+		undoNewRound: function () {
+			this.roundCounter -= 1;
 			this.config.round = this.roundCounter;
+			this.currentState = this.states[this.states.length - 1];
+			this.currentState.enter.call(this.currentState);
+		},
 
-			this.currentState = new this.states[this.stateCounter - 1](_.extend({
-				config: this.config,
-				roundOutputs: this.roundOutputs,
-			}, this.options.stateOptions[this.stateCounter - 1]));
-			this.currentState.enter.apply(this.currentState, arguments);
+		// start at first state of round
+		newRound: function (input) {
+			this.roundCounter += 1;
+			this.config.round = this.roundCounter;
+			this.currentState = this.states[0];
+			this.currentState.enter.call(this.currentState, input);
+		},
 
-			return this;
+		run: function () {
+			this.newRound(this.input);
+
+			return false; // do not automatically flow to next state
 		},
 
 		// delegate to current state
@@ -296,18 +330,19 @@ function(app) {
 					return State.prototype.nextString.call(this);
 				}
 			}
+			var stateCounter = _.indexOf(this.states, this.currentState) + 1;
 
-			var nextStateCounter = (this.stateCounter % this.states.length) + 1;
-			var nextRoundCounter = (this.stateCounter < nextStateCounter) ? this.roundCounter : this.roundCounter + 1;
+			var nextStateCounter = (stateCounter % this.states.length) + 1;
+			var nextRoundCounter = (stateCounter < nextStateCounter) ? this.roundCounter : this.roundCounter + 1;
 
-			var str = this.stateString(this.stateCounter, this.roundCounter)
+			var str = this.stateString(stateCounter, this.roundCounter)
 					+ " -> " + this.stateString(nextStateCounter, nextRoundCounter);
 
 			return str;
 		},
 
 		stateString: function (stateCounter, roundCounter) {
-			return this.id + "[" + roundCounter + "][" + stateCounter + "]";
+			return (this.name || this.id) + "[" + roundCounter + "][" + stateCounter + "] " + this.states[stateCounter - 1].toString();
 		},
 
 		// for debugging / logging
@@ -317,12 +352,13 @@ function(app) {
 					return State.prototype.prevString.call(this);
 				}
 			}
+			var stateCounter = _.indexOf(this.states, this.currentState);
 
-			var prevStateCounter = (this.stateCounter === 1) ? this.states.length : this.stateCounter - 1;
-			var prevRoundCounter = (this.stateCounter > prevStateCounter) ? this.roundCounter : this.roundCounter - 1;
+			var prevStateCounter = (stateCounter === 1) ? this.states.length : stateCounter - 1;
+			var prevRoundCounter = (stateCounter > prevStateCounter) ? this.roundCounter : this.roundCounter - 1;
 
 			var str = this.stateString(prevStateCounter, prevRoundCounter)
-					+ " <- " + this.stateString(this.stateCounter, this.roundCounter);
+					+ " <- " + this.stateString(stateCounter, this.roundCounter);
 
 			return str;
 		},

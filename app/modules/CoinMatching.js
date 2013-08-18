@@ -178,7 +178,7 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
 
     onExit: function () {
-      var result = Common.States.GroupPlay.prototype.onExit.call(this);
+      var result = Common.States.GroupScore.prototype.onExit.call(this);
 
       console.log("ROUND OUTPUTS", this.options.roundOutputs);
       this.groupModel.get("participants").each(function (participant, i) {
@@ -216,7 +216,7 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   CoinMatching.States.Round = StateApp.RoundState.extend({
     name: "phase",
-    states: [ CoinMatching.States.Play, CoinMatching.States.Score, CoinMatching.States.Results ],
+    States: [ CoinMatching.States.Play, CoinMatching.States.Score, CoinMatching.States.Results ],
     numRounds: CoinMatching.config.roundsPerPhase,
 
     // what is saved between each round
