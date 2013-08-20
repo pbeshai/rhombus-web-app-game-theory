@@ -13,6 +13,7 @@ define([
 	ParticipantServer.Model = Backbone.Model.extend({
 		defaults: {
 			connected: false,
+			ignoreChoices: false,
 			acceptingChoices: false // whether submitting choices is enabled
 		},
 
@@ -65,12 +66,21 @@ define([
 			if (groupedData.instructor) {
 				this.trigger(this.clientEvents.instructor, groupedData.instructor);
 			}
-			if (groupedData.choices) {
+			console.log("ignoreChoices", this.get("ignoreChoices"), "_ignoring", this._ignoring);
+			if (groupedData.choices && !this.get("ignoreChoices") && !this._ignoring) {
 				this.trigger(this.clientEvents.choiceData, { choices: groupedData.choices });
 			}
 
 			// we handle the trigger here, so abort
 			return false;
+		},
+
+		ignoreChoices: function () { // can be used to discard choice as they come in without triggering them
+			this.set("ignoreChoices", true);
+		},
+
+		stopIgnoringChoices: function () {
+			this.set("ignoreChoices", false);
 		},
 
 	  connectCallback: function (data) {
@@ -81,8 +91,16 @@ define([
 			this.set("acceptingChoices", data);
 		},
 
+		disableChoices: function () {
+			console.log("disabling choices");
+			// set internal flag to immediately start rejecting choices until they are stopped at the server
+			this._ignoring = true;
+			this.socket.emit(this.socketEvents.disableChoices);
+		},
+
 		disableChoicesCallback: function (data) {
 			this.set("acceptingChoices", !data);
+			this._ignoring = false; // unset internal ignoring flag
 		},
 
 		statusCallback: function (data) {

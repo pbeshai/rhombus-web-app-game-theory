@@ -68,7 +68,7 @@ function(app, Participant, StateApp) {
     view: "grid",
 
     viewOptions: function () {
-      return { participants: this.input || this.options.participants }
+      return { participants: this.input.participants || this.options.participants }
     },
   });
 

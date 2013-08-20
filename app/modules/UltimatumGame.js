@@ -117,7 +117,6 @@ function(app, Common, Participant, StateApp, Graphs) {
       var keep = amount - offer;
       giver.set("keep", keep); // amount kept
       giver.get("partner").set("offer", offerMap[giver.get("choice")]); // amount given away
-      giver.set("complete", true);
     }, this);
   };
 

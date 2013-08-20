@@ -13,7 +13,7 @@ define([
 ],
 
 function(app, Participant, StateApp) {
-
+  var debug = false;
   var Clicker = app.module();
 
   // TODO: clean this up
@@ -63,7 +63,7 @@ function(app, Participant, StateApp) {
 
     choose: function (choice) {
       if (this.enabled) {
-        console.log(this.id + " chooses " + choice);
+        if (debug) { console.log(this.id + " chooses " + choice); }
         app.controller.participantServer.submitChoice(this.id, choice);
       }
     },

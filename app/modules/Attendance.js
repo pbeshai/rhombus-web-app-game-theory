@@ -143,7 +143,7 @@ function(app, Common, Participant, StateApp) {
       if (this.options.acceptNew && this.options.saveNew) {
         presentParticipants.saveNew();
       }
-      return presentParticipants;
+      return new StateApp.StateMessage({ participants: presentParticipants });
     }
   });
 

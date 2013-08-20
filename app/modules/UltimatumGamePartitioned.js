@@ -38,9 +38,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   UltimatumGamePartitioned.Views.GiverPlay = {};
 
   UltimatumGamePartitioned.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay;
-  UltimatumGamePartitioned.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay.extend({
-    locked: true
-  });
+  UltimatumGamePartitioned.Views.GiverPlay.Receiver = Common.Views.ParticipantHiddenPlay;
 
   UltimatumGamePartitioned.Views.PreGroups = Backbone.View.extend({
     template: "ultimatum/pre_participants",
@@ -65,7 +63,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   UltimatumGamePartitioned.Views.ReceiverPlay = {};
 
   UltimatumGamePartitioned.Views.ReceiverPlay.Giver = Common.Views.ParticipantHiddenPlay.extend({
-    locked: true
+    // locked: true
   });
 
   UltimatumGamePartitioned.Views.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
@@ -128,7 +126,6 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
       var keep = amount - offer;
       giver.set("keep", keep); // amount kept
       giver.get("partner").set("offer", offerMap[giver.get("choice")]); // amount given away
-      giver.set("complete", true);
     }, this);
   };
 
@@ -138,6 +135,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   UltimatumGamePartitioned.States.GiverPlay = Common.States.GroupPlay.extend({
     name: "giver-play",
     view: "ugp::giver-play",
+    validChoices: { group2: [] }, // group1 can do anything, group2 nothing
 
     handleConfigure: function () {
       this.render();
@@ -159,7 +157,8 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
   UltimatumGamePartitioned.States.ReceiverPlay = Common.States.GroupPlay.extend({
     name: "receiver-play",
     view: "ugp::receiver-play",
-    validChoices: ["A", "B"],
+    validChoices: { group1: [], group2: ["A", "B"] },
+
     handleConfigure: function () {
       this.render();
     },
@@ -169,17 +168,13 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         this.config.amount, this.config.offerMap);
     },
 
-    // do not reset or prepare group1, but prepare group2 as normal
-    beforeRenderGroup1: function () { },
+    prepareParticipantGroup1: function (participant) {
+      Common.States.GroupPlay.prototype.prepareParticipantGroup1.apply(this, arguments);
+      participant.set("played", true);
+    },
 
     // do not modify group 1
     prepareOutputGroup1: function () { },
-
-    // set complete to true on group2 participants
-    prepareParticipantOutputGroup2: function (participant) {
-      this.prepareParticipantOutput(participant);
-      participant.set("complete", true);
-    },
   });
 
   UltimatumGamePartitioned.States.Score = Common.States.GroupScore.extend({
@@ -195,7 +190,6 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         receiver.set("score", 0);
         giver.set("score", 0)
       }
-      console.log("set score to ", receiver.get("score"));
     },
   });
 

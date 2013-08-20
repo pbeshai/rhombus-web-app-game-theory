@@ -178,20 +178,19 @@ function(app, Clicker, Apps) {
         if (evt.ctrlKey) {
           switch (evt.which) {
             case 49: // ctrl-1
-              console.log("prev state");
               $(".prev-state").click();
               break;
             case 50: // ctrl-2
-              console.log("next state");
               $(".next-state").click();
               break;
             case 51: // ctrl-3
-              console.log("random votes");
               $(".random-votes").click();
               break;
             case 52: // ctrl-4
-              console.log("random AB votes");
               $(".random-votes-ab").click();
+              break;
+            case 53: // ctrl-5
+              $(".random-votes-cd").click();
               break;
           }
         }

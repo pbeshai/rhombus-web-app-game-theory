@@ -50,6 +50,14 @@ function(app, ParticipantServer, AppController, Common, Participant) {
         app.controller.appController.updateView({ participants: participants }, "Viewer1");
         this.clearBuffer();
       }
+    },
+
+    ignoreChanges: function () {
+      this.ignore = true;
+    },
+
+    stopIgnoringChanges: function () {
+      this.ignore = false;
     }
   });
 

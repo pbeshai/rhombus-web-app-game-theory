@@ -34,7 +34,7 @@ function (app, Grid) {
     }
   });
 
-  CommonViews.ParticipantPlay = Backbone.View.extend({
+  CommonViews.ParticipantPlay = app.BaseView.extend({
     template: "common/participant_play",
     className: "participant player",
     playedClass: "played",
@@ -53,10 +53,14 @@ function (app, Grid) {
     },
 
     afterRender: function () {
-      var played = this.model.get("played"), complete = this.model.get("complete");
-      if (played && !complete) {
+      var played = this.model.get("played");
+
+      // fade in if at least second render and the participant has played
+      if (!this.initialRender && played) {
         this.$(".played-text").hide().delay(200).fadeIn(400);
       }
+
+      app.BaseView.prototype.afterRender.call(this);
     },
 
     safeRender: function () {
@@ -66,6 +70,7 @@ function (app, Grid) {
     },
 
     initialize: function (options) {
+      app.BaseView.prototype.initialize.apply(this, arguments);
       handleOptions(this, options);
       this.listenTo(this.model, "change", this.safeRender);
     }
@@ -75,10 +80,14 @@ function (app, Grid) {
     template: "common/participant_hidden_play",
 
     afterRender: function () {
-      var played = this.model.get("played"), complete = this.model.get("complete");
-      if (played && !complete) {
+      var played = this.model.get("played")
+
+      // fade in if at least second render and the participant has played
+      if (!this.initialRender && played) {
         this.$(".medium-text").hide().delay(200).fadeIn(400);
       }
+
+      app.BaseView.prototype.afterRender.call(this);
     },
   });
 

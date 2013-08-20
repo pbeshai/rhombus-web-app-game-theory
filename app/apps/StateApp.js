@@ -9,7 +9,23 @@ define([
 ],
 
 function(app) {
-	var debug = true;
+	var debug = false;
+
+	// object to be used for passing data between states (onEntry this.input and the output of exit)
+	var StateMessage = function (data) {
+		_.extend(this, data);
+	};
+	StateMessage.prototype.clone = function (newData) {
+		var data = _.clone(this);
+		for (key in data) {
+			if (!this.hasOwnProperty(key)) {
+				delete data[key];
+			}
+		}
+		data = _.extend(data, newData);
+		return new StateMessage(data);
+	}
+	window.StateMessage = StateMessage;
 
 	// define the State prototype object
 	var State = function (options, stateApp) {
@@ -62,7 +78,6 @@ function(app) {
 			}
 
 			var autoFlow = this.run();
-			console.log("autoflow is ", autoFlow, this.flow);
 			if (autoFlow !== false) {
 				if (prevState === this.flow.next) {
 					return this.prev();
@@ -78,14 +93,20 @@ function(app) {
 
 		exit: function () {
 			if (debug) { console.log("[state:"+this.toString()+"] exit"); }
+
+			// ignore changes before exiting, since new state will be coming on which will
+			// interpret changes and load a view with the updates
+			app.controller.participantUpdater.ignoreChanges();
+
 			var output = this.onExit() || this.input;
+
+			app.controller.participantUpdater.stopIgnoringChanges();
+
 			return output;
 		},
 
 		onExit: function () {  }, // this can return a value to modify the output (default is the input)
 
-		beforeNext: function () { },
-		beforePrev: function () { },
 		validateNext: function () { return true; },
 		validatePrev: function () { return true; },
 
@@ -94,7 +115,6 @@ function(app) {
 			if (!this.validateNext()) {
 				return false;
 			}
-			this.beforeNext();
 
 			if (this.flow.next) {
 				return this.flow.next.enter(this.exit(), this);
@@ -107,8 +127,6 @@ function(app) {
 			if (!this.validatePrev()) {
 				return false;
 			}
-
-			this.beforePrev();
 
 			if (this.flow.prev) {
 				return this.flow.prev.enter(undefined, this);
@@ -170,12 +188,12 @@ function(app) {
 
 		render: function () {
 			// ignore any changes up until render since we will call loadView with the current set of participants
-			app.controller.participantUpdater.ignore = true;
+			app.controller.participantUpdater.ignoreChanges();
 			this.beforeRender();
 			this.setViewOptions();
 			this._render();
 
-			app.controller.participantUpdater.ignore = false;
+			app.controller.participantUpdater.stopIgnoringChanges();
 			this.afterRender();
 		},
 
@@ -191,21 +209,19 @@ function(app) {
 	var RoundState = ViewState.extend({
 		initialize: function () {
 			ViewState.prototype.initialize.apply(this, arguments);
-			this.roundCounter = 0;
-			this.config.round = 0;
-			this.roundOutputs = [];
-			this.numRounds || (this.numRounds = 1);
-
-			this.stateCounter = 0;
-			this.currentState = null;
+			this.reset();
 
 			// initialize substates
 			this.states = [];
 			_.each(this.States, function (State, i) {
+				var stateOptions;
+				if (this.options.stateOptions) {
+					stateOptions = this.options.stateOptions[i];
+				}
 				var state = new State(_.extend({
 					config: this.config,
 					roundOutputs: this.roundOutputs,
-				}, this.options.stateOptions[i]));
+				}, stateOptions));
 
 				this.states.push(state);
 
@@ -244,6 +260,7 @@ function(app) {
 					return State.prototype.next.apply(this, arguments);
 				} else {
 					// start new round
+
 					this.newRound(this.lastOutput);
 				}
 			} else { // not final state in round, so go to next
@@ -307,7 +324,16 @@ function(app) {
 			this.currentState.enter.call(this.currentState, input);
 		},
 
+		reset: function () {
+			this.roundCounter = 0;
+			this.config.round = 0;
+			this.roundOutputs = [];
+			this.stateCounter = 0;
+			this.currentState = null;
+		},
+
 		run: function () {
+			this.reset();
 			this.newRound(this.input);
 
 			return false; // do not automatically flow to next state
@@ -320,7 +346,7 @@ function(app) {
 
 
 		onExit: function () {
-			return this.currentState.exit();
+			return this.currentState.exit().clone({ roundOutputs: this.roundOutputs });
 		},
 
 		// for debugging / logging
@@ -406,19 +432,23 @@ function(app) {
 		},
 
 		next: function () {
+			app.controller.participantServer.ignoreChoices();
       console.log("Next State:" + this.get("currentState").nextString());
 			var result = this.get("currentState").next();
 			if (result) { // only update current state if we reached a state (not null/undefined)
 				this.set("currentState", result);
 			}
+			app.controller.participantServer.stopIgnoringChoices();
 		},
 
 		prev: function () {
+			app.controller.participantServer.ignoreChoices();
 			console.log("Prev State:" + this.get("currentState").prevString());
 			var result = this.get("currentState").prev();
 			if (result) {
 				this.set("currentState", result);
 			}
+			app.controller.participantServer.stopIgnoringChoices();
 		},
 
 		configure: function (config) {
@@ -435,6 +465,7 @@ function(app) {
 
 	return {
 		State: State,
+		StateMessage: StateMessage,
 		ViewState: ViewState,
 		RoundState: RoundState,
 		App: StateApp,

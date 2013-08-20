@@ -13,40 +13,20 @@ define([
 
   "apps/StateApp",
 
-  "modules/Participant",
-  "modules/Attendance",
-  "modules/PrisonersDilemma",
+  "modules/common/CommonStateApps",
   "modules/PrisonersDilemmaMulti"
 ],
 
-function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDilemmaMulti) {
-	var PrisonersDilemmaMultiApp = StateApp.App.extend({
+function(app, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
+	var PrisonersDilemmaMultiApp = CommonStateApps.BasicGame.extend({
 		version: "1.0",
 		config: PrisonersDilemmaMulti.config,
+		States: [ PrisonersDilemmaMulti.States.Round ]
 
-		defineStates: function () {
-			var attendanceState = new Attendance.State({
-				participants: this.options.participants,
-				acceptNew: true,
-				saveNew: false
-			});
+	});
 
-			var playState = new PrisonersDilemmaMulti.States.Play({
-				config: this.config
-			});
-			var resultsState = new PrisonersDilemmaMulti.States.Results({
-				config: this.config
-			});
-
-			this.states = {
-		  	"attendance": attendanceState,
-		  	"play": playState,
-		  	"results": resultsState
-	  	};
-
-			attendanceState.setNext(playState);
-			playState.setNext(resultsState);
-		},
+/*
+	var old = {
 
 		transitions: {
 	  		attendance_play: function (output) {
@@ -71,10 +51,6 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 					this.config.newRound = true;
 
 		      // return output;
-	  		},
-
-	  		play_attendance: function () {
-				  this.options.participants.fetch(); // reset the participants that attendance uses
 	  		},
 
 	  		play_results: function () {
@@ -103,12 +79,12 @@ function(app, StateApp, Participant, Attendance, PrisonersDilemma, PrisonersDile
 	  			}
 	  		}
 		}
-	});
-
+	};
+*/
 	// description for use in router
 	PrisonersDilemmaMultiApp.app = {
-		instantiate: function (router) {
-			return new PrisonersDilemmaMultiApp({ participants: router.participants });
+		instantiate: function (options) {
+			return new PrisonersDilemmaMultiApp(options);
 		},
 		configView: PrisonersDilemmaMulti.Views.Configure,
 		title: "Multiround Prisoner's Dilemma"

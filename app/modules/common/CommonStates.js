@@ -21,8 +21,9 @@ function(app, CommonModels, StateApp) {
       activeRules: [ "at-least-two", "even" ],
     },
 
-    run: function () {
-      var participants = this.input;
+    // add bot on exit, so it only happens when going to next state, not back to prev
+    onExit: function () {
+      var participants = this.input.participants;
 
       var botsRequired = _.some(this.options.activeRules, function (rule) {
         var result = this.rules[rule](participants);
@@ -42,8 +43,9 @@ function(app, CommonModels, StateApp) {
       symmetric: true,
     },
 
-    run: function () {
-      var participants = this.input;
+    // assign partners on exit, so it only happens when going to next state, not back to prev
+    onExit: function () {
+      var participants = this.input.participants;
 
       if (this.options.symmetric) {
         participants.pairModels();
@@ -60,16 +62,15 @@ function(app, CommonModels, StateApp) {
       partnerUp: true
     },
 
-    run: function () {
-      if (this.input instanceof CommonModels.GroupModel) { // already grouped; do nothing
+    // assign groups on exit, so it only happens when going to next state, not back to prev
+    onExit: function () {
+      if (this.input.groupModel) { // already grouped; do nothing
         return;
       }
 
-      this.groupModel = new CommonModels.GroupModel({ participants: this.input }, this.groupModelOptions);
-    },
+      var groupModel = new CommonModels.GroupModel({ participants: this.input.participants }, this.groupModelOptions);
 
-    onExit: function () {
-      return this.groupModel;
+      return new StateApp.StateMessage({ groupModel: groupModel });
     }
   })
 
@@ -84,8 +85,9 @@ function(app, CommonModels, StateApp) {
       participants.each(this.assignScore, this);
     },
 
-    run: function () {
-      var participants = this.input;
+    // assign scores on exit, so it only happens when going to next state, not back to prev
+    onExit: function () {
+      var participants = this.input.participants;
 
       this.assignScores(participants);
     }
@@ -119,9 +121,9 @@ function(app, CommonModels, StateApp) {
       this.assignScoresGroup2(groupModel.get("group2"));
     },
 
-    run: function () {
-      this.groupModel = this.input;
-
+    // assign scores on exit, so it only happens when going to next state, not back to prev
+    onExit: function () {
+      this.groupModel = this.input.groupModel;
       this.assignScores(this.groupModel);
     }
   });
@@ -138,10 +140,11 @@ function(app, CommonModels, StateApp) {
       this.name = this.name + ":" + this.bucketAttribute;
     },
 
-    run: function () {
-      var participants = this.input;
-      if (participants instanceof CommonModels.GroupModel) {
-        participants = participants.get("participants");
+    // assign buckets on exit, so it only happens when going to next state, not back to prev
+    onExit: function () {
+      var participants = this.input.participants;
+      if (this.input.groupModel) {
+        participants = this.input.groupModel.get("participants");
       }
 
       participants.bucket(this.bucketAttribute, this.numBuckets);
@@ -169,16 +172,12 @@ function(app, CommonModels, StateApp) {
 
     // this.input is a participant participants.
     beforeRender: function () {
-      var participants = this.participants = this.input;
+      var participants = this.participants = this.input.participants;
 
       // listen for setting play
       this.stopListening();
       this.listenTo(participants, "change:choice", function (participant, choice) {
         participant.set("played", choice != null);
-
-        if (participant.get("complete")) { // only update choice if it isn't complete.
-          participant.attributes.choice = participant.previous("choice");
-        }
       });
 
       // reset played and choices
@@ -201,7 +200,7 @@ function(app, CommonModels, StateApp) {
         }
       }, this);
 
-      return this.participants;
+      return new StateApp.StateMessage({ participants: this.participants });
     }
   });
 
@@ -209,12 +208,18 @@ function(app, CommonModels, StateApp) {
     name: "group-play",
     defaultChoice: "A",
 
-    prepareParticipant: function (participant) {
+    initialize: function () {
+      StateApp.ViewState.prototype.initialize.call(this);
+      if (_.isArray(this.validChoices)) {
+        this.validChoices = { group1: this.validChoices, group2: this.validChoices };
+      }
+    },
+
+    prepareParticipant: function (participant, group) {
       participant.reset();
 
-
       if (this.validChoices) {
-        participant.set("validChoices", this.validChoices);
+        participant.set("validChoices", this.validChoices[group]);
       }
 
       if (participant.bot) {
@@ -223,11 +228,11 @@ function(app, CommonModels, StateApp) {
     },
 
     prepareParticipantGroup1: function (participant) {
-      this.prepareParticipant(participant);
+      this.prepareParticipant(participant, "group1");
     },
 
     prepareParticipantGroup2: function (participant) {
-      this.prepareParticipant(participant);
+      this.prepareParticipant(participant, "group2");
     },
 
     beforeRenderGroup1: function(group1) {
@@ -239,16 +244,12 @@ function(app, CommonModels, StateApp) {
     },
 
     beforeRender: function () {
-      this.groupModel = this.input // input must be a group model
+      this.groupModel = this.input.groupModel // input must be a group model
 
       // listen for setting play
       this.stopListening();
       this.listenTo(this.groupModel.get("participants"), "change:choice", function (participant, choice) {
         participant.set("played", choice != null);
-
-        if (participant.get("complete")) { // only update choice if it isn't complete.
-          participant.attributes.choice = participant.previous("choice");
-        }
       });
 
       this.beforeRenderGroup1(this.groupModel.get("group1"));
@@ -298,7 +299,7 @@ function(app, CommonModels, StateApp) {
       this.prepareOutputGroup1();
       this.prepareOutputGroup2();
 
-      return this.groupModel;
+      return new StateApp.StateMessage({ groupModel: this.groupModel });
     }
   });
 
@@ -306,7 +307,7 @@ function(app, CommonModels, StateApp) {
     name: "results",
     beforeRender: function () {
       // this.input is a participant collection
-      this.participants = this.input;
+      this.participants = this.input.participants;
     },
 
     afterRender: function () {
@@ -327,7 +328,7 @@ function(app, CommonModels, StateApp) {
     logResults: function () { }, // template method
 
     onExit: function () {
-      return this.participants;
+      return new StateApp.StateMessage({ participants: this.participants });
     }
   });
 
@@ -335,7 +336,7 @@ function(app, CommonModels, StateApp) {
     name: "group-results",
     beforeRender: function () {
       // this.input is a GroupModel
-      this.groupModel = this.input;
+      this.groupModel = this.input.groupModel;
     },
 
     afterRender: function () {
@@ -360,7 +361,7 @@ function(app, CommonModels, StateApp) {
     logResults: function () { }, // template method
 
     onExit: function () {
-      return this.groupModel;
+      return new StateApp.StateMessage({ groupModel: this.groupModel });
     }
   });
 

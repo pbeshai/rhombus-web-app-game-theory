@@ -18,8 +18,7 @@ function(app) {
     defaults: {
       "choice": null,
       "played": false,
-      "complete": false,
-      "validChoices": [ "A", "B", "C", "D", "E" ] // if null, all choices are accepted
+      "validChoices": null // if null, all choices are accepted
     },
 
     toJSON: function () {
@@ -51,7 +50,6 @@ function(app) {
 
       if (attrs.choice != null && this.get("validChoices") != null && !_.contains(this.get("validChoices"), attrs.choice)) {
         var msg = "invalid choice " + attrs.choice + ", valid choices are " + this.get("validChoices").join(", ");
-        console.log(msg);
         return msg;
       }
     }
@@ -110,11 +108,6 @@ function(app) {
     defaults: {
       acceptNew: false, // if true, users when data is received for users not in the collection, they are added
       validateOnChoice: true,
-    },
-
-    fetchTODO : function () {
-      console.log("fetching participants ...");
-      Backbone.Collection.prototype.fetch.call(this, { success: function () { console.log("fetch complete."); }});
     },
 
   	initialize: function (models, options) {

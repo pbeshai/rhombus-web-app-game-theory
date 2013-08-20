@@ -122,7 +122,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         }
       }, this);
 
-      models.payoff = {
+      this.payoff = {
         cooperatorPayoff: cooperatorPayoff,
         numCooperators: numCooperators,
         defectorPayoff: defectorPayoff,
@@ -131,6 +131,11 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         maxPayoff: maxPayoff
       };
     },
+
+    onExit: function () {
+      Common.States.Score.prototype.onExit.call(this);
+      return this.input.clone({ payoff: this.payoff });
+    }
   });
 
   NPrisonersDilemma.States.Results = Common.States.Results.extend({
@@ -138,7 +143,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
     beforeRender: function () {
       Common.States.Results.prototype.beforeRender.call(this);
-      this.payoff = this.participants.payoff;
+      console.log("input", this.input);
+      this.payoff = this.input.payoff;
     },
 
     viewOptions: function () {
