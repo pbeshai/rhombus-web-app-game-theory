@@ -66,7 +66,6 @@ define([
 			if (groupedData.instructor) {
 				this.trigger(this.clientEvents.instructor, groupedData.instructor);
 			}
-			console.log("ignoreChoices", this.get("ignoreChoices"), "_ignoring", this._ignoring);
 			if (groupedData.choices && !this.get("ignoreChoices") && !this._ignoring) {
 				this.trigger(this.clientEvents.choiceData, { choices: groupedData.choices });
 			}
@@ -92,7 +91,6 @@ define([
 		},
 
 		disableChoices: function () {
-			console.log("disabling choices");
 			// set internal flag to immediately start rejecting choices until they are stopped at the server
 			this._ignoring = true;
 			this.socket.emit(this.socketEvents.disableChoices);

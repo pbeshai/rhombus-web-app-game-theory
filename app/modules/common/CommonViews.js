@@ -179,6 +179,7 @@ function (app, Grid) {
     ParticipantsView: CommonViews.ParticipantsGrid,
     PreParticipantsView: null,
     PostParticipantsView: null,
+    PreHeaderView: null,
     InstructionsModel: null,
 
     serialize: function () {
@@ -192,6 +193,10 @@ function (app, Grid) {
       var viewOptions = _.extend({
         participants: this.participants
       }, this.options);
+
+      if (this.PreHeaderView != null) {
+        this.insertView(".pre-header", new this.PreHeaderView(viewOptions));
+      }
 
       if (this.ParticipantView != null) {
         this.insertView(".participants", new this.ParticipantsView(_.extend({

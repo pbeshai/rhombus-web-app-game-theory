@@ -56,8 +56,8 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   })
 
-  PrisonersDilemma.Views.Results.Stats = app.BaseView.extend({
-    template: "pd/results/stats",
+  PrisonersDilemma.Views.Results.BarChart = app.BaseView.extend({
+    template: "common/chart",
 
     tooltipTemplate: '<h3><%= label %></h3>'
       + '<div class="value"><span class="value"><%= value.toFixed(1) %></span> '
@@ -65,104 +65,16 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
       + '</div>'
       + '<div class="count"><%= count %> <% if (count === 1) { print("person") } else { print("people") } %></div>',
 
-    calculateStatsFromHistory: function () {
-      if (this.participants.at(0).get("history") == null) return null;
-
-      var histories = this.participants.map(function (model) { return model.get("history"); });
-      var historySize = (histories[0] == null) ? 0 : histories[0].length;
-      var byRound = _.zip.apply(this, histories);
-
-      var stats = _.map(byRound, function (roundData) {
-        var groups = group(roundData);
-        var count = roundData.length;
-        var round = roundData[0].round;
-
-        return {
-          round: round,
-          cooperate: {
-            count: groups.cooperate.length,
-            average: average(groups.cooperate)
-          },
-          defect: {
-            count: groups.defect.length,
-            average: average(groups.defect)
-          },
-          total: {
-            count: roundData.length,
-            average: average(roundData)
-          }
-        };
-      });
-
-      function group(roundData) {
-        var groups = _.groupBy(roundData, function (data) { return data.pairChoices[0] === "D" ? "defect" : "cooperate"; });
-        groups.cooperate || (groups.cooperate = []);
-        groups.defect || (groups.defect = []);
-
-        return groups;
-      }
-
-      function average(roundData) {
-        if (roundData.length === 0) return 0; // avoid division by 0
-        return _.reduce(roundData, function (memo, data) { return memo + data.score; }, 0) / roundData.length;
-      }
-
-      return stats;
-    },
-
-    calculateStatsFromChoice: function () {
-      // models partitioned by choice
-      var groups = this.participants.groupBy(function (model) { return model.get("choice") === "D" ? "defect" : "cooperate"; });
-      groups.cooperate || (groups.cooperate = []);
-      groups.defect || (groups.defect = []);
-
-      function average(modelsArray) {
-        if (modelsArray.length === 0) return 0; // avoid division by 0
-        return _.reduce(modelsArray, function(memo, model) { return memo + model.get("score"); }, 0) / modelsArray.length;
-      }
-
-      return {
-        cooperate: {
-          count: groups.cooperate.length,
-          average: average(groups.cooperate)
-        },
-        defect: {
-          count: groups.defect.length,
-          average: average(groups.defect)
-        },
-        total: {
-          count: this.participants.length,
-          average: average(this.participants.models)
-        }
-      }
-    },
-
-    calculateStats: function () {
-      var stats = this.calculateStatsFromHistory();
-      if (stats == null) { // backwards compatibility
-        stats = [this.calculateStatsFromChoice()];
-      }
-      return stats;
-    },
-
-    beforeRender: function () {
-      this.stats = this.calculateStats();
-    },
-
     serialize: function () {
-      return this.stats;
+      return this.options.stats;
     },
 
     afterRender: function () {
-      if (this.stats.length > 1) {
-        this.renderTimeSeries();
-      } else {
-        this.renderBarChart();
-      }
+      this.renderBarChart();
     },
 
     renderBarChart: function () {
-      var stats = this.stats[0];
+      var stats = this.options.stats;
       var chartData = [ {
           label: "C - Cooperated",
           value: stats.cooperate.average,
@@ -173,7 +85,6 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
           count: stats.defect.count
         }
       ];
-
 
       var chart = variableWidthBarChart()
         .tooltip(_.template(this.tooltipTemplate), {
@@ -189,61 +100,17 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
       d3.select(".chart .chart-data").datum([stats.total.average]).call(avgLine);
     },
+  });
 
-    renderTimeSeries: function () {
-      var numRounds = this.stats.length;
-      var cooperateData = _.pluck(this.stats, "cooperate");
-      var defectData = _.pluck(this.stats, "defect");
-
-      function formatData(data) {
-        return _.map(data, function (elem, i) {
-          return {
-            x: i+1,
-            y: elem.average,
-            aux: elem.count + " people",
-          };
-        });
-      }
-
-      var timeSeries = Graphs.createTimeSeries(this, {
-        graph: {
-          element: this.$(".chart")[0],
-          interpolation: "linear",
-          series: [
-            {
-              data: formatData(cooperateData),
-              name: 'Cooperated',
-              className: "cooperated"
-            }, {
-              data: formatData(defectData),
-              name: 'Defected',
-              className: "defected"
-            },
-          ]
-        },
-        xAxis: {
-          ticks: numRounds,
-          tickFormat: function(n) {
-            if (Math.floor(n) === n) {
-              return "Round " + n;
-            }
-          }
-        },
-        yAxis: {
-          ticks: 5
-        },
-
-        hover: {
-          xFormatter: function (n) { return "Round " + n; }
-        }
-      });
-    },
+  PrisonersDilemma.Views.Results.Legend = Backbone.View.extend({
+    template: "pd/results/legend"
   });
 
   PrisonersDilemma.Views.Results.Layout = app.registerView("pd::results", Common.Views.SimpleLayout.extend({
     header: "Results",
+    PreHeaderView: PrisonersDilemma.Views.Results.Legend,
     ParticipantView: PrisonersDilemma.Views.Results.Participant,
-    PostParticipantsView: PrisonersDilemma.Views.Results.Stats
+    PostParticipantsView: PrisonersDilemma.Views.Results.BarChart
   }));
 
   PrisonersDilemma.Views.Configure = Backbone.View.extend({
@@ -283,18 +150,64 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
         "pairChoices": pairChoices
       });
     },
-  })
+  });
+
+  PrisonersDilemma.States.Stats = StateApp.State.extend({
+    onExit: function () {
+      var result = StateApp.State.prototype.onExit.call(this) || this.input;
+      var results = this.input.participants.map(PrisonersDilemma.Util.participantResults);
+      var stats = this.calculateStats(results);
+      return result.clone({ stats: stats });
+    },
+
+    calculateStats: function (results) {
+      var groups = group(results);
+      var stats = {
+        cooperate: {
+          count: groups.cooperate.length,
+          average: average(groups.cooperate)
+        },
+        defect: {
+          count: groups.defect.length,
+          average: average(groups.defect)
+        },
+        total: {
+          count: results.length,
+          average: average(results)
+        }
+      };
+
+      return stats;
+
+      function group(results) {
+        var groups = _.groupBy(results, function (data) { return data.choice === "D" ? "defect" : "cooperate"; });
+        groups.cooperate || (groups.cooperate = []);
+        groups.defect || (groups.defect = []);
+
+        return groups;
+      }
+
+      function average(results) {
+        if (results.length === 0) return 0; // avoid division by 0
+        return _.reduce(results, function (memo, data) { return memo + data.score; }, 0) / results.length;
+      }
+    },
+  });
 
   PrisonersDilemma.States.Play = Common.States.Play.extend({
-    // view: PrisonersDilemma.Views.Play.Layout,
     view: "pd::play",
     defaultChoice: "C",
     validChoices: ["C", "D"],
   });
 
   PrisonersDilemma.States.Results = Common.States.Results.extend({
-    // view: PrisonersDilemma.Views.Results.Layout,
     view: "pd::results",
+
+    viewOptions: function () {
+      var viewOptions = Common.States.Results.prototype.viewOptions.apply(this, arguments);
+      viewOptions.stats = this.input.stats;
+      return viewOptions;
+    },
 
     logResults: function () {
       var results = this.participants.map(function (model) {
@@ -312,7 +225,18 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
 
       this.log("apps/pd/results", { results: results });
     },
-  })
+  });
+
+  PrisonersDilemma.Util = {};
+  // simplify participant to just the relevant results
+  PrisonersDilemma.Util.participantResults = function (participant) {
+    return {
+      alias: participant.get("alias"),
+      score: participant.get("score"),
+      choice: participant.get("choice"),
+      pairChoices: participant.get("pairChoices")
+    };
+  }
 
   return PrisonersDilemma;
 });

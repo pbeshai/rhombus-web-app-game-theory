@@ -20,7 +20,7 @@ function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 	var TeamPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
 		version: "1.0",
 		config: TeamPrisonersDilemma.config,
-		States: [ TeamPrisonersDilemma.States.Play, TeamPrisonersDilemma.States.Score, TeamPrisonersDilemma.States.Results ],
+		States: [ TeamPrisonersDilemma.States.Play, TeamPrisonersDilemma.States.Score, TeamPrisonersDilemma.States.Stats, TeamPrisonersDilemma.States.Results ],
 		prepend: { attendance: true, botCheck: true, group: true }
 	});
 

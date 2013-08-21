@@ -52,7 +52,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
     beforeRender: function () {
       if (this.participants.length) {
-        this.setView(".results-stats", new PrisonersDilemma.Views.Results.Stats({ participants: this.participants }));
+        this.setView(".results-stats", new PrisonersDilemma.Views.Results.BarChart({ participants: this.participants, stats: this.options.stats }));
       }
     },
   });
@@ -138,6 +138,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
+  NPrisonersDilemma.States.Stats = PrisonersDilemma.States.Stats;
+
   NPrisonersDilemma.States.Results = Common.States.Results.extend({
     view: "npd::results",
 
@@ -150,6 +152,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     viewOptions: function () {
       var options = Common.States.Results.prototype.viewOptions.call(this);
       options.payoff = this.payoff;
+      options.stats = this.input.stats;
       return options;
     },
 

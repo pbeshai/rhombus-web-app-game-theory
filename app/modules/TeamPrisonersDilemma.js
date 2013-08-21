@@ -38,7 +38,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     InstructionsModel: PrisonersDilemma.Instructions
   }));
 
-  TeamPrisonersDilemma.Views.Results.TeamStats = PrisonersDilemma.Views.Results.Stats.extend({
+  // TODO: fix this to use the score state for stats
+  TeamPrisonersDilemma.Views.Results.TeamStats = PrisonersDilemma.Views.Results.BarChart.extend({
     template: "teampd/results/team_stats",
     afterRender: function () { }, // do not render graphs
     serialize: function () {
@@ -51,7 +52,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     header: "Results",
     ParticipantView: PrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: TeamPrisonersDilemma.Views.Results.TeamStats,
-    PostGroupsView: PrisonersDilemma.Views.Results.Stats
+    PostGroupsView: PrisonersDilemma.Views.Results.BarChart
   }));
 
   TeamPrisonersDilemma.Views.Configure = Backbone.View.extend({
@@ -95,8 +96,16 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     },
   });
 
+  TeamPrisonersDilemma.States.Stats = PrisonersDilemma.States.Stats;
+
   TeamPrisonersDilemma.States.Results = Common.States.GroupResults.extend({
     view: "teampd::results",
+
+    viewOptions: function () {
+      var viewOptions = Common.States.GroupResults.prototype.viewOptions.apply(this, arguments);
+      viewOptions.stats = this.input.stats;
+      return viewOptions;
+    },
 
     logResults: function () {
       var modelTransform = function (model) {
