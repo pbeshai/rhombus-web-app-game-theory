@@ -259,7 +259,7 @@ function (app, Grid) {
       function addGroup(groupNum) {
         var viewOptions = _.extend({
           participants: this.model.get("group" + groupNum)
-        }, this.options);
+        }, this.options, this.options["group" + groupNum + "ViewOptions"]);
         // only specify ParticipantView if it is set.
         if (this.ParticipantView != null) {
           if (_.isFunction(this.ParticipantView)) {

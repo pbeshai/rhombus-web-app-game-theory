@@ -38,13 +38,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     InstructionsModel: PrisonersDilemma.Instructions
   }));
 
-  // TODO: fix this to use the score state for stats
-  TeamPrisonersDilemma.Views.Results.TeamStats = PrisonersDilemma.Views.Results.BarChart.extend({
+  TeamPrisonersDilemma.Views.Results.TeamStats = app.BaseView.extend({
     template: "teampd/results/team_stats",
-    afterRender: function () { }, // do not render graphs
     serialize: function () {
-      var stats = PrisonersDilemma.Views.Results.Stats.prototype.serialize.call(this);
-      return stats[0];
+      return this.options.groupStats;
     }
   });
 
@@ -96,14 +93,27 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     },
   });
 
-  TeamPrisonersDilemma.States.Stats = PrisonersDilemma.States.Stats;
+  TeamPrisonersDilemma.States.Stats = PrisonersDilemma.States.Stats.extend({
+    onExit: function () {
+      var result = StateApp.State.prototype.onExit.call(this) || this.input;
+
+      var overallStats = this.calculateStats(this.input.groupModel.get("participants").map(PrisonersDilemma.Util.participantResults));
+      var group1Stats = this.calculateStats(this.input.groupModel.get("group1").map(PrisonersDilemma.Util.participantResults));
+      var group2Stats = this.calculateStats(this.input.groupModel.get("group2").map(PrisonersDilemma.Util.participantResults));
+
+      return result.clone({ stats: { overall: overallStats, group1: group1Stats, group2: group2Stats } });
+    },
+  });
 
   TeamPrisonersDilemma.States.Results = Common.States.GroupResults.extend({
     view: "teampd::results",
 
     viewOptions: function () {
       var viewOptions = Common.States.GroupResults.prototype.viewOptions.apply(this, arguments);
-      viewOptions.stats = this.input.stats;
+      viewOptions.stats = this.input.stats.overall;
+      viewOptions.group1ViewOptions = { groupStats: this.input.stats.group1 };
+      viewOptions.group2ViewOptions = { groupStats: this.input.stats.group2 };
+
       return viewOptions;
     },
 
