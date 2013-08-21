@@ -52,7 +52,7 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   CoinMatching.Views.Play.Participant = Common.Views.ParticipantHiddenPlay
 
-  CoinMatching.Views.Play.Layout = app.registerView("coin-matching::play", Common.Mixins.mixin(["gameOver", "rounds"], Common.Views.GroupLayout.extend({
+  CoinMatching.Views.Play.Layout = app.registerView("coin-matching::play", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
     header: "Play",
     ParticipantView: CoinMatching.Views.Play.Participant,
     InstructionsModel: CoinMatching.Instructions
@@ -82,7 +82,7 @@ function(app, Common, Participant, StateApp, Graphs) {
     }
   }));
 
-  CoinMatching.Views.Results.Layout = app.registerView("coin-matching::results", Common.Mixins.mixin(["gameOver", "rounds"], Common.Views.GroupLayout.extend({
+  CoinMatching.Views.Results.Layout = app.registerView("coin-matching::results", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
     header: "Results",
     className: "coin-matching-results",
     ParticipantView: CoinMatching.Views.Results.Score,

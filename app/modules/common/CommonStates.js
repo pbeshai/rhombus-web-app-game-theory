@@ -129,6 +129,75 @@ function(app, CommonModels, StateApp) {
   });
 
 
+  CommonStates.Stats = StateApp.State.extend({
+    name: "stats",
+    onExit: function () {
+      var stats = this.calculateStats(this.input.participants);
+      return this.input.clone({ stats: stats });
+    },
+
+    calculateStats: function (participants) {
+      return {
+        average: this.average(participants, "score")
+      };
+    },
+
+    group: function (participants, attribute) {
+      var groups;
+
+      if (participants instanceof Backbone.Collection) {
+        groups = participants.groupBy(attribute);
+      } else { // assume array
+        groups = _.groupBy(participants, function (participant) {
+          if (participant instanceof Backbone.Model) {
+            return participant.get(attribute);
+          } else {
+            return participant[attribute];
+          }
+        });
+      }
+
+      return groups;
+    },
+
+    count: function (participants) {
+      if (participants == null) return 0;
+
+      return participants.length;
+    },
+
+    average: function (participants, attribute) {
+      if (participants == null || participants.length === 0) return 0; // avoid division by 0
+
+      if (participants instanceof Backbone.Collection) {
+        return participants.reduce(function (memo, participant) {
+          return memo + participant.get(attribute);
+        }, 0) / participants.length;
+
+      } else { // assume it's an array
+        return _.reduce(participants, function (memo, participant) {
+          if (participant instanceof Backbone.Model) {
+            return memo + participant.get(attribute);
+          }
+          return memo + participant[attribute];
+        }, 0) / participants.length;
+
+      }
+    }
+  });
+
+  CommonStates.GroupStats = CommonStates.Stats.extend({
+    name: "group-stats",
+    onExit: function () {
+      var overallStats = this.calculateStats(this.input.groupModel.get("participants"));
+      var group1Stats = this.calculateStats(this.input.groupModel.get("group1"));
+      var group2Stats = this.calculateStats(this.input.groupModel.get("group2"));
+
+      return result.clone({ stats: { overall: overallStats, group1: group1Stats, group2: group2Stats } });
+    },
+  });
+
+
   // buckets participants
   CommonStates.Bucket = StateApp.State.extend({
     name: "bucket",

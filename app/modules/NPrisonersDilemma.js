@@ -58,6 +58,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   });
 
   NPrisonersDilemma.Views.Results.Layout = app.registerView("npd::results", Common.Views.SimpleLayout.extend({
+    PreHeaderView: PrisonersDilemma.Views.Results.Legend,
     ParticipantView: NPrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: NPrisonersDilemma.Views.Results.Stats
   }));

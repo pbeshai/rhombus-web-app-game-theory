@@ -47,6 +47,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
 
   TeamPrisonersDilemma.Views.Results.Layout = app.registerView("teampd::results", Common.Views.GroupLayout.extend({
     header: "Results",
+    PreHeaderView: PrisonersDilemma.Views.Results.Legend,
     ParticipantView: PrisonersDilemma.Views.Results.Participant,
     PostParticipantsView: TeamPrisonersDilemma.Views.Results.TeamStats,
     PostGroupsView: PrisonersDilemma.Views.Results.BarChart
@@ -94,14 +95,13 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
   });
 
   TeamPrisonersDilemma.States.Stats = PrisonersDilemma.States.Stats.extend({
+    name: "stats",
     onExit: function () {
-      var result = StateApp.State.prototype.onExit.call(this) || this.input;
+      var overallStats = this.calculateStats(this.input.groupModel.get("participants"));
+      var group1Stats = this.calculateStats(this.input.groupModel.get("group1"));
+      var group2Stats = this.calculateStats(this.input.groupModel.get("group2"));
 
-      var overallStats = this.calculateStats(this.input.groupModel.get("participants").map(PrisonersDilemma.Util.participantResults));
-      var group1Stats = this.calculateStats(this.input.groupModel.get("group1").map(PrisonersDilemma.Util.participantResults));
-      var group2Stats = this.calculateStats(this.input.groupModel.get("group2").map(PrisonersDilemma.Util.participantResults));
-
-      return result.clone({ stats: { overall: overallStats, group1: group1Stats, group2: group2Stats } });
+      return this.input.clone({ stats: { overall: overallStats, group1: group1Stats, group2: group2Stats } });
     },
   });
 

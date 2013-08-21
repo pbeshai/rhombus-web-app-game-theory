@@ -236,6 +236,7 @@ function (app, Grid) {
     ParticipantsView: CommonViews.ParticipantsGrid,
     PreParticipantsView: null,
     PostParticipantsView: null,
+    PreHeaderView: null,
     PreGroupsView: null,
     PostGroupsView: null,
     InstructionsModel: null,
@@ -277,6 +278,10 @@ function (app, Grid) {
         if (this.PostParticipantsView != null) {
           this.insertView(".group" + groupNum + " .post-participants", new this.PostParticipantsView(viewOptions));
         }
+      }
+
+      if (this.PreHeaderView != null) {
+        this.insertView(".pre-header", new this.PreHeaderView(viewOptions));
       }
 
       addGroup.apply(this, [1]);

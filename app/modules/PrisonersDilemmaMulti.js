@@ -135,15 +135,15 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
 
   PrisonersDilemmaMulti.States.Stats = PrisonersDilemma.States.Stats.extend({
     onExit: function () {
-      var result = StateApp.State.prototype.onExit.call(this) || this.input;
-
       var roundResults = this.options.roundOutputs.slice();
+
       // add in the current round's results
-      roundResults.push(this.input.participants.map(PrisonersDilemma.Util.participantResults));
+      roundResults.push(this.input.participants);
 
-      var statsArray = _.map(roundResults, this.calculateStats);
+      // calculate stats
+      var statsArray = _.map(roundResults, this.calculateStats, this);
 
-      return result.clone({ stats: statsArray });
+      return this.input.clone({ stats: statsArray });
     }
   });
 

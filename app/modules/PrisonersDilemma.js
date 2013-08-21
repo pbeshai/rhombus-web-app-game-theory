@@ -152,46 +152,26 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     },
   });
 
-  PrisonersDilemma.States.Stats = StateApp.State.extend({
-    onExit: function () {
-      var result = StateApp.State.prototype.onExit.call(this) || this.input;
-      var results = this.input.participants.map(PrisonersDilemma.Util.participantResults);
-      var stats = this.calculateStats(results);
-      return result.clone({ stats: stats });
-    },
-
-    calculateStats: function (results) {
-      var groups = group(results);
+  PrisonersDilemma.States.Stats = Common.States.Stats.extend({
+    calculateStats: function (participants) {
+      var groups = this.group(participants, "choice");
       var stats = {
         cooperate: {
-          count: groups.cooperate.length,
-          average: average(groups.cooperate)
+          count: this.count(groups.C),
+          average: this.average(groups.C, "score")
         },
         defect: {
-          count: groups.defect.length,
-          average: average(groups.defect)
+          count: this.count(groups.D),
+          average: this.average(groups.D, "score")
         },
         total: {
-          count: results.length,
-          average: average(results)
+          count: this.count(participants),
+          average: this.average(participants, "score")
         }
       };
 
       return stats;
-
-      function group(results) {
-        var groups = _.groupBy(results, function (data) { return data.choice === "D" ? "defect" : "cooperate"; });
-        groups.cooperate || (groups.cooperate = []);
-        groups.defect || (groups.defect = []);
-
-        return groups;
-      }
-
-      function average(results) {
-        if (results.length === 0) return 0; // avoid division by 0
-        return _.reduce(results, function (memo, data) { return memo + data.score; }, 0) / results.length;
-      }
-    },
+     }
   });
 
   PrisonersDilemma.States.Play = Common.States.Play.extend({
