@@ -177,19 +177,6 @@ function(app, Common, Participant, StateApp, Graphs) {
 
   CoinMatching.States.Results = Common.States.GroupResults.extend({
     view: "coin-matching::results",
-
-    logResults: function () {
-      // console.log("ROUND OUTPUTS",  this.options.roundOutputs);
-      return; // TODO: logging
-
-      var results = this.participants.map(function (model) {
-        return {
-          alias: model.get("alias"),
-        };
-      });
-
-      this.log("apps/coin-matching/results", { results: results });
-    },
   });
 
 
@@ -258,6 +245,20 @@ function(app, Common, Participant, StateApp, Graphs) {
           }
         }
       }, this);
+    },
+
+    logResults: function () {
+      console.log("@@ COIN MATCHING @@ Logging results");
+      // console.log("ROUND OUTPUTS",  this.options.roundOutputs);
+      return; // TODO: logging
+
+      var results = this.participants.map(function (model) {
+        return {
+          alias: model.get("alias"),
+        };
+      });
+
+      this.log("apps/coin-matching/results", { results: results });
     },
   });
 

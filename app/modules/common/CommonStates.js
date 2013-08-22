@@ -21,6 +21,11 @@ function(app, CommonModels, StateApp) {
       activeRules: [ "at-least-two", "even" ],
     },
 
+    run: function () {
+      // clear all bots that are currently there. this was when going through here on prev it removes bots
+      this.input.participants.remove(this.input.participants.filter(function (p) { return p.bot; }))
+    },
+
     // add bot on exit, so it only happens when going to next state, not back to prev
     onExit: function () {
       var participants = this.input.participants;

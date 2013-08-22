@@ -25,8 +25,8 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
       DC: 5,
       DD: 1
     },
-    minRounds: 2,
-    maxRounds: 2,
+    minRounds: 3,
+    maxRounds: 3,
   };
 
   PrisonersDilemmaMulti.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
@@ -151,14 +151,15 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
     view: "pdm::results",
     beforeRender: function () {
       PrisonersDilemma.States.Results.prototype.beforeRender.call(this);
-      console.log("@@@ results state last round", this.options.lastRound);
       this.config.gameOver = this.options.lastRound; // TODO: handle game over
     },
 
 
     logResults: function () {
-      return; // TODO: log results
-      var results = this.collection.map(function (model) {
+      console.log("PDM LOG");
+      var roundOutputsByParticipant = _.zip.apply(this, this.options.roundOutputs);
+      var results = this.participants.map(function (model, i) {
+        var history = roundOutputsByParticipant[i];
         return {
           alias: model.get("alias"),
           choice: model.get("choice"),
@@ -168,11 +169,11 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
             choice: model.get("partner").get("choice"),
             score: model.get("partner").get("score"),
           },
-          history: model.get("history") // TODO: history no longer exists
+          history: history
         };
-      });
+      }, this);
 
-      this.log("apps/pdm/results", { results: results, round: this.stateApp.round });
+      this.log("apps/pdm/results", { results: results, round: this.config.round });
     },
 
     onExit: function () {

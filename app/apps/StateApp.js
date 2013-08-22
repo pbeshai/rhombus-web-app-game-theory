@@ -218,6 +218,8 @@ function(app) {
 				this.numRounds = this.minRounds + Math.round(Math.random() * (this.maxRounds - this.minRounds))
 			}
 
+			this.config.numRounds = this.numRounds;
+
 			// initialize substates
 			this.states = [];
 			_.each(this.States, function (State, i) {
@@ -228,7 +230,7 @@ function(app) {
 				var state = new State(_.extend({
 					config: this.config,
 					roundOutputs: this.roundOutputs,
-				}, stateOptions));
+				}, stateOptions), this.stateApp);
 
 				this.states.push(state);
 
