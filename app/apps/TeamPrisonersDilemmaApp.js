@@ -18,6 +18,7 @@ define([
 function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 
 	var TeamPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
+		id: "teampd",
 		version: "1.0",
 		config: TeamPrisonersDilemma.config,
 		States: [ TeamPrisonersDilemma.States.Play, TeamPrisonersDilemma.States.Score, TeamPrisonersDilemma.States.Stats, TeamPrisonersDilemma.States.Results ],
@@ -26,8 +27,8 @@ function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 
 	// description for use in router
 	TeamPrisonersDilemmaApp.app = {
-		instantiate: function (options) {
-			return new TeamPrisonersDilemmaApp(options);
+		instantiate: function (attrs) {
+			return new TeamPrisonersDilemmaApp(attrs);
 		},
 		configView: TeamPrisonersDilemma.Views.Configure,
 		title: "Team Prisoner's Dilemma"

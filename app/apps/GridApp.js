@@ -20,6 +20,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 	 *  Grid App
 	 */
 	var GridApp = StateApp.App.extend({
+		id: "grid",
 		defineStates: function () {
 			console.log("define states");
 			var attendanceState = new Attendance.State({

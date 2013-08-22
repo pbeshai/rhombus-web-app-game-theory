@@ -25,8 +25,6 @@ function(app, Common, Participant, StateApp, Graphs) {
       "D": 2,
       "E": 1
     },
-    group1Name: "Givers",
-    group2Name: "Receivers",
   };
 
   UltimatumGame.Instructions = {};
@@ -143,7 +141,7 @@ function(app, Common, Participant, StateApp, Graphs) {
   UltimatumGame.States.ReceiverPlay = Common.States.Play.extend({
     name: "receiver-play",
     view: "ug::receiver-play",
-    validChoices: ["C", "D"],
+    validChoices: ["A", "B"],
 
     handleConfigure: function () {
       UltimatumGame.Util.assignOffers(this.participants,
@@ -188,7 +186,7 @@ function(app, Common, Participant, StateApp, Graphs) {
         };
       });
 
-      this.log("apps/ultimatum/results", { results: results });
+      return { results: results };
     }
   });
 

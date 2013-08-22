@@ -18,6 +18,7 @@ define([
 function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
 
 	var NPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
+		id: "npd",
 		version: "1.0",
 		config: NPrisonersDilemma.config,
 		States: [ NPrisonersDilemma.States.Play, NPrisonersDilemma.States.Score, NPrisonersDilemma.States.Stats, NPrisonersDilemma.States.Results]
@@ -25,8 +26,8 @@ function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
 
 	// description for use in router
 	NPrisonersDilemmaApp.app = {
-		instantiate: function (options) {
-			return new NPrisonersDilemmaApp(options);
+		instantiate: function (attrs) {
+			return new NPrisonersDilemmaApp(attrs);
 		},
 		configView: NPrisonersDilemma.Views.Configure,
 		title: "N-Person Prisoner's Dilemma"

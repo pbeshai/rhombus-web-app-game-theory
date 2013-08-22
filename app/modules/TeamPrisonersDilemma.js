@@ -135,7 +135,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
         team1: this.groupModel.get("group1").map(modelTransform),
         team2: this.groupModel.get("group2").map(modelTransform)
       }
-      this.log("apps/teampd/results", { results: results });
+      return { results: results };
     },
   });
 

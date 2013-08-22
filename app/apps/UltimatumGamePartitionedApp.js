@@ -21,6 +21,7 @@ function(app, StateApp, CommonStateApps, UltimatumGamePartitioned) {
 	 *  Team Prisoner's Dilemma App
 	 */
 	var UltimatumGamePartitionedApp = CommonStateApps.BasicGame.extend({
+		id: "ultimatum-partitioned",
 		version: "1.0",
 		config: UltimatumGamePartitioned.config,
 		States: [ UltimatumGamePartitioned.States.GiverPlay, UltimatumGamePartitioned.States.ReceiverPlay,
@@ -30,8 +31,8 @@ function(app, StateApp, CommonStateApps, UltimatumGamePartitioned) {
 
 	// description for use in router
 	UltimatumGamePartitionedApp.app = {
-		instantiate: function (options) {
-			return new UltimatumGamePartitionedApp(options);
+		instantiate: function (attrs) {
+			return new UltimatumGamePartitionedApp(attrs);
 		},
 		configView: UltimatumGamePartitioned.Views.Configure,
 		title: "Ultimatum Game (Partitioned)"

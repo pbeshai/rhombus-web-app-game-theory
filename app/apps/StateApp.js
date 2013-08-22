@@ -110,6 +110,14 @@ function(app) {
 		validateNext: function () { return true; },
 		validatePrev: function () { return true; },
 
+		hasNext: function () {
+			return this.flow.next != null;
+		},
+
+		hasPrev: function () {
+			return this.flow.prev != null;
+		},
+
 		// go to the next state
 		next: function () {
 			if (!this.validateNext()) {
@@ -151,14 +159,9 @@ function(app) {
 		},
 
 		// commonly used to log results via an API call
-		log: function (apiCall, data) {
-      var logData = _.extend({
-        config: this.config,
-        version: this.stateApp.version,
-      }, data);
-
-      console.log("Logging", logData);
-      app.api({ call: apiCall, type: "post", data: logData });
+		log: function (data) {
+      console.log("@@ Adding log data", data);
+      this.stateApp.addLogData(data);
     },
 
 		// can be called when a state app configures itself (perhaps a new config is set)
@@ -421,6 +424,15 @@ function(app) {
 	 */
 	var StateApp = Backbone.Model.extend({
 		initialize: function (attrs, options) {
+			this.options = options || {};
+			_.defaults(this.options, {
+				writeLogAtEnd: true // default to writing a log when the final state is reached
+			});
+
+			this.logData = null;
+			this.logApiCall = "apps/" + this.id + "/log";
+
+
 			if (this.defineStates) {
 				this.defineStates();
 			} else {
@@ -459,6 +471,10 @@ function(app) {
 			var result = this.get("currentState").next();
 			if (result) { // only update current state if we reached a state (not null/undefined)
 				this.set("currentState", result);
+
+				if (!result.hasNext() && this.options.writeLogAtEnd) {
+					this.writeLog();
+				}
 			}
 			app.controller.participantServer.stopIgnoringChoices();
 		},
@@ -469,6 +485,10 @@ function(app) {
 			var result = this.get("currentState").prev();
 			if (result) {
 				this.set("currentState", result);
+
+				if (!result.hasPrev()) { // reset log if we reach the first state again
+					this.clearLogData();
+				}
 			}
 			app.controller.participantServer.stopIgnoringChoices();
 		},
@@ -476,13 +496,35 @@ function(app) {
 		configure: function (config) {
 			// don't just set = to config in case states are referencing the existing object,
 			// and in the event the full config isn't being overwritten
-			this.config = _.extend(this.config, config);
+			_.extend(this.config, config);
 			this.handleConfigure();
 		},
 
 		handleConfigure: function () {
 			this.get("currentState").handleConfigure();
-		}
+		},
+
+		addLogData: function (data) {
+			console.log("@@ APP: Adding log data", data);
+			this.logData = data;
+		},
+
+		clearLogData: function () {
+			console.log("@@ clearing log data");
+			this.logData = null;
+		},
+
+		writeLog: function () {
+			console.log("@@ APP: writing the log now");
+
+			var logData = _.extend({
+        config: this.config,
+        version: this.version,
+      }, this.logData);
+
+			console.log(this.logApiCall, logData);
+			app.api({ call: this.logApiCall, type: "post", data: logData });
+		},
 	});
 
 	return {

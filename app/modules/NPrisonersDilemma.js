@@ -165,7 +165,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
           score: model.get("score"),
         };
       });
-      this.log("apps/npd/results", { results: results, payoff: this.payoff });
+      return { results: results, payoff: this.payoff };
     },
   });
 

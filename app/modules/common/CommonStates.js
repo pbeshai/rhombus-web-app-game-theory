@@ -385,7 +385,7 @@ function(app, CommonModels, StateApp) {
     },
 
     afterRender: function () {
-      this.logResults();
+      this.log(this.logResults());
     },
 
     viewOptions: function () {
@@ -414,7 +414,7 @@ function(app, CommonModels, StateApp) {
     },
 
     afterRender: function () {
-      this.logResults();
+      this.log(this.logResults());
     },
 
     viewOptions: function () {
