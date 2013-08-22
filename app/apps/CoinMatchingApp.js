@@ -19,6 +19,7 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 
 	// Attendance -> Phase 1 (Play) -> Phase 1 (Results) -> Phase 2 Play -> Phase 2 Results -> Total Results -> ...
 	var CoinMatchingApp = CommonStateApps.PhaseGame.extend({
+		id: "coin-matching",
 		version: "1.0",
 		config: CoinMatching.config,
 		prepend: { attendance: true, botCheck: true, group: true },
@@ -86,8 +87,8 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 
 	// description for use in router
 	CoinMatchingApp.app = {
-		instantiate: function (options) {
-			return new CoinMatchingApp(options);
+		instantiate: function (attrs) {
+			return new CoinMatchingApp(attrs);
 		},
 		configView: CoinMatching.Views.Configure,
 		title: "Coin Matching Game"

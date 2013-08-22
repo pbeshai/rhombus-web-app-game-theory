@@ -203,7 +203,7 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
         };
       });
 
-      this.log("apps/pd/results", { results: results });
+      return { results: results };
     },
   });
 

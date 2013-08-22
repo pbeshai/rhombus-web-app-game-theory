@@ -21,6 +21,7 @@ function(app, StateApp, CommonStateApps, UltimatumGame) {
 	 *  Team Prisoner's Dilemma App
 	 */
 	var UltimatumGameApp = CommonStateApps.BasicGame.extend({
+		id: "ultimatum",
 		version: "1.0",
 		config: UltimatumGame.config,
 		partnerOptions: { symmetric: false },
@@ -30,8 +31,8 @@ function(app, StateApp, CommonStateApps, UltimatumGame) {
 
 	// description for use in router
 	UltimatumGameApp.app = {
-		instantiate: function (options) {
-			return new UltimatumGameApp(options);
+		instantiate: function (attrs) {
+			return new UltimatumGameApp(attrs);
 		},
 		configView: UltimatumGame.Views.Configure,
 		title: "Ultimatum Game"

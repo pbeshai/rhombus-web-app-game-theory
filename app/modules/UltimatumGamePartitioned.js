@@ -222,7 +222,7 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
         };
       });
 
-      this.log( "apps/ultimatum-partition/results", { results: results });
+      return { results: results };
     },
   });
 

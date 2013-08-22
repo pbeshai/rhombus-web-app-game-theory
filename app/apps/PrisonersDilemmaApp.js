@@ -18,6 +18,7 @@ define([
 function(app, StateApp, CommonStateApps, PrisonersDilemma) {
 
 	var PrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
+		id: "pd",
 		version: "1.0",
 		config: PrisonersDilemma.config,
 		States: [ PrisonersDilemma.States.Play, PrisonersDilemma.States.Score, PrisonersDilemma.States.Stats, PrisonersDilemma.States.Results ]
@@ -25,8 +26,8 @@ function(app, StateApp, CommonStateApps, PrisonersDilemma) {
 
 	// description for use in router
 	PrisonersDilemmaApp.app = {
-		instantiate: function (options) {
-			return new PrisonersDilemmaApp(options);
+		instantiate: function (attrs) {
+			return new PrisonersDilemmaApp(attrs);
 		},
 		configView: PrisonersDilemma.Views.Configure,
 		title: "Prisoner's Dilemma"

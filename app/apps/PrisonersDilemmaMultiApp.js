@@ -19,6 +19,7 @@ define([
 
 function(app, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 	var PrisonersDilemmaMultiApp = CommonStateApps.BasicGame.extend({
+		id: "pdm",
 		version: "1.0",
 		config: PrisonersDilemmaMulti.config,
 		States: [ PrisonersDilemmaMulti.States.Round ]
