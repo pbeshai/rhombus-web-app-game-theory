@@ -173,7 +173,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
         };
       }, this);
 
-      this.log("apps/pdm/results", { results: results, round: this.config.round });
+      return { results: results, round: this.config.round };
     },
 
     onExit: function () {

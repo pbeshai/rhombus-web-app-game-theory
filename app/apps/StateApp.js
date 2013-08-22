@@ -260,6 +260,20 @@ function(app) {
 			return this.roundCounter === this.numRounds;
 		},
 
+		hasNext: function () {
+			if (this.isLastRound() && this.isLastState()) {
+				return ViewState.prototype.hasNext.call(this);
+			}
+			return true;
+		},
+
+		hasPrev: function () {
+			if (this.isFirstRound() && this.isFirstState()) {
+				return ViewState.prototype.hasPrev.call(this);
+			}
+			return true;
+		},
+
 		// returns what is saved after each round
 		roundOutput: function (output) { },
 
