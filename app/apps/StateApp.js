@@ -520,7 +520,7 @@ function(app) {
 
 		addLogData: function (data) {
 			console.log("@@ APP: Adding log data", data);
-			this.logData = data;
+			this.logData = _.extend(this.logData || {}, data);
 		},
 
 		clearLogData: function () {

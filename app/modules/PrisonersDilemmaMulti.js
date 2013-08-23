@@ -157,9 +157,7 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
 
     logResults: function () {
       console.log("PDM LOG");
-      var roundOutputsByParticipant = _.zip.apply(this, this.options.roundOutputs);
       var results = this.participants.map(function (model, i) {
-        var history = roundOutputsByParticipant[i];
         return {
           alias: model.get("alias"),
           choice: model.get("choice"),
@@ -169,11 +167,12 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
             choice: model.get("partner").get("choice"),
             score: model.get("partner").get("score"),
           },
-          history: history
         };
       }, this);
 
-      return { results: results, round: this.config.round };
+      var logData = {};
+      logData["round" + this.config.round] = results;
+      return logData;
     },
 
     onExit: function () {
