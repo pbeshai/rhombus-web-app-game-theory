@@ -160,8 +160,10 @@ function(app) {
 
 		// commonly used to log results via an API call
 		log: function (data) {
-      console.log("@@ Adding log data", data);
-      this.stateApp.addLogData(data);
+      if (data) {
+      	console.log("@@ Adding log data", data);
+      	this.stateApp.addLogData(data);
+      }
     },
 
 		// can be called when a state app configures itself (perhaps a new config is set)

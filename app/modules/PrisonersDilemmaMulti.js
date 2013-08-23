@@ -156,7 +156,6 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
 
 
     logResults: function () {
-      console.log("PDM LOG");
       var results = this.participants.map(function (model, i) {
         return {
           alias: model.get("alias"),

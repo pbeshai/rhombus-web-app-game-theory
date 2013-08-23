@@ -163,10 +163,18 @@ function(app, Common, Participant, StateApp, Graphs) {
     onExit: function () {
       var result = Common.States.GroupScore.prototype.onExit.call(this);
       // save the phase total (we need to do this before results since we show the phase total there)
-      this.groupModel.get("participants").each(function (participant, i) {
+      this.groupModel.get("group1").each(function (participant, i) {
         // sum up total scores from rounds in this phase
         var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
-          return roundOutput[i].score + memo;
+          return roundOutput.group1[i].score + memo;
+        }, 0) + participant.get("score");
+        participant.set("phaseTotal", phaseTotal);
+      }, this);
+
+      this.groupModel.get("group2").each(function (participant, i) {
+        // sum up total scores from rounds in this phase
+        var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
+          return roundOutput.group2[i].score + memo;
         }, 0) + participant.get("score");
         participant.set("phaseTotal", phaseTotal);
       }, this);
@@ -187,16 +195,24 @@ function(app, Common, Participant, StateApp, Graphs) {
 
     // what is saved between each round
     // output is a groupModel
+
     roundOutput: function (output) {
-      return output.groupModel.get("participants").map(function (participant) {
+      var roundOutput = {
+        group1: output.groupModel.get("group1").map(serialize),
+        group2: output.groupModel.get("group2").map(serialize)
+      };
+
+      return roundOutput;
+
+      function serialize(participant) {
         return {
           alias: participant.get("alias"),
           choice: participant.get("choice"),
           score: participant.get("score"),
-          partner: participant.get("partner"),
+          partner: participant.get("partner").get("alias"),
           total: participant.get("total")
         };
-      });
+      };
     },
 
     onEntry: function (input, prevState) {
@@ -226,6 +242,13 @@ function(app, Common, Participant, StateApp, Graphs) {
       this.groupModel.get("participants").each(function (participant, i) {
         participant.set("phase" + this.options.phase + "Total", participant.get("phaseTotal"));
       }, this);
+    },
+
+    logResults: function () {
+      console.log("@@ phase results");
+      var logData = {};
+      logData["phase" + this.options.phase] = this.input.roundOutputs
+      return logData;
     }
   });
 
@@ -245,20 +268,6 @@ function(app, Common, Participant, StateApp, Graphs) {
           }
         }
       }, this);
-    },
-
-    logResults: function () {
-      console.log("@@ COIN MATCHING @@ Logging results");
-      // console.log("ROUND OUTPUTS",  this.options.roundOutputs);
-      return; // TODO: logging
-
-      var results = this.participants.map(function (model) {
-        return {
-          alias: model.get("alias"),
-        };
-      });
-
-      this.log("apps/coin-matching/results", { results: results });
     },
   });
 
