@@ -21,6 +21,7 @@ function(app, StateApp, Attendance, Common) {
       this.States || (this.States = []);
       this.stateOptions || (this.stateOptions = []);
       this.initStateOptions();
+      this.initialInput = new StateApp.StateMessage({ participants: this.get("participants") });
       StateApp.App.prototype.initialize.call(this);
     },
 

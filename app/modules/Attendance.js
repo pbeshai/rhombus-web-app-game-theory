@@ -123,13 +123,9 @@ function(app, Common, Participant, StateApp) {
       };
     },
 
-    // if we are coming from a state, let's reset the participants, as this
-    // is common behavior (e.g., attendance is first state and we are returning to it)
-    // can be overridden via "enter" option otherwise
+    // reset participants to those in the db everytime we enter the attendance state
     onEntry: function (input, prevState) {
-      if (prevState) {
-        this.options.participants.fetch();
-      }
+      this.options.participants.fetch();
     },
 
     onExit: function () {

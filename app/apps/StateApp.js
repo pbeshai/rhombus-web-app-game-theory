@@ -102,10 +102,17 @@ function(app) {
 
 			app.controller.participantUpdater.stopIgnoringChanges();
 
+			this.cleanup();
+
 			return output;
 		},
 
 		onExit: function () {  }, // this can return a value to modify the output (default is the input)
+
+		cleanup: function () {
+			console.log("@@ cleaning up ", this);
+			this.stopListening();
+		},
 
 		validateNext: function () { return true; },
 		validatePrev: function () { return true; },
@@ -161,7 +168,6 @@ function(app) {
 		// commonly used to log results via an API call
 		log: function (data) {
       if (data) {
-      	console.log("@@ Adding log data", data);
       	this.stateApp.addLogData(data);
       }
     },
@@ -467,14 +473,14 @@ function(app) {
 
 				this.initialState = this.states[stateKeys[0]];
 				this.set("currentState", this.states[stateKeys[0]]);
-				this.loadState(this.initialState.id);
+				this.loadState(this.initialState.id, this.initialInput);
 			}
 		},
 
-		loadState: function (id) {
+		loadState: function (id, input) {
 			var state = this.states[id];
 			if (state) {
-				state.enter();
+				state.enter(input);
 				this.set("currentState", state);
 			} else {
 				console.log("Could not load state ", id);
@@ -521,26 +527,28 @@ function(app) {
 		},
 
 		addLogData: function (data) {
-			console.log("@@ APP: Adding log data", data);
 			this.logData = _.extend(this.logData || {}, data);
 		},
 
 		clearLogData: function () {
-			console.log("@@ clearing log data");
 			this.logData = null;
 		},
 
 		writeLog: function () {
-			console.log("@@ APP: writing the log now");
-
 			var logData = _.extend({
         config: this.config,
         version: this.version,
       }, this.logData);
 
-			console.log(this.logApiCall, logData);
+			console.log("Logging", this.logApiCall, logData);
 			app.api({ call: this.logApiCall, type: "post", data: logData });
 		},
+
+		cleanup: function () {
+			if (this.get("currentState")) {
+				this.get("currentState").cleanup();
+			}
+		}
 	});
 
 	return {

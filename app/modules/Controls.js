@@ -172,6 +172,7 @@ function(app, Clicker, Apps) {
       app.controller.participantServer.hookCollection(this.options.participants, this);
       this.listenTo(this.options.participants, "change", app.controller.changedParticipant);
       this.listenTo(this.options.participants, "sync", app.controller.syncParticipants);
+      this.listenTo(this.options.participants, "add", app.controller.newParticipant);
 
       // TODO: temporary keyboard shortcuts for faster debugging
       $(document.body).on("keypress", function (evt) {
@@ -219,8 +220,14 @@ function(app, Clicker, Apps) {
 
 
       // reset the participants if there was another app running previously
-      this.options.participants.fetch({ reset: true });
+      // this.options.participants.fetch({ reset: true }); TODO
+      this.options.participants.reset();
 
+      // clean up the old app
+      var activeApp = app.controller.get("activeApp");
+      if (activeApp) {
+        activeApp.cleanup();
+      }
 
       // instantiate the application.
       app.controller.set("activeApp", selectedApp.instantiate({ participants: this.options.participants }));

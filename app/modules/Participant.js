@@ -126,6 +126,7 @@ function(app) {
         var model = this.aliasMap[choiceData.id];
         if (model) {
           model.set({"choice": choiceData.choice}, { validate: this.options.validateOnChoice });
+          this.trigger("update:choice", model, choiceData.choice); // slightly different from change:choice since it is fired even if the choice is unchanged.
         } else {
           console.log("new user. accept new? ", this.options.acceptNew, this.options);
           this.trigger("new-user", choiceData);
@@ -133,6 +134,7 @@ function(app) {
             console.log("adding new user");
             model = new Participant.Model({ alias: choiceData.id, choice: choiceData.choice });
             this.add(model);
+            this.trigger("update:choice", model, choiceData.choice);
           }
         }
       }, this);

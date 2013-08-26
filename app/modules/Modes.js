@@ -63,7 +63,7 @@ function(app, ParticipantServer, AppController, Common, Participant) {
 
   Modes.Controller = Backbone.Model.extend({
     initialize: function (attrs) {
-      _.bindAll(this, "handleInstructor", "changedParticipant", "syncParticipants");
+      _.bindAll(this, "handleInstructor", "changedParticipant", "syncParticipants", "newParticipant");
       this.participantServer = new ParticipantServer.Model({ socket: attrs.socket });
       this.appController = new AppController.Model({ socket: attrs.socket });
       this.participantUpdater = new ParticipantUpdater();
@@ -132,6 +132,10 @@ function(app, ParticipantServer, AppController, Common, Participant) {
     // when the participants collection is synced (e.g., fetch is called), signal the updater
     syncParticipants: function (collection, participants) {
       collection.each(this.participantUpdater.add, this.participantUpdater);
+    },
+
+    newParticipant: function (participant) {
+      this.participantUpdater.add(participant);
     },
 
     // go to next state in app

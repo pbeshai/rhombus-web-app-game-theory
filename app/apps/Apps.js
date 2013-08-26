@@ -11,10 +11,12 @@ define([
   "apps/TeamPrisonersDilemmaApp",
   "apps/UltimatumGameApp",
   "apps/UltimatumGamePartitionedApp",
-  "apps/CoinMatchingApp"
+  "apps/CoinMatchingApp",
+  "apps/SequenceAliaserApp"
 ],
 function (app, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDilemmaApp,
-	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp, CoinMatchingApp) {
+	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp, CoinMatchingApp,
+	SequenceAliaserApp) {
 
 	var Apps = app.module();
 
@@ -26,7 +28,8 @@ function (app, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisoner
 		"teampd": TeamPrisonersDilemmaApp.app,
 		"ultimatum": UltimatumGameApp.app,
 		"ultimatum-partitioned": UltimatumGamePartitionedApp.app,
-		"coin-matching": CoinMatchingApp.app
+		"coin-matching": CoinMatchingApp.app,
+		"seq-alias": SequenceAliaserApp.app,
 	};
 
 	Apps.Views.Selector = Backbone.View.extend({

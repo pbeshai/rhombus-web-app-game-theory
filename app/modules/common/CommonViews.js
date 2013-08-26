@@ -111,13 +111,15 @@ function (app, Grid) {
     className: "participant",
     optionProperties: [ "locked", "cssClass", "bottomText", "mainText" ],
     locked: false,
-    cssClass: function () { },
-    bottomText: function () { },
-    mainText: function () { },
+    cssClass: function (model) { },
+    bottomText: function (model) { },
+    mainText: function (model) { },
+    idText: function (model) { return model.get("alias"); },
 
     serialize: function () {
       return {
         model: this.model,
+        idText: this.idText(this.model),
         bottomText: this.bottomText(this.model),
         mainText: this.mainText(this.model)
       };
@@ -158,9 +160,16 @@ function (app, Grid) {
     optionProperties: [ "ParticipantView" ],
 
     beforeRender: function () {
+      if (!this.participants) return;
       this.participants.each(function (participant) {
         this.insertView(new this.ParticipantView({ model: participant }));
       }, this);
+    },
+
+    add: function (participant) {
+      var newView = new this.ParticipantView({ model: participant })
+      this.insertView(newView);
+      newView.render();
     },
 
     initialize: function (options) {
@@ -173,7 +182,8 @@ function (app, Grid) {
   CommonViews.SimpleLayout = app.BaseView.extend({
     template: "common/simple_layout",
     // properties that can be overridden via options
-    optionProperties: [ "header", "ParticipantView", "ParticipantsView", "PreParticipantsView", "PostParticipantsView", "InstructionsModel"],
+    optionProperties: [ "header", "ParticipantView", "ParticipantsView", "PreParticipantsView",
+      "PostParticipantsView", "InstructionsModel", "acceptNew"],
     header: "Participants",
     ParticipantView: null,
     ParticipantsView: CommonViews.ParticipantsGrid,
@@ -181,11 +191,12 @@ function (app, Grid) {
     PostParticipantsView: null,
     PreHeaderView: null,
     InstructionsModel: null,
+    acceptNew: false,
 
     serialize: function () {
       return {
         header: this.header,
-        hasPlayers: (this.participants.length > 0),
+        hasPlayers: (this.participants && this.participants.length > 0),
       };
     },
 
@@ -220,9 +231,35 @@ function (app, Grid) {
       }
     },
 
+    add: function (participant) {
+      if (this.participants.length === 1) {
+        this.render();
+      } else {
+        var participantsView = this.getView(".participants");
+        if (participantsView && participantsView.add) {
+          participantsView.add(participant);
+        }
+      }
+    },
+
+    cleanup: function () {
+      if (this.acceptNew) {
+        this.participants.options.acceptNew = this.prevAcceptNew;
+      }
+    },
+
     initialize: function (options) {
       app.BaseView.prototype.initialize.apply(this, arguments);
       handleOptions(this, options);
+
+      if (this.acceptNew) {
+        this.prevAcceptNew = this.participants.options.acceptNew;
+        this.participants.options.acceptNew = true; // allow new users to be added when data comes from server
+      }
+
+      this.listenTo(this.participants, {
+        "add": this.add
+      });
     },
   });
 

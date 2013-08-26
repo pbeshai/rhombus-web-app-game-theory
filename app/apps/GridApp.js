@@ -53,8 +53,8 @@ function(app, StateApp, Participant, Attendance, Grid) {
 
 	// description for use in router
 	GridApp.app = {
-		instantiate: function (options) {
-			return new GridApp(options);
+		instantiate: function (attrs) {
+			return new GridApp(attrs, { writeLogAtEnd: false });
 		},
 		configView: undefined,
 		title: "Grid App"
