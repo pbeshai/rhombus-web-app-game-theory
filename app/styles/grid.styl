@@ -189,3 +189,22 @@ bucket-color = rgb(18, 60, 88)
 
 .overlay.choice-e
 	background-color rgba(224, 54, 0, 0.5)
+
+.overlay.highlight
+	background-color: rgba(192, 215, 255, 0.7);
+	transition: none;
+
+.overlay.cancel
+	background-color: rgba(255, 124, 124, 0.7);
+	transition: none;
+
+	&:before {
+		content: "\00d7";
+		display: block;
+		font-size: 7em;
+		margin-top: .22em;
+		text-align: center;
+		text-shadow: none;
+		color: rgba(150,50,50,.4);
+		font-weight: bold;
+	}

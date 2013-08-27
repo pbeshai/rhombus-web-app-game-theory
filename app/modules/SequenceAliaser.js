@@ -48,12 +48,15 @@ function (app, Common, Participant, StateApp) {
     cssClass: function (model) {
       if (model.get("action")) {
         return "animated " + this.actionAnimations[model.get("action")];
-      }
-    },
+      }    },
 
     overlay: function (model) {
       if (model.get("action")) {
         return "choice-" + model.get("action").toLowerCase();
+      } else if (model.get("choice") === "E") {
+        return "cancel animated fadeOut";
+      } else {
+        return "highlight animated fadeOut";
       }
     },
 
