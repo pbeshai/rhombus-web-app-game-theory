@@ -1,9 +1,9 @@
 define([
-	"app",
-	"modules/Grid",
+  "app",
+  "modules/Grid",
 ],
 function (app, Grid) {
-	var CommonViews = {};
+  var CommonViews = {};
 
   // sets 'this.options' and overrides properties with options if specified
   function handleOptions(object, options) {
@@ -16,7 +16,7 @@ function (app, Grid) {
     });
   }
 
-	CommonViews.Instructions = Backbone.View.extend({
+  CommonViews.Instructions = Backbone.View.extend({
     template: "common/instructions",
     className: "instructions",
 
@@ -106,11 +106,12 @@ function (app, Grid) {
     },
   });
 
-  CommonViews.ParticipantDisplay = Backbone.View.extend({
+  CommonViews.ParticipantDisplay = app.BaseView.extend({
     template: "common/participant_display",
     className: "participant",
-    optionProperties: [ "locked", "cssClass", "bottomText", "mainText" ],
+    optionProperties: [ "locked", "cssClass", "bottomText", "mainText", "overlay" ],
     locked: false,
+    overlay: function (model) { },
     cssClass: function (model) { },
     bottomText: function (model) { },
     mainText: function (model) { },
@@ -121,7 +122,8 @@ function (app, Grid) {
         model: this.model,
         idText: this.idText(this.model),
         bottomText: this.bottomText(this.model),
-        mainText: this.mainText(this.model)
+        mainText: this.mainText(this.model),
+        overlay: this.overlay(this.model)
       };
     },
 
@@ -129,16 +131,40 @@ function (app, Grid) {
       // reset any extra classes added in after render (do this since we
       // do not know which classes are added by this.cssClass)
       this.$el.attr("class", this.className);
+
+      // handle the overlay carefully so it can be preserved between renders (for animation)
+      if (this.$overlay) {
+        this.$overlay.remove();
+      }
     },
 
     afterRender: function () {
+      app.BaseView.prototype.afterRender.call(this);
+
       var bottomText = this.bottomText(this.model);
       if (bottomText) {
         this.$el.addClass("has-bottom");
       } else {
         this.$el.removeClass("has-bottom");
       }
+      // this.restartCssAnimationFix();
       this.$el.addClass(this.cssClass(this.model));
+
+      // add the overlay back (or for the first time)
+      var overlay = this.overlay(this.model);
+      if (overlay) {
+        if (this.$overlay) {
+          this.$overlay.prependTo(this.$el);
+        } else {
+          this.$overlay = $("<div class='overlay'/>").prependTo(this.$el);
+        }
+        // this.restartCssAnimationFix(this.$overlay.get(0));
+        var el =this.$overlay.get(0)
+        el.offsetWidth = el.offsetWidth;
+        this.$overlay.attr("class", "overlay " + overlay)
+      }
+
+
     },
 
     safeRender: function () {
@@ -148,10 +174,36 @@ function (app, Grid) {
     },
 
     initialize: function (options) {
+      app.BaseView.prototype.initialize.apply(this, arguments);
       handleOptions(this, options);
       this.listenTo(this.model, "change", this.safeRender);
     }
   });
+
+CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
+  className: "participant image-display",
+  optionProperties: ["image"].concat(CommonViews.ParticipantDisplay.prototype.optionProperties.slice()),
+  image: function (model) {
+    return "/img/junhao.jpg";
+  },
+
+  beforeRender: function () {
+    CommonViews.ParticipantDisplay.prototype.beforeRender.call(this);
+    var img = this.image(this.model);
+
+    if (img && this.$el.css("background-image") === "none") {
+      this.$el.css("background-image", "url(" + img + ")");
+    } else if (!img && this.$el.css("background-image") !== "none") {
+      this.$el.css("background-image", "none");
+    }
+  },
+
+  serialize: function () {
+    return _.extend(CommonViews.ParticipantDisplay.prototype.serialize.call(this), {
+      image: this.image(this.model)
+    });
+  }
+});
 
 
   CommonViews.ParticipantsGrid = app.BaseView.extend({
@@ -263,7 +315,7 @@ function (app, Grid) {
     },
   });
 
-	// requires model Common.Models.GroupModel or similar
+  // requires model Common.Models.GroupModel or similar
   CommonViews.GroupLayout = Backbone.View.extend({
     template: "common/group_layout",
     header: "Groups",
@@ -554,5 +606,5 @@ function (app, Grid) {
     }
   });
 
-	return CommonViews;
+  return CommonViews;
 });

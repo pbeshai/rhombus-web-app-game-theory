@@ -11,6 +11,10 @@
 
 @import "../../vendor/js/plugins/d3/rickshaw.css";
 
+/*-- Fancy animations. -------------------------------------------------------------*/
+
+@import "../../vendor/animate/animate.css"; /* http://daneden.me/animate/ */
+
 /*-- Application stylesheets. -----------------------------------------------*/
 
 @import "app.styl";

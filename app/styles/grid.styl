@@ -17,6 +17,7 @@
 	display inline-block
 	transition 1s background-color
 	border-radius .5em
+	background-size 5.5em
 
 .participant.choice-a
 	background-color #03588C
@@ -154,3 +155,37 @@ bucket-color = rgb(18, 60, 88)
 
 .participant.bucket-6
 	background-color: lighten(bucket-color, 30%);
+
+.participant.image-display
+	text-shadow: 2px 2px 0 #222, -1px -1px 0 #222, 1px -1px 0 #222, -1px 1px 0 #222, 1px 1px 0 #222;
+	zoom: 1.5;
+
+
+.overlay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	transition: 1s background-color;
+	border-radius: 4px;
+}
+
+.overlay:hover {
+	background: none;
+}
+
+.overlay.choice-a
+	background-color rgba(48, 241, 0, 0.5)
+
+.overlay.choice-b
+	background-color rgba(0, 112, 255, 0.5)
+
+.overlay.choice-c
+	background-color rgba(161, 0, 224, 0.5)
+
+.overlay.choice-d
+	background-color rgba(224, 215, 0, 0.5)
+
+.overlay.choice-e
+	background-color rgba(224, 54, 0, 0.5)

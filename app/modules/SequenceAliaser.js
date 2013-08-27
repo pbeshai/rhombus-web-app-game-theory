@@ -21,8 +21,9 @@ function (app, Common, Participant, StateApp) {
   SequenceAliaser.config = {
     sequenceLength: 4,
     sequenceAliasMap: {
-      "ABCD": "Alphabet",
-      "AAAA": "Zombies"
+      "ABCD": "Kelly",
+      "AAAA": "Peter",
+      "BBBB": "Junhao"
     }
   };
 
@@ -36,8 +37,21 @@ function (app, Common, Participant, StateApp) {
     }
   });
 
-  SequenceAliaser.Views.Participant = Common.Views.ParticipantDisplay.extend({
+  SequenceAliaser.Views.Participant = Common.Views.ParticipantImageDisplay.extend({
+    actionAnimations: {
+      "A": "pulse",
+      "B": "bounce",
+      "C": "shake",
+      "D": "swing"
+    },
+
     cssClass: function (model) {
+      if (model.get("action")) {
+        return "animated " + this.actionAnimations[model.get("action")];
+      }
+    },
+
+    overlay: function (model) {
       if (model.get("action")) {
         return "choice-" + model.get("action").toLowerCase();
       }
@@ -48,7 +62,27 @@ function (app, Common, Participant, StateApp) {
     },
 
     mainText: function (model) {
-      return model.get("sequence");
+      return model.get("action");
+    },
+
+    image: function (model) {
+      var img;
+      switch (model.get("seqAlias")) {
+        case "Kelly":
+          img = "kelly.jpg";
+          break;
+        case "Peter":
+          img = "peter.jpg";
+          break;
+        case "Junhao":
+          img = "junhao.jpg";
+          break;
+      }
+
+      if (img) {
+        img = "/img/" + img;
+      }
+      return img;
     },
   })
 

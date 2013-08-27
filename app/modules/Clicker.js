@@ -114,12 +114,23 @@ function(app, Participant, StateApp) {
     events: {
       "click .random-votes" : "randomVotes",
       "click .random-votes-ab" : "randomVotesAB",
-      "click .random-votes-cd" : "randomVotesCD"
+      "click .random-votes-cd" : "randomVotesCD",
+      "click .add-clickers" : "addClickers",
+    },
+
+    addClicker: function (id, render) {
+      var view = new Clicker.Views.Clicker({ id: id })
+      this.insertView(".clicker-container", view);
+
+      if (render) {
+        view.render();
+      }
     },
 
   	beforeRender: function () {
+      extraClickerCount = 0;
       this.collection.each(function (participant) {
-  			this.insertView(".clicker-container", new Clicker.Views.Clicker({ id: participant.get("alias") }));
+        this.addClicker(participant.get("alias"));
   		}, this);
   	},
 
@@ -148,6 +159,14 @@ function(app, Participant, StateApp) {
         clickerView.randomChoice(["C","D"]);
       });
     },
+
+    // adds in four clickers
+    addClickers: function () {
+      for (var i = 0; i < 4; i++) {
+        this.addClicker("Web" + (++extraClickerCount), true);
+      }
+
+    }
 
 
   });

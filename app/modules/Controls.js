@@ -171,6 +171,7 @@ function(app, Clicker, Apps) {
       // TODO: not sure where to put these
       app.controller.participantServer.hookCollection(this.options.participants, this);
       this.listenTo(this.options.participants, "change", app.controller.changedParticipant);
+      this.listenTo(this.options.participants, "update:choice", app.controller.changedParticipant);
       this.listenTo(this.options.participants, "sync", app.controller.syncParticipants);
       this.listenTo(this.options.participants, "add", app.controller.newParticipant);
 
@@ -192,6 +193,12 @@ function(app, Clicker, Apps) {
               break;
             case 53: // ctrl-5
               $(".random-votes-cd").click();
+              break;
+            case 54: // ctrl-6
+              $(".add-clickers").click();
+              break;
+            case 48: // ctrl-0
+              $('button[data-key="seq-alias"]').click() // select app
               break;
           }
         }

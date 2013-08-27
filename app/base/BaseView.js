@@ -3,6 +3,12 @@ define(["backbone.layoutmanager"],
 function() {
 
   var BaseView = Backbone.View.extend({
+    restartCssAnimationFix: function (el) {
+      // strange hack required to get css animation to work (http://css-tricks.com/restart-css-animation/)
+      el || (el = this.el);
+      console.log(el);
+      el.offsetWidth = el.offsetWidth;
+    },
 
     afterRender: function () {
       if (this.initialRender) {

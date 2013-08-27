@@ -155,7 +155,8 @@ function(app) {
             participant.partnerBackward = this.aliasMap[participant.partnerBackward];
           }
 
-          model.set(participant, { validate: this.options.validateOnChoice });
+          model.set(participant, { validate: this.options.validateOnChoice, silent: true });
+          model.trigger("change", model, participant);
         } else {
           console.log("new user. accept new? ", this.options.acceptNew, this.options);
           this.trigger("new-user", participant);
