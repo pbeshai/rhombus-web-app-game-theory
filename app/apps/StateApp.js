@@ -110,7 +110,6 @@ function(app) {
 		onExit: function () {  }, // this can return a value to modify the output (default is the input)
 
 		cleanup: function () {
-			console.log("@@ cleaning up ", this);
 			this.stopListening();
 		},
 
