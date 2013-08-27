@@ -56,7 +56,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		instantiate: function (attrs) {
 			return new GridApp(attrs, { writeLogAtEnd: false });
 		},
-		configView: undefined,
+		AppControlsView: undefined,
 		title: "Grid App"
 	}
 

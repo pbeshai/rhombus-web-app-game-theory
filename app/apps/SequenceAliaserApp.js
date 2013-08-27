@@ -29,7 +29,7 @@ function(app, StateApp, CommonStateApps, SequenceAliaser) {
 		instantiate: function (attrs) {
 			return new SequenceAliaserApp(attrs, { writeLogAtEnd: false });
 		},
-		configView: SequenceAliaser.Views.Configure,
+		AppControlsView: SequenceAliaser.Views.AppControls,
 		title: "Sequence Aliaser"
 	};
 

@@ -7,145 +7,61 @@ define([
   // Application.
   "app",
 
+  "modules/common/Common",
   "modules/Clicker",
   "apps/Apps",
 
   "util/jquery/jQuery.psToggleButton"
 ],
 
-function(app, Clicker, Apps) {
+function(app, Common, Clicker, Apps) {
 
   var Controls = app.module();
 
   var enableChoicesButton = function ($button, participantServer) {
-      $button.psToggleButton({
-        clickState1: participantServer.enableChoices,
-        clickState2: participantServer.disableChoices,
-        textState1: "Enable Choices",
-        textState2: "Disable Choices",
-        state1To2Event: "enable-choices",
-        state2To1Event: "disable-choices",
-        classState1: "btn-success",
-        classState2: "btn-danger",
-        participantServer: participantServer
-      });
+    $button.psToggleButton({
+      clickState1: participantServer.enableChoices,
+      clickState2: participantServer.disableChoices,
+      textState1: "Enable Choices",
+      textState2: "Disable Choices",
+      state1To2Event: "enable-choices",
+      state2To1Event: "disable-choices",
+      classState1: "btn-success",
+      classState2: "btn-danger",
+      participantServer: participantServer
+    });
 
-      if (!participantServer.get("connected")) {
+    if (!participantServer.get("connected")) {
+      $button.addClass("disabled").prop("disabled", true);
+    }
+
+    participantServer.on("status", function (state) {
+      if (state.acceptingChoices) {
+        $button.trigger("to-state2");
+      } else {
+        $button.trigger("to-state1");
+      }
+    });
+
+    participantServer.on("connect", function (success) {
+      console.log("connect? ", success, $button);
+      if (success) {
+        $button.removeClass("disabled").prop("disabled", false);
+      } else {
         $button.addClass("disabled").prop("disabled", true);
       }
-
-      participantServer.on("status", function (state) {
-        if (state.acceptingChoices) {
-          $button.trigger("to-state2");
-        } else {
-          $button.trigger("to-state1");
-        }
-      });
-
-      participantServer.on("connect", function (success) {
-        console.log("connect? ", success, $button);
-        if (success) {
-          $button.removeClass("disabled").prop("disabled", false);
-        } else {
-          $button.addClass("disabled").prop("disabled", true);
-        }
-      });
-      participantServer.on("disconnect", function (success) {
-        if (success) {
-          $button.addClass("disabled").prop("disabled", true);
-        }
-      });
-
-      // check the current state, so we initialize correctly
-      if (participantServer.get("acceptingChoices")) {
-        $button.trigger("to-state2");
+    });
+    participantServer.on("disconnect", function (success) {
+      if (success) {
+        $button.addClass("disabled").prop("disabled", true);
       }
+    });
+
+    // check the current state, so we initialize correctly
+    if (participantServer.get("acceptingChoices")) {
+      $button.trigger("to-state2");
     }
-
-
-  Controls.Views.AppControls = Backbone.View.extend({
-    tagName: "div",
-    className: "controls",
-    template: "controls/app_controls",
-
-    events: {
-      "click .next-state" : "nextState",
-      "click .prev-state" : "prevState",
-    },
-
-    initialize: function () {
-      this.listenTo(this.options.activeApp, "change:currentState", this.render);
-    },
-    serialize: function () {
-      return {
-        title: this.options.title,
-        states: this.options.activeApp.states,
-        currentState: this.options.activeApp.get("currentState")
-      }
-    },
-
-    beforeRender: function () {
-      if (this.options.appConfigView) {
-        this.setView(".configure", new Controls.Views.Configure({ appConfigView: this.options.appConfigView }));
-      }
-    },
-
-    afterRender: function () {
-      if (this.options.appConfigView == null) {
-        this.$(".configure").hide();
-      }
-    },
-
-    nextState: function () {
-      app.controller.appNext();
-    },
-
-    prevState: function () {
-      app.controller.appPrev();
-    },
-
-  });
-
-  Controls.ConfigurationModel = Backbone.Model.extend({
-    sync: function () {
-      app.controller.appConfig(this.attributes);
-      this.changed = {};
-    }
-  });
-
-  Controls.Views.Configure = Backbone.View.extend({
-    template: "controls/configure",
-
-    events: {
-      "change .config-message": "updateMessage",
-      "click .update-config": "submit"
-    },
-
-    beforeRender: function () {
-      if (this.options.appConfigView) {
-        this.insertView(".app-config-view", new this.options.appConfigView({ model: this.model }));
-      }
-    },
-
-    updateMessage: function (evt) {
-      this.model.set("message", $(evt.target).val());
-    },
-
-    serialize: function () {
-      return {
-        model: this.model
-      }
-    },
-
-    submit: function () {
-      this.model.save();
-      this.render();
-    },
-
-    initialize: function () {
-      this.model = new Controls.ConfigurationModel();
-    }
-  });
+  }
 
   Controls.Views.Viewers = Backbone.View.extend({
     template: "controls/viewers",
@@ -239,10 +155,10 @@ function(app, Clicker, Apps) {
       // instantiate the application.
       app.controller.set("activeApp", selectedApp.instantiate({ participants: this.options.participants }));
 
-      // show the this and config for the app
-      var appControls = new Controls.Views.AppControls({
+      // load the app controls
+      var AppControlsView = selectedApp.AppControlsView || Common.Views.AppControls;
+      var appControls = new AppControlsView({
         title: selectedApp.title,
-        appConfigView: selectedApp.configView,
         activeApp: app.controller.get("activeApp")
       });
 

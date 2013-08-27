@@ -151,5 +151,9 @@ function (app, Common, Participant, StateApp) {
     },
   });
 
+  SequenceAliaser.Views.AppControls = Common.Views.AppControls.extend({
+
+  })
+
   return SequenceAliaser;
 });

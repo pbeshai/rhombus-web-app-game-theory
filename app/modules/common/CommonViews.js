@@ -606,5 +606,97 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     }
   });
 
+  /* App Controls */
+  CommonViews.AppControls = Backbone.View.extend({
+    className: "controls",
+    template: "common/app_controls",
+    optionProperties: [ "appConfigView" ],
+
+    events: {
+      "click .next-state" : "nextState",
+      "click .prev-state" : "prevState",
+      "click .show-view-states-only" : "toggleViewStates"
+    },
+
+    initialize: function (options) {
+      handleOptions(this, options);
+      this.listenTo(this.options.activeApp, "change:currentState", this.render);
+    },
+    serialize: function () {
+      return {
+        title: this.options.title,
+        states: this.options.activeApp.states,
+        currentState: this.options.activeApp.get("currentState")
+      }
+    },
+
+    beforeRender: function () {
+      if (this.options.appConfigView) {
+        this.setView(".configure", new Controls.Views.Configure({ appConfigView: this.appConfigView }));
+      }
+    },
+
+    afterRender: function () {
+      if (this.options.appConfigView == null) {
+        this.$(".configure").hide();
+      }
+    },
+
+    nextState: function () {
+      app.controller.appNext();
+    },
+
+    prevState: function () {
+      app.controller.appPrev();
+    },
+
+    toggleViewStates: function (evt) {
+      if ($(evt.target).prop("checked")) {
+        this.$(".states").addClass("view-states-only");
+      } else {
+        this.$(".states").removeClass("view-states-only");
+      }
+    }
+  });
+
+  CommonViews.Configure = Backbone.View.extend({
+    template: "common/configure",
+
+    events: {
+      "change .config-message": "updateMessage",
+      "click .update-config": "submit"
+    },
+
+    beforeRender: function () {
+      if (this.options.appConfigView) {
+        this.insertView(".app-config-view", new this.options.appConfigView({ model: this.model }));
+      }
+    },
+
+    updateMessage: function (evt) {
+      this.model.set("message", $(evt.target).val());
+    },
+
+    serialize: function () {
+      return {
+        model: this.model
+      }
+    },
+
+    submit: function () {
+      this.model.save();
+      this.render();
+    },
+
+    initialize: function () {
+      this.model = new Backbone.Model({
+        sync: function () {
+          app.controller.appConfig(this.attributes);
+          this.changed = {};
+        }
+      });
+    }
+  });
+
   return CommonViews;
 });
