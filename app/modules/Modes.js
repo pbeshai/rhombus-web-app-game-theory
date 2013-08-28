@@ -94,7 +94,7 @@ function(app, ParticipantServer, AppController, Common, Participant) {
 
     // setup instructor handling
     handleInstructor: function () {
-      this.participantServer.on("instructor", function (data) {
+      this.listenTo(this.participantServer, "instructor", function (data) {
         // for now, only use the first item in the data array (highly unusual to have more than one)
         var choice = data[0].choice;
         switch (choice) {
@@ -111,11 +111,11 @@ function(app, ParticipantServer, AppController, Common, Participant) {
             break;
           case "C":
             console.log("instructor C: next state");
-            this.appController.appNext();
+            this.appNext();
             break;
           case "D":
             console.log("instructor D: prev state");
-            this.appController.appPrev();
+            this.appPrev();
             break;
           case "E":
             console.log("instructor E (unused)");

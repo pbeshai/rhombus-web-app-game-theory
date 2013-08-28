@@ -144,9 +144,19 @@ function (app, Common, Participant, StateApp) {
       this.listenTo(participants, "update:choice", this.updateSequence);
     },
 
+    onEntry: function (input) {
+      this.prevAcceptNew = input.participants.options.acceptNew;
+      input.participants.options.acceptNew = true;
+    },
+
+    cleanup: function () {
+      StateApp.ViewState.prototype.cleanup.call(this);
+      this.participants.options.acceptNew = this.prevAcceptNew;
+    },
+
     viewOptions: function () {
       return {
-        participants: this.options.participants,
+        participants: this.participants,
       };
     },
   });

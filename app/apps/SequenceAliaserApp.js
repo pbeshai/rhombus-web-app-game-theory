@@ -20,7 +20,6 @@ function(app, StateApp, CommonStateApps, SequenceAliaser) {
 
 		initStateOptions: function () {
 			this.stateOptions[0] = { participants: this.get("participants") };
-			this.get("participants").options.acceptNew = true;
 		}
 	})
 

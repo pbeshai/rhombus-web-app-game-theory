@@ -113,7 +113,6 @@ function(app, Common, Participant, StateApp) {
   // To be used in StateApps
   Attendance.State = StateApp.ViewState.extend({
     name: "attendance",
-    // view: Attendance.Views.Participants,
     view: "attendance", // key in app.views map
 
     viewOptions: function () {
@@ -126,6 +125,8 @@ function(app, Common, Participant, StateApp) {
     // reset participants to those in the db everytime we enter the attendance state
     onEntry: function (input, prevState) {
       this.options.participants.fetch();
+      this.prevAcceptNew = this.options.participants.options.acceptNew;
+      this.options.participants.options.acceptNew = this.options.acceptNew;
     },
 
     onExit: function () {
@@ -140,6 +141,11 @@ function(app, Common, Participant, StateApp) {
         presentParticipants.saveNew();
       }
       return new StateApp.StateMessage({ participants: presentParticipants });
+    },
+
+    cleanup: function () {
+      StateApp.ViewState.prototype.cleanup.call(this);
+      this.options.participants.options.acceptNew = this.prevAcceptNew;
     }
   });
 

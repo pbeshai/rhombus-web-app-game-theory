@@ -100,7 +100,7 @@ function(app, CommonModels, StateApp) {
 
   // score participants
   CommonStates.GroupScore = StateApp.State.extend({
-    name: "group-score",
+    name: "score",
     assignScore: function (participant) { // template method
       participant.set("score", -94);
     },
@@ -192,7 +192,7 @@ function(app, CommonModels, StateApp) {
   });
 
   CommonStates.GroupStats = CommonStates.Stats.extend({
-    name: "group-stats",
+    name: "stats",
     onExit: function () {
       var overallStats = this.calculateStats(this.input.groupModel.get("participants"));
       var group1Stats = this.calculateStats(this.input.groupModel.get("group1"));
@@ -279,7 +279,7 @@ function(app, CommonModels, StateApp) {
   });
 
   CommonStates.GroupPlay = StateApp.ViewState.extend({
-    name: "group-play",
+    name: "play",
     defaultChoice: "A",
 
     initialize: function () {
@@ -407,7 +407,7 @@ function(app, CommonModels, StateApp) {
   });
 
   CommonStates.GroupResults = StateApp.ViewState.extend({
-    name: "group-results",
+    name: "results",
     beforeRender: function () {
       // this.input is a GroupModel
       this.groupModel = this.input.groupModel;
