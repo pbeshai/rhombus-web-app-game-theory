@@ -152,8 +152,15 @@ function (app, Common, Participant, StateApp) {
   });
 
   SequenceAliaser.Views.AppControls = Common.Views.AppControls.extend({
+    template: "sequence_aliaser/controls",
+    events: {
+      "click .register-aliases" : "registerAliases"
+    },
 
-  })
+    registerAliases: function () {
+      console.log("@@ registering aliases", this);
+    }
+  });
 
   return SequenceAliaser;
 });

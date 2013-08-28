@@ -1,8 +1,9 @@
 define([
   "app",
   "modules/Grid",
+  "modules/common/CommonModels"
 ],
-function (app, Grid) {
+function (app, Grid, CommonModels) {
   var CommonViews = {};
 
   // sets 'this.options' and overrides properties with options if specified
@@ -607,10 +608,8 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
   });
 
   /* App Controls */
-  CommonViews.AppControls = Backbone.View.extend({
-    className: "controls",
-    template: "common/app_controls",
-    optionProperties: [ "appConfigView" ],
+  CommonViews.StateControls = Backbone.View.extend({
+    template: "common/state_controls",
 
     events: {
       "click .next-state" : "nextState",
@@ -619,26 +618,12 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     },
 
     initialize: function (options) {
-      handleOptions(this, options);
       this.listenTo(this.options.activeApp, "change:currentState", this.render);
     },
     serialize: function () {
       return {
-        title: this.options.title,
         states: this.options.activeApp.states,
         currentState: this.options.activeApp.get("currentState")
-      }
-    },
-
-    beforeRender: function () {
-      if (this.options.appConfigView) {
-        this.setView(".configure", new Controls.Views.Configure({ appConfigView: this.appConfigView }));
-      }
-    },
-
-    afterRender: function () {
-      if (this.options.appConfigView == null) {
-        this.$(".configure").hide();
       }
     },
 
@@ -659,6 +644,34 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     }
   });
 
+  CommonViews.AppControls = Backbone.View.extend({
+    className: "controls",
+    template: "common/app_controls",
+    optionProperties: [ "appConfigView" ],
+
+    initialize: function (options) {
+      handleOptions(this, options);
+    },
+    serialize: function () {
+      return {
+        title: this.options.title
+      }
+    },
+
+    beforeRender: function () {
+      if (this.AppConfigView) {
+        this.setView(".configure", new CommonViews.Configure({ AppConfigView: this.AppConfigView }));
+      }
+      this.setView(".state-controls", new CommonViews.StateControls(this.options));
+    },
+
+    afterRender: function () {
+      if (this.AppConfigView == null) {
+        this.$(".configure").hide();
+      }
+    },
+  });
+
   CommonViews.Configure = Backbone.View.extend({
     template: "common/configure",
 
@@ -668,8 +681,8 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     },
 
     beforeRender: function () {
-      if (this.options.appConfigView) {
-        this.insertView(".app-config-view", new this.options.appConfigView({ model: this.model }));
+      if (this.options.AppConfigView) {
+        this.insertView(".app-config-view", new this.options.AppConfigView({ model: this.model }));
       }
     },
 
@@ -689,12 +702,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     },
 
     initialize: function () {
-      this.model = new Backbone.Model({
-        sync: function () {
-          app.controller.appConfig(this.attributes);
-          this.changed = {};
-        }
-      });
+      this.model = new CommonModels.ConfigureModel();
     }
   });
 

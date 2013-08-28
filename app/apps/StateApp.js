@@ -164,6 +164,10 @@ function(app) {
 			return this.name || this.id;
 		},
 
+		toHtml: function () {
+			return "<span class='" + this.type + "'>" + this.toString() + "</span>";
+		},
+
 		// commonly used to log results via an API call
 		log: function (data) {
       if (data) {
@@ -217,6 +221,7 @@ function(app) {
 
 	// a collection of states that is run through repeatedly before exiting
 	var RoundState = ViewState.extend({
+		type: "round-state",
 		initialize: function () {
 			ViewState.prototype.initialize.apply(this, arguments);
 
@@ -435,9 +440,27 @@ function(app) {
 		},
 
 		toString: function () {
-			var statesString = _.invoke(this.states, "toString").join(", ");
+			var statesString = _.invoke(this.states, function (state) {
+				var str = this.toString();
+				if (this.type !== "view-state") {
+					str = "[" + str + "]";
+				}
+				return str;
+			}).join(", ");
 			return (this.name || this.id) + "["+this.numRounds+" x (" + statesString+ ")]";
 		},
+
+		toHtml: function () {
+			var currentState = this.currentState;
+			var statesString = _.invoke(this.states, function (state) {
+				var str = this.toHtml();
+				if (this === currentState) {
+					str = "<span class='active'>" + str + "</span>";
+				}
+				return str;
+			}).join(" ");
+			return (this.name || this.id) + ": "+this.numRounds+" rounds: " + statesString;
+		}
 	});
 
 	/**

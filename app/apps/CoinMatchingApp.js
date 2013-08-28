@@ -90,7 +90,7 @@ function(app, StateApp, CommonStateApps, CoinMatching) {
 		instantiate: function (attrs) {
 			return new CoinMatchingApp(attrs);
 		},
-		configView: CoinMatching.Views.Configure,
+		AppControlsView: CoinMatching.Views.AppControls,
 		title: "Coin Matching Game"
 	};
 

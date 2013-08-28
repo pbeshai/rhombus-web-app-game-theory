@@ -284,7 +284,20 @@ input[type="text"].input-large-text {
 
 .states {
 	margin: 10px 0 20px;
+	cursor: default;
 }
+
+.states li:after {
+	content: "\2192"; /* right arrow */
+	display: inline-block;
+	margin-left: 12px;
+}
+.states li:last-child:after {
+		content: "";
+		margin: 0;
+		display: none;
+	}
+
 .states .state {
 	font-style: italic
 	color: #777;
@@ -298,18 +311,53 @@ input[type="text"].input-large-text {
 .states.view-states-only .state {
 	display: none;
 }
-.states.view-states-only .view-state {
+.states.view-states-only .view-state,
+.states.view-states-only .round-state {
 	display: inline-block
 }
 
-.states .view-state {
+.states span.view-state {
+	color: #3E3E46
 	font-style: normal
-	border: 1px dotted #ddd;
-	padding: 0 10px;
+}
+.states li.active.view-state span.view-state {
+	font-weight: bold;
+	color: #222
+}
 
-	&.active {
-		border: 1px solid #ddd;
-		font-weight: bold;
-		background-color: #eee;
-	}
+.states li.active.round-state span.active span.view-state {
+	border-radius: 1em;
+	font-weight: bold;
+	background-color: #bbc;
+}
+.states li.round-state .state-inner > span
+.states li.round-state span.active span {
+	padding: 0 10px;
+}
+
+.states li.round-state .state-inner > span.active {
+	padding: 0;
+}
+
+
+.states li {
+	margin-bottom: 12px;
+}
+
+.states .state-inner {
+	border: 1px solid #bbc;
+	border-radius: 1em;
+	background: #fff;
+	padding: 3px 10px;
+}
+
+.states .state .state-inner {
+	background: #eee;
+	border: 1px solid transparent; /* prevent jumping */
+}
+
+.states li.active .state-inner {
+	border-bottom: 1px solid #bbc;
+	border-right: 1px solid #bbc;
+	background: #dddde9;
 }

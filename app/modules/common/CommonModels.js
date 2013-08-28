@@ -126,5 +126,12 @@ function (app, Participant) {
     }
   });
 
+  CommonModels.ConfigureModel = Backbone.Model.extend({
+    sync: function () {
+      app.controller.appConfig(this.attributes);
+      this.changed = {};
+    }
+  });
+
   return CommonModels;
 })
