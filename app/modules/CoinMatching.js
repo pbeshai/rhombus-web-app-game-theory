@@ -224,7 +224,7 @@ function(app, Common, Participant, StateApp, Graphs) {
         participant.set({ "phaseTotal": 0});
       });
 
-      StateApp.RoundState.prototype.apply(this, arguments);
+      StateApp.RoundState.prototype.onEntry.apply(this, arguments);
     },
 
     handleConfigure: function () {

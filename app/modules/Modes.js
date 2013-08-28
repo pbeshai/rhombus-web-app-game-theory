@@ -104,6 +104,7 @@ function(app, ParticipantServer, AppController, Common, Participant) {
         viewers.push(viewer);
         controller.set("viewers", viewers);
         controller.trigger("change:viewers");
+        controller.reloadView();
       });
 
       this.appController.on("viewer-disconnect", function (viewer) {
@@ -182,6 +183,13 @@ function(app, ParticipantServer, AppController, Common, Participant) {
         activeApp.configure(config);
       }
     },
+
+    reloadView: function (viewer) { // TODO: should use viewer
+      var currState = this.get("activeApp").get("currentState");
+      if (currState.rerender) {
+        currState.rerender();
+      }
+    }
   });
 
   Modes.Viewer = Backbone.Model.extend({

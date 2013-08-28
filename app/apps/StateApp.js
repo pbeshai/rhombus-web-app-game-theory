@@ -231,6 +231,13 @@ function(app) {
 			// TODO: Viewer1 shouldn't be hardcoded
 			app.controller.appController.loadView(this.view, this.options.viewOptions, "Viewer1");
 		},
+
+		// for re-loading a view without doing any logic. (e.g. a viewer just connected and needs the current view)
+		// can't simply loadView since the options are out of date.
+		rerender: function () {
+			this.setViewOptions();
+			this._render();
+		}
 	});
 
 	// a collection of states that is run through repeatedly before exiting
@@ -410,6 +417,10 @@ function(app) {
 		// delegate to current state
 		render: function () {
 			this.currentState.render();
+		},
+
+		rerender: function () {
+			this.currentState.rerender();
 		},
 
 

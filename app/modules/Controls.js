@@ -65,6 +65,9 @@ function(app, Common, Clicker, Apps) {
 
   Controls.Views.Viewers = Backbone.View.extend({
     template: "controls/viewers",
+    events: {
+      "click .reload-view" : "reloadView"
+    },
 
     serialize: function () {
       return { viewers: app.controller.get("viewers") };
@@ -72,6 +75,10 @@ function(app, Common, Clicker, Apps) {
 
     initialize: function () {
       this.listenTo(app.controller, "change:viewers", this.render);
+    },
+
+    reloadView: function () {
+      app.controller.reloadView(); // TODO: should probably include viewer
     }
   });
 

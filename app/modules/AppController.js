@@ -50,6 +50,7 @@ define([
 
 		loadView: function (view, options, viewer) {
 			console.log("load view", view, options);
+
 			// make JSON friendly
 			_.each(_.keys(options), function (key) {
 				if (options[key] && options[key].toJSON) {
