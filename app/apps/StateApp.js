@@ -39,9 +39,6 @@ function(app) {
 		initialize: function () {
 			this.id = undefined;
 			this.flow = { next: undefined, prev: undefined };
-	    if (this.options.enter) {
-	    	this.onEntry = this.options.enter;
-	    }
 	    this.view = this.view || this.options.view;
 	    this.config = this.options.config;
 		},
@@ -64,29 +61,39 @@ function(app) {
 		},
 
 		// return value becomes this.input
-		onEntry: function (input, prevState) { },
+		onEntry: function (input, prevState) {
+			this.deferRun.resolve();
+		},
 
 		// enter the state
 		enter: function (input, prevState) {
+			this.deferRun = $.Deferred();
+
+			// states will update in the run phase, so do not needlessy update now.
+			app.controller.participantUpdater.ignoreChanges();
+
 			if (debug) { console.log("[state:"+this.toString()+"] enter" + ((prevState !== undefined) ? " from " + prevState.toString() : "" )); }
-			var result = this.onEntry(input || this.input, prevState);
-			if (result !== undefined) {
-				input = result;
-			}
+
+			this.onEntry(input || this.input, prevState);
+
 			if (input) {
 				this.input = input;
 			}
 
-			var autoFlow = this.run();
-			if (autoFlow !== false) {
-				if (prevState === this.flow.next) {
-					return this.prev();
-				} else {
-					return this.next();
-				}
-			}
+			var state = this;
+			return this.deferRun.then(function () {
+				app.controller.participantUpdater.stopIgnoringChanges();
 
-			return this;
+				var autoFlow = state.run();
+				if (autoFlow !== false) {
+					if (prevState === state.flow.next) {
+						return state.prev();
+					} else {
+						return state.next();
+					}
+				}
+				return state;
+			});
 		},
 
 		run: function () { }, // return false to not automatically go to next state
@@ -131,9 +138,13 @@ function(app) {
 			}
 
 			if (this.flow.next) {
+				// returns a Promise that returns the state
 				return this.flow.next.enter(this.exit(), this);
 			}
-			return this.flow.next;
+
+			// wrap the result in a promise
+			var state = this;
+			return $.Deferred(function () { this.resolve(); }).then(function () { return state.flow.next; })
 		},
 
 		// go to the previous state
@@ -143,9 +154,12 @@ function(app) {
 			}
 
 			if (this.flow.prev) {
-				return this.flow.prev.enter(undefined, this);
+				return this.flow.prev.enter(undefined, this); // returns a promise
 			}
-			return this.flow.prev;
+
+			// wrap the result in a promise
+			var state = this;
+			return $.Deferred(function () { this.resolve(); }).then(function () { return state.flow.prev; })
 		},
 
 		// for debugging / logging
@@ -525,28 +539,34 @@ function(app) {
 			app.controller.participantServer.ignoreChoices();
       console.log("Next State:" + this.get("currentState").nextString());
 			var result = this.get("currentState").next();
-			if (result) { // only update current state if we reached a state (not null/undefined)
-				this.setCurrentState(result);
+			var stateApp = this;
+			result.done(function (resultState) {
+				if (resultState) { // only update current state if we reached a state (not null/undefined)
+					stateApp.setCurrentState(resultState);
 
-				if (!result.hasNext() && this.options.writeLogAtEnd) {
-					this.writeLog();
+					if (!resultState.hasNext() && stateApp.options.writeLogAtEnd) {
+						stateApp.writeLog();
+					}
 				}
-			}
-			app.controller.participantServer.stopIgnoringChoices();
+				app.controller.participantServer.stopIgnoringChoices();
+			})
 		},
 
 		prev: function () {
 			app.controller.participantServer.ignoreChoices();
 			console.log("Prev State:" + this.get("currentState").prevString());
 			var result = this.get("currentState").prev();
-			if (result) {
-				this.setCurrentState(result);
+			var stateApp = this;
+			result.done(function (resultState) {
+				if (resultState) {
+					stateApp.setCurrentState(resultState);
 
-				if (!result.hasPrev()) { // reset log if we reach the first state again
-					this.clearLogData();
+					if (!resultState.hasPrev()) { // reset log if we reach the first state again
+						stateApp.clearLogData();
+					}
 				}
-			}
-			app.controller.participantServer.stopIgnoringChoices();
+				app.controller.participantServer.stopIgnoringChoices();
+			});
 		},
 
 		configure: function (config) {

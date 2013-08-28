@@ -124,7 +124,11 @@ function(app, Common, Participant, StateApp) {
 
     // reset participants to those in the db everytime we enter the attendance state
     onEntry: function (input, prevState) {
-      this.options.participants.fetch();
+      var deferRun = this.deferRun;
+      this.options.participants.fetch({ success: function () {
+        deferRun.resolve();
+        app.controller.participantUpdater.ignoreChangesOnce(); // do not send sync callback over the wire (since it is included in loadView)
+      }});
       this.prevAcceptNew = this.options.participants.options.acceptNew;
       this.options.participants.options.acceptNew = this.options.acceptNew;
     },

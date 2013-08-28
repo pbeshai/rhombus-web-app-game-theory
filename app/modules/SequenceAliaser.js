@@ -46,14 +46,15 @@ function (app, Common, Participant, StateApp) {
     },
 
     cssClass: function (model) {
-      if (model.get("action")) {
+      if (model.get("action") && model.get("action") !== "E") {
         return "animated " + this.actionAnimations[model.get("action")];
-      }    },
+      }
+    },
 
     overlay: function (model) {
-      if (model.get("action")) {
+      if (model.get("action") && model.get("action") !== "E") {
         return "choice-" + model.get("action").toLowerCase();
-      } else if (model.get("choice") === "E") {
+      } else if (model.get("choice") === "E" || model.get("action") === "E") {
         return "cancel animated fadeOut";
       } else {
         return "highlight animated fadeOut";
@@ -65,7 +66,9 @@ function (app, Common, Participant, StateApp) {
     },
 
     mainText: function (model) {
-      return model.get("action");
+      if (model.get("action") !== "E") {
+        return model.get("action");
+      }
     },
 
     image: function (model) {
@@ -107,6 +110,8 @@ function (app, Common, Participant, StateApp) {
     },
 
     updateSequence: function (participant, choice) {
+      participant.set("action", null, { silent: true });
+
       if (choice === "E") {
         participant.set({ sequence: null, seqAlias: null, action: null });
         return;
@@ -129,6 +134,7 @@ function (app, Common, Participant, StateApp) {
 
           } else { // invalid sequence, restart
             sequence = null;
+            this.runAction(participant, "E"); // as if they canceled
           }
         }
 
@@ -147,6 +153,8 @@ function (app, Common, Participant, StateApp) {
     onEntry: function (input) {
       this.prevAcceptNew = input.participants.options.acceptNew;
       input.participants.options.acceptNew = true;
+
+      StateApp.ViewState.prototype.onEntry.apply(this, arguments);
     },
 
     cleanup: function () {

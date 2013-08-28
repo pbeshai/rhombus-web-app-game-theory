@@ -34,6 +34,22 @@ function(app, ParticipantServer, AppController, Common, Participant) {
     },
 
     add: function (participant) {
+      if (this.ignore === "once") {
+        this.ignore = false;
+        return;
+      }
+
+      if (!this.ignore) {
+        if (participant instanceof Backbone.Collection) {
+          participant.each(this.addParticipant, this);
+        } else {
+          this.addParticipant(participant);
+        }
+
+      }
+    },
+
+    addParticipant: function (participant) {
       if (!this.ignore) {
         this.participantBuffer[participant.get("alias")] = participant;
       }
@@ -54,6 +70,10 @@ function(app, ParticipantServer, AppController, Common, Participant) {
 
     ignoreChanges: function () {
       this.ignore = true;
+    },
+
+    ignoreChangesOnce: function () {
+      this.ignore = "once";
     },
 
     stopIgnoringChanges: function () {
@@ -131,7 +151,7 @@ function(app, ParticipantServer, AppController, Common, Participant) {
 
     // when the participants collection is synced (e.g., fetch is called), signal the updater
     syncParticipants: function (collection, participants) {
-      collection.each(this.participantUpdater.add, this.participantUpdater);
+      this.participantUpdater.add(collection);
     },
 
     newParticipant: function (participant) {

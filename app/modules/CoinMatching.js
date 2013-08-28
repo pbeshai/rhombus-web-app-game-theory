@@ -225,6 +225,8 @@ function(app, Common, Participant, StateApp, Graphs) {
       input.groupModel.get("participants").each(function (participant) {
         participant.set({ "phaseTotal": 0});
       });
+
+      StateApp.RoundState.prototype.apply(this, arguments);
     },
 
     handleConfigure: function () {

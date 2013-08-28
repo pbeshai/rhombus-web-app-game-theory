@@ -84,7 +84,6 @@ function(app, Common, Clicker, Apps) {
     },
 
     initialize: function () {
-      // TODO: not sure where to put these
       app.controller.participantServer.hookCollection(this.options.participants, this);
       this.listenTo(this.options.participants, "change", app.controller.changedParticipant);
       this.listenTo(this.options.participants, "update:choice", app.controller.changedParticipant);
@@ -92,6 +91,7 @@ function(app, Common, Clicker, Apps) {
       this.listenTo(this.options.participants, "add", app.controller.newParticipant);
 
       // TODO: temporary keyboard shortcuts for faster debugging
+      var testApp = "seq-alias";
       $(document.body).on("keypress", function (evt) {
         if (evt.ctrlKey) {
           switch (evt.which) {
@@ -114,7 +114,7 @@ function(app, Common, Clicker, Apps) {
               $(".add-clickers").click();
               break;
             case 48: // ctrl-0
-              $('button[data-key="seq-alias"]').click() // select app
+              $('button[data-key="' + testApp + '"]').click() // select app
               break;
           }
         }
