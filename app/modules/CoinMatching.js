@@ -251,7 +251,6 @@ function(app, Common, Participant, StateApp, Graphs) {
     },
 
     logResults: function () {
-      console.log("@@ phase results");
       var logData = {};
       logData["phase" + this.options.phase] = this.input.roundOutputs
       return logData;
