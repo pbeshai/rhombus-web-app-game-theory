@@ -304,9 +304,11 @@ function(app) {
 				} else {
 					// start new round
 					this.newRound(this.lastOutput);
+					this.trigger("change");
 				}
 			} else { // not final state in round, so go to next
 				this.currentState = this.currentState.next();
+				this.trigger("change");
 			}
 
 			return this;
@@ -326,9 +328,11 @@ function(app) {
 					}
 				} else {
 					this.undoNewRound();
+					this.trigger("change");
 				}
 			} else {
 				this.currentState = this.currentState.prev();
+				this.trigger("change");
 			}
 
 			return this;
@@ -459,7 +463,7 @@ function(app) {
 				}
 				return str;
 			}).join(" ");
-			return (this.name || this.id) + ": "+this.numRounds+" rounds: " + statesString;
+			return (this.name || this.id) + ": "+ this.roundCounter + " of "+this.numRounds+": " + statesString;
 		}
 	});
 
@@ -475,7 +479,6 @@ function(app) {
 
 			this.logData = null;
 			this.logApiCall = "apps/" + this.id + "/log";
-
 
 			if (this.defineStates) {
 				this.defineStates();
@@ -494,16 +497,25 @@ function(app) {
 				}, this);
 
 				this.initialState = this.states[stateKeys[0]];
-				this.set("currentState", this.states[stateKeys[0]]);
+				this.setCurrentState(this.states[stateKeys[0]]);
 				this.loadState(this.initialState.id, this.initialInput);
 			}
+		},
+
+		setCurrentState: function (state) {
+			var prevState = this.get("currentState");
+			if (prevState) {
+				this.stopListening(prevState);
+			}
+			this.listenTo(state, "change", function () { this.trigger("change:currentState", this, state); });
+			this.set("currentState", state);
 		},
 
 		loadState: function (id, input) {
 			var state = this.states[id];
 			if (state) {
 				state.enter(input);
-				this.set("currentState", state);
+				this.setCurrentState(state);
 			} else {
 				console.log("Could not load state ", id);
 			}
@@ -514,7 +526,7 @@ function(app) {
       console.log("Next State:" + this.get("currentState").nextString());
 			var result = this.get("currentState").next();
 			if (result) { // only update current state if we reached a state (not null/undefined)
-				this.set("currentState", result);
+				this.setCurrentState(result);
 
 				if (!result.hasNext() && this.options.writeLogAtEnd) {
 					this.writeLog();
@@ -528,7 +540,7 @@ function(app) {
 			console.log("Prev State:" + this.get("currentState").prevString());
 			var result = this.get("currentState").prev();
 			if (result) {
-				this.set("currentState", result);
+				this.setCurrentState(result);
 
 				if (!result.hasPrev()) { // reset log if we reach the first state again
 					this.clearLogData();
