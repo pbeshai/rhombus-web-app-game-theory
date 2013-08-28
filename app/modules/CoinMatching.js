@@ -45,12 +45,10 @@ function(app, Common, Participant, StateApp, Graphs) {
   }
 
   CoinMatching.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
-    DEBUG: "CONFIGURE",
     modelOptions: _.extend({}, CoinMatching.config)
   });
 
   CoinMatching.Views.AppControls = Common.Views.AppControls.extend({
-    DEBUG: "APPCONTROLS",
     AppConfigView: CoinMatching.Views.Configure
   });
 

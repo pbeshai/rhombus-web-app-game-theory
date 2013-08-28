@@ -34,7 +34,7 @@ function(app, StateApp, CommonStateApps, UltimatumGamePartitioned) {
 		instantiate: function (attrs) {
 			return new UltimatumGamePartitionedApp(attrs);
 		},
-		configView: UltimatumGamePartitioned.Views.Configure,
+		AppControlsView: UltimatumGamePartitioned.Views.AppControls,
 		title: "Ultimatum Game (Partitioned)"
 	};
 

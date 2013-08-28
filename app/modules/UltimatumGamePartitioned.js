@@ -35,6 +35,12 @@ function(app, Common, Participant, UltimatumGame, StateApp, Graphs) {
     modelOptions: _.extend({}, UltimatumGamePartitioned.config)
   });
 
+
+  UltimatumGamePartitioned.Views.AppControls = Common.Views.AppControls.extend({
+    AppConfigView: UltimatumGamePartitioned.Views.Configure
+  });
+
+
   UltimatumGamePartitioned.Views.GiverPlay = {};
 
   UltimatumGamePartitioned.Views.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay;

@@ -31,7 +31,7 @@ function(app, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 		instantiate: function (options) {
 			return new PrisonersDilemmaMultiApp(options);
 		},
-		configView: PrisonersDilemmaMulti.Views.Configure,
+		AppControlsView: PrisonersDilemmaMulti.Views.AppControls,
 		title: "Multiround Prisoner's Dilemma"
 	};
 

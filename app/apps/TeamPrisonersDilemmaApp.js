@@ -30,7 +30,7 @@ function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 		instantiate: function (attrs) {
 			return new TeamPrisonersDilemmaApp(attrs);
 		},
-		configView: TeamPrisonersDilemma.Views.Configure,
+		AppControlsView: TeamPrisonersDilemma.Views.AppControls,
 		title: "Team Prisoner's Dilemma"
 	};
 

@@ -31,7 +31,7 @@
 }
 
 h1 {
-	margin: 15px 0 20px; /* a bit bigger margins (default is 10px 0) */
+	margin: 16px 0 16px; /* a bit bigger margins (default is 10px 0) */
 }
 
 .view-controls {
@@ -104,7 +104,7 @@ h1 {
 	border: 1px solid #ccc;
 	padding: 10px;
 	display: inline-block;
-	margin: 10px 20px;
+	margin: 10px 20px 10px 0;
 	border-radius: 4px;
 }
 
@@ -210,16 +210,9 @@ h1 {
 
 
 .control-panel-group {
-	margin-bottom: 32px;
+	margin: 0 0 24px;
 }
 
-
-/* configuration */
-.configure {
-	background: #eee;
-	padding: 10px
-	border-radius: 4px
-}
 
 .form-horizontal.narrow .controls {
 	margin-left: 100px;
@@ -360,4 +353,55 @@ input[type="text"].input-large-text {
 	border-bottom: 1px solid #bbc;
 	border-right: 1px solid #bbc;
 	background: #dddde9;
+}
+
+.collapse-toggle {
+	cursor: pointer;
+	i {
+		opacity: .8
+	}
+}
+
+.collapse-toggle:hover {
+	color: #111;
+	background: #e7e7e7;
+	i {
+		opacity: 1;
+	}
+}
+.collapsible-panel {
+	background: #eee;
+	border-radius: 4px;
+}
+
+.collapsible-panel header {
+	border-radius: 4px;
+	padding: 10px;
+	background: #ddd;
+	h3 {
+		margin: 0;
+		line-height: 1em;
+	}
+}
+.collapsible-panel .collapse {
+	padding: 0 10px;
+}
+
+.collapsible-panel .collapse-inner {
+	padding: 10px 0 0;
+}
+
+.collapse-indicator {
+	float: right;
+}
+
+.collapse-indicator-collapsed {
+	display: none;
+}
+
+.collapsed .collapse-indicator-collapsed {
+	display: block;
+}
+.collapsed .collapse-indicator-open {
+	display: none;
 }

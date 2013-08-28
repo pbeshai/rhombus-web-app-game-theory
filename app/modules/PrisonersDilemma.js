@@ -140,6 +140,11 @@ function(app, Common, Participant, StateApp, variableWidthBarChart, xLine, Graph
     }
   });
 
+  PrisonersDilemma.Views.AppControls = Common.Views.AppControls.extend({
+    AppConfigView: PrisonersDilemma.Views.Configure
+  });
+
+
   // To be used in StateApps
   PrisonersDilemma.States = {};
   PrisonersDilemma.States.Score = Common.States.Score.extend({

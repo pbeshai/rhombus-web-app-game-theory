@@ -93,6 +93,11 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
+  NPrisonersDilemma.Views.AppControls = Common.Views.AppControls.extend({
+    AppConfigView: NPrisonersDilemma.Views.Configure
+  });
+
+
   // To be used in StateApps
   NPrisonersDilemma.States = {};
   NPrisonersDilemma.States.Play = PrisonersDilemma.States.Play.extend({

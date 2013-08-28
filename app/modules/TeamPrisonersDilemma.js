@@ -74,6 +74,10 @@ function(app, Common, PrisonersDilemma, Participant, StateApp) {
     }
   });
 
+  TeamPrisonersDilemma.Views.AppControls = Common.Views.AppControls.extend({
+    AppConfigView: TeamPrisonersDilemma.Views.Configure
+  });
+
   // To be used in StateApps
   TeamPrisonersDilemma.States = {};
   TeamPrisonersDilemma.States.Group = Common.States.Group;

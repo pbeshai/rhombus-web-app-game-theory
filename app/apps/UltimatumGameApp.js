@@ -34,7 +34,7 @@ function(app, StateApp, CommonStateApps, UltimatumGame) {
 		instantiate: function (attrs) {
 			return new UltimatumGameApp(attrs);
 		},
-		configView: UltimatumGame.Views.Configure,
+		AppControlsView: UltimatumGame.Views.AppControls,
 		title: "Ultimatum Game"
 	};
 

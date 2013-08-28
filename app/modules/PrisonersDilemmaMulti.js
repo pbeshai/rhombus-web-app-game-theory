@@ -26,11 +26,15 @@ function(app, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
       DD: 1
     },
     minRounds: 3,
-    maxRounds: 3,
+    maxRounds: 6,
   };
 
   PrisonersDilemmaMulti.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
     modelOptions: _.clone(PrisonersDilemmaMulti.config)
+  });
+
+  PrisonersDilemmaMulti.Views.AppControls = Common.Views.AppControls.extend({
+    AppConfigView: PrisonersDilemmaMulti.Views.Configure
   });
 
   PrisonersDilemmaMulti.Views.Results = {};
