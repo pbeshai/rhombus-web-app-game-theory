@@ -619,11 +619,14 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
 
     initialize: function (options) {
       this.listenTo(this.options.activeApp, "change:currentState", this.render);
+      this.model = new Backbone.Model({ "views-only": true });
     },
+
     serialize: function () {
       return {
         states: this.options.activeApp.states,
-        currentState: this.options.activeApp.get("currentState")
+        currentState: this.options.activeApp.get("currentState"),
+        viewsOnly: this.model.get("views-only")
       }
     },
 
@@ -636,7 +639,10 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     },
 
     toggleViewStates: function (evt) {
-      if ($(evt.target).prop("checked")) {
+      var viewsOnly = $(evt.target).prop("checked");
+      this.model.set("views-only", viewsOnly); // persist it so on re-render it remembers
+
+      if (viewsOnly) {
         this.$(".states").addClass("view-states-only");
       } else {
         this.$(".states").removeClass("view-states-only");

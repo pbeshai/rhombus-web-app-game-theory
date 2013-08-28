@@ -2,10 +2,10 @@
 	<header class="clearfix">
 		<h4 class="pull-left">States</h4>
 		<div class="pull-left states-toggle">
-			<label class="checkbox inline"><input type="checkbox" class="show-view-states-only" checked> Only show states with views</label>
+			<label class="checkbox inline"><input type="checkbox" class="show-view-states-only" <% if (viewsOnly) { print("checked") } %>> Only show states with views</label>
 		</div>
 	</header>
-	<div class="states view-states-only">
+	<div class="states <% if (viewsOnly) { print("view-states-only") } %>">
 		<ul class="inline">
 		<% _.each(states, function (s) { %>
 			<li class="<%= s.type %> <% if (s.id === currentState.id) { %>active<% } %>"><span class="state-inner"><%= s.toHtml() %></span></li>
