@@ -4,8 +4,8 @@
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 ],
 
 function(app) {
@@ -17,20 +17,19 @@ function(app) {
 	};
 	StateMessage.prototype.clone = function (newData) {
 		var data = _.clone(this);
-		for (key in data) {
+		for (var key in data) {
 			if (!this.hasOwnProperty(key)) {
 				delete data[key];
 			}
 		}
 		data = _.extend(data, newData);
 		return new StateMessage(data);
-	}
-	window.StateMessage = StateMessage;
+	};
 
 	// define the State prototype object
 	var State = function (options, stateApp) {
 		this.options = _.defaults({}, options, this.defaults);
-    this.stateApp = stateApp;
+		this.stateApp = stateApp;
 		this.initialize();
 	};
 	State.extend = Backbone.Model.extend; // use Backbone's extend for subclassing
@@ -39,8 +38,8 @@ function(app) {
 		initialize: function () {
 			this.id = undefined;
 			this.flow = { next: undefined, prev: undefined };
-	    this.view = this.view || this.options.view;
-	    this.config = this.options.config;
+			this.view = this.view || this.options.view;
+			this.config = this.options.config;
 		},
 
 		setNext: function(nextState, mutual) {
@@ -144,7 +143,7 @@ function(app) {
 
 			// wrap the result in a promise
 			var state = this;
-			return $.Deferred(function () { this.resolve(); }).then(function () { return state.flow.next; })
+			return $.Deferred(function () { this.resolve(); }).then(function () { return state.flow.next; });
 		},
 
 		// go to the previous state
@@ -159,19 +158,19 @@ function(app) {
 
 			// wrap the result in a promise
 			var state = this;
-			return $.Deferred(function () { this.resolve(); }).then(function () { return state.flow.prev; })
+			return $.Deferred(function () { this.resolve(); }).then(function () { return state.flow.prev; });
 		},
 
 		// for debugging / logging
 		nextString: function () {
 			var nextState = this.flow.next ? this.flow.next.toString() : "#";
-	  	return this.toString() + " -> " + nextState;
+			return this.toString() + " -> " + nextState;
 		},
 
 		// for debugging / logging
 		prevString: function () {
 			var prevState = this.flow.prev ? this.flow.prev.toString() : "#";
-	  	return prevState + " <- " + this.toString();
+			return prevState + " <- " + this.toString();
 		},
 
 		toString: function () {
@@ -184,10 +183,10 @@ function(app) {
 
 		// commonly used to log results via an API call
 		log: function (data) {
-      if (data) {
-      	this.stateApp.addLogData(data);
-      }
-    },
+			if (data) {
+				this.stateApp.addLogData(data);
+			}
+		},
 
 		// can be called when a state app configures itself (perhaps a new config is set)
 		handleConfigure: function () {}
@@ -251,7 +250,7 @@ function(app) {
 
 			// handle round range
 			if (this.numRounds === undefined && this.minRounds !== undefined && this.maxRounds !== undefined) {
-				this.numRounds = this.minRounds + Math.round(Math.random() * (this.maxRounds - this.minRounds))
+				this.numRounds = this.minRounds + Math.round(Math.random() * (this.maxRounds - this.minRounds));
 			}
 
 			this.config.numRounds = this.numRounds;
@@ -362,7 +361,7 @@ function(app) {
 		// used when prev'ing into an old round
 		undoEndRound: function () {
 			// put lastOutput as the previous rounds output
-			this.lastOutput = this.roundOutputs[this.roundOutputs.length - 2]
+			this.lastOutput = this.roundOutputs[this.roundOutputs.length - 2];
 
 			// delete the old round output
 			this.roundOutputs.pop();
@@ -440,8 +439,8 @@ function(app) {
 			var nextStateCounter = (stateCounter % this.states.length) + 1;
 			var nextRoundCounter = (stateCounter < nextStateCounter) ? this.roundCounter : this.roundCounter + 1;
 
-			var str = this.stateString(stateCounter, this.roundCounter)
-					+ " -> " + this.stateString(nextStateCounter, nextRoundCounter);
+			var str = this.stateString(stateCounter, this.roundCounter) +
+					" -> " + this.stateString(nextStateCounter, nextRoundCounter);
 
 			return str;
 		},
@@ -462,8 +461,8 @@ function(app) {
 			var prevStateCounter = (stateCounter === 1) ? this.states.length : stateCounter - 1;
 			var prevRoundCounter = (stateCounter > prevStateCounter) ? this.roundCounter : this.roundCounter - 1;
 
-			var str = this.stateString(prevStateCounter, prevRoundCounter)
-					+ " <- " + this.stateString(stateCounter, this.roundCounter);
+			var str = this.stateString(prevStateCounter, prevRoundCounter) +
+					" <- " + this.stateString(stateCounter, this.roundCounter);
 
 			return str;
 		},
@@ -548,7 +547,7 @@ function(app) {
 
 		next: function () {
 			app.controller.participantServer.ignoreChoices();
-      console.log("Next State:" + this.get("currentState").nextString());
+			console.log("Next State:" + this.get("currentState").nextString());
 			var result = this.get("currentState").next();
 			var stateApp = this;
 			result.done(function (resultState) {
@@ -560,7 +559,7 @@ function(app) {
 					}
 				}
 				app.controller.participantServer.stopIgnoringChoices();
-			})
+			});
 		},
 
 		prev: function () {
@@ -601,9 +600,9 @@ function(app) {
 
 		writeLog: function () {
 			var logData = _.extend({
-        config: this.config,
-        version: this.version,
-      }, this.logData);
+				config: this.config,
+				version: this.version,
+			}, this.logData);
 
 			console.log("Logging", this.logApiCall, logData);
 			app.api({ call: this.logApiCall, type: "post", data: logData });

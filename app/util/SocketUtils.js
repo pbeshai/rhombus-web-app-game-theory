@@ -2,7 +2,8 @@
  */
 define(["app"],
 	function (app) {
-	"use strict"
+	"use strict";
+
 	var debug = false;
 
 	var SocketUtils = {
@@ -52,7 +53,7 @@ define(["app"],
 		sendFunction: function (socketEvent) {
 			return _.bind(function (data) {
 				if (debug) { console.log("sending " + socketEvent + ": ", data); }
-				this.socket.emit(socketEvent, data)
+				this.socket.emit(socketEvent, data);
 			}, this);
 		},
 

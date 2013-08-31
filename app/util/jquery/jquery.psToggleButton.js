@@ -2,7 +2,8 @@
 // @author pbeshai
 define(["jquery"],
 function (jQuery) {
-	"use strict"
+	"use strict";
+
 	if (typeof jQuery === 'undefined')
 		return;
 	var $ = jQuery;
@@ -14,10 +15,10 @@ function (jQuery) {
 			classPending: "state-pending",
 			textState1: "State 1",
 			textState2: "State 2",
-			clickState1: null,		 // function that is called when state1 button clicked
-			clickState2: null,		 // function that is called when state2 button clicked
-			state1to2Event: null,  // string event name from Participant Server
-			state2to1Event: null,  // string event name from Participant Server
+			clickState1: null,			// function that is called when state1 button clicked
+			clickState2: null,			// function that is called when state2 button clicked
+			state1to2Event: null,		// string event name from Participant Server
+			state2to1Event: null,		// string event name from Participant Server
 			participantServer: null
 		};
 		return this.each(function() {
@@ -25,51 +26,51 @@ function (jQuery) {
 
 			var elem = this;
 
-			var $button = $(this)
+			var $button = $(this);
 
 			$button.addClass(config.classState1).text(config.textState1);
 
 			$button.on("click", clickHandler);
 			if (config.state1To2Event !== null && config.participantServer) {
-		  	config.participantServer.on(config.state1To2Event, toState2);
-		  }
-		  if (config.state2To1Event !== null && config.participantServer) {
-		  	config.participantServer.on(config.state2To1Event, toState1);
-		  }
+				config.participantServer.on(config.state1To2Event, toState2);
+			}
+			if (config.state2To1Event !== null && config.participantServer) {
+				config.participantServer.on(config.state2To1Event, toState1);
+			}
 
-		  // allow programmatic changing of visual state
-		  $button.on("to-state1", function () { toState1(true); });
-		  $button.on("to-state2", function () { toState2(true); });
+			// allow programmatic changing of visual state
+			$button.on("to-state1", function () { toState1(true); });
+			$button.on("to-state2", function () { toState2(true); });
 
-		  // the main button click handler for changing appearance and firing actions
-		  function clickHandler() {
-		  	if($button.hasClass(config.classState1)) {
-		  		if (config.clickState1 !== null) {
-		  			config.clickState1();
-		  		}
-		  	} else {
-		  		if (config.clickState2 !== null) {
-		  			config.clickState2();
-		  		}
-		  	}
-		  	$button.addClass(config.classPending).addClass("disabled").prop("disabled", true);
-	  	};
+			// the main button click handler for changing appearance and firing actions
+			function clickHandler() {
+				if($button.hasClass(config.classState1)) {
+					if (config.clickState1 !== null) {
+						config.clickState1();
+					}
+				} else {
+					if (config.clickState2 !== null) {
+						config.clickState2();
+					}
+				}
+				$button.addClass(config.classPending).addClass("disabled").prop("disabled", true);
+			}
 
-	  	function toState2(success) {
-	  		if (!success) return toState1(true); // abort
+			function toState2(success) {
+				if (!success) return toState1(true); // abort
 
-	  		$button.removeClass(config.classPending).removeClass(config.classState1)
-	  			.removeClass("disabled").prop("disabled", false)
-	  			.addClass(config.classState2).text(config.textState2);
-	  	}
+				$button.removeClass(config.classPending).removeClass(config.classState1)
+					.removeClass("disabled").prop("disabled", false)
+					.addClass(config.classState2).text(config.textState2);
+			}
 
 			function toState1(success) {
 				if (!success) return toState2(true); // abort
 
-	  		$button.removeClass(config.classPending).removeClass(config.classState2)
-	  			.removeClass("disabled").prop("disabled", false)
-	  			.addClass(config.classState1).text(config.textState1);
-	  	}
+				$button.removeClass(config.classPending).removeClass(config.classState2)
+					.removeClass("disabled").prop("disabled", false)
+					.addClass(config.classState1).text(config.textState1);
+			}
 		});
 	};
 

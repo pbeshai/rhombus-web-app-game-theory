@@ -61,7 +61,7 @@ function(app, Sandbox, ParticipantServer, AppController, ViewControls, Participa
 
       // need to force new connection in case we have connected and disconnected before
       // (e.g., back button took us back to index and now we choose again)
-      var socket = io.connect(app.socketUrl, { "force new connection": true });
+      var socket = window.io.connect(app.socketUrl, { "force new connection": true });
 
       // register the viewer/controller
       socket.on("connect", function () {

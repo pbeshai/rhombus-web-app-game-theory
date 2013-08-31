@@ -11,7 +11,7 @@ function() {
     className: "round-label",
     afterRender: function () {
       if (this.options.round !== undefined) {
-        this.$el.html("Round " + this.options.round)
+        this.$el.html("Round " + this.options.round);
       }
     },
   });
@@ -21,7 +21,7 @@ function() {
       Layout = CommonMixins[mixinName](Layout);
     });
     return Layout;
-  }
+  };
 
   CommonMixins.bucketParticipant = function (ParticipantDisplay) {
     return ParticipantDisplay.extend({
@@ -31,8 +31,8 @@ function() {
           return "bucket-" + bucket;
         }
       },
-    })
-  }
+    });
+  };
 
   CommonMixins.gameOver = function (Layout) {
     return Layout.extend({
@@ -44,8 +44,8 @@ function() {
         }
         return superSerialize;
       }
-    })
-  }
+    });
+  };
 
 
   CommonMixins.rounds = function (Layout) {
@@ -55,7 +55,7 @@ function() {
         this.insertView(".layout-header", new CommonMixins.Views.RoundLabel({ round: this.options.config.round }));
       }
     });
-  }
+  };
 
   return CommonMixins;
-})
+});

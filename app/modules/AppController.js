@@ -7,7 +7,7 @@ define([
 	"util/SocketUtils"
 	],
 	function (app, SocketUtils) {
-	"use strict"
+	"use strict";
 
 	var AppController = app.module();
 
@@ -36,7 +36,7 @@ define([
 			var appMessage = {
 				type: type,
 				message: message,
-			}
+			};
 
 			this.socket.emit("app-message", appMessage);
 		},
@@ -75,7 +75,7 @@ define([
 		initialize: function (attrs) {
 			// web socket
 			this.socket = attrs.socket;
-			SocketUtils.initSendReceive.call(this)
+			SocketUtils.initSendReceive.call(this);
 
 			this.on("change:socket", function (model, socket) {
 				this.socket = socket;

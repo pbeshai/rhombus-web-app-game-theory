@@ -6,13 +6,13 @@ define([
 
 	"apps/GridApp",
 	"apps/PrisonersDilemmaApp",
-  "apps/PrisonersDilemmaMultiApp",
-  "apps/NPrisonersDilemmaApp",
-  "apps/TeamPrisonersDilemmaApp",
-  "apps/UltimatumGameApp",
-  "apps/UltimatumGamePartitionedApp",
-  "apps/CoinMatchingApp",
-  "apps/SequenceAliaserApp"
+	"apps/PrisonersDilemmaMultiApp",
+	"apps/NPrisonersDilemmaApp",
+	"apps/TeamPrisonersDilemmaApp",
+	"apps/UltimatumGameApp",
+	"apps/UltimatumGamePartitionedApp",
+	"apps/CoinMatchingApp",
+	"apps/SequenceAliaserApp"
 ],
 function (app, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDilemmaApp,
 	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp, CoinMatchingApp,

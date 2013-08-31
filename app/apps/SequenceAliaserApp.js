@@ -1,12 +1,12 @@
 
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/common/CommonStateApps",
-  "modules/SequenceAliaser"
+	"modules/common/CommonStateApps",
+	"modules/SequenceAliaser"
 ],
 
 function(app, StateApp, CommonStateApps, SequenceAliaser) {
@@ -21,7 +21,7 @@ function(app, StateApp, CommonStateApps, SequenceAliaser) {
 		initStateOptions: function () {
 			this.stateOptions[0] = { participants: this.get("participants") };
 		}
-	})
+	});
 
 	// description for use in router
 	SequenceAliaserApp.app = {
@@ -32,5 +32,5 @@ function(app, StateApp, CommonStateApps, SequenceAliaser) {
 		title: "Sequence Aliaser"
 	};
 
-  return SequenceAliaserApp;
+	return SequenceAliaserApp;
 });

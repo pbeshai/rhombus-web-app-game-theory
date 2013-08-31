@@ -4,14 +4,14 @@
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/Participant",
-  "modules/Attendance",
-  "modules/Grid"
+	"modules/Participant",
+	"modules/Attendance",
+	"modules/Grid"
 ],
 
 function(app, StateApp, Participant, Attendance, Grid) {
@@ -32,22 +32,22 @@ function(app, StateApp, Participant, Attendance, Grid) {
 			});
 
 			this.states = {
-		  	"attendance": attendanceState,
-		  	"grid": gridState
-	  	};
+				"attendance": attendanceState,
+				"grid": gridState
+			};
 
 			attendanceState.setNext(gridState);
 		},
 
 		transitions: {
-  		attendance_grid: function () {
-  			console.log("going from attendance to grid");
-  		},
+			attendance_grid: function () {
+				console.log("going from attendance to grid");
+			},
 
-  		grid_attendance: function () {
-			  console.log("going from grid to attendance");
-			  this.options.participants.fetch();
-  		}
+			grid_attendance: function () {
+				console.log("going from grid to attendance");
+				this.options.participants.fetch();
+			}
 		}
 	});
 
@@ -58,7 +58,7 @@ function(app, StateApp, Participant, Attendance, Grid) {
 		},
 		AppControlsView: undefined,
 		title: "Grid App"
-	}
+	};
 
-  return GridApp;
+	return GridApp;
 });

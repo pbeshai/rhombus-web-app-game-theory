@@ -8,13 +8,13 @@ play many rounds
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/common/CommonStateApps",
-  "modules/PrisonersDilemmaMulti"
+	"modules/common/CommonStateApps",
+	"modules/PrisonersDilemmaMulti"
 ],
 
 function(app, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
@@ -35,5 +35,5 @@ function(app, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 		title: "Multiround Prisoner's Dilemma"
 	};
 
-  return PrisonersDilemmaMultiApp;
+	return PrisonersDilemmaMultiApp;
 });

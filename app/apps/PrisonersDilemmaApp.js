@@ -6,13 +6,13 @@ Attendance -> Prisoner's Dilemma Play -> Prisoner's Dilemam Results
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/common/CommonStateApps",
-  "modules/PrisonersDilemma"
+	"modules/common/CommonStateApps",
+	"modules/PrisonersDilemma"
 ],
 
 function(app, StateApp, CommonStateApps, PrisonersDilemma) {
@@ -22,7 +22,7 @@ function(app, StateApp, CommonStateApps, PrisonersDilemma) {
 		version: "1.0",
 		config: PrisonersDilemma.config,
 		States: [ PrisonersDilemma.States.Play, PrisonersDilemma.States.Score, PrisonersDilemma.States.Stats, PrisonersDilemma.States.Results ]
-	})
+	});
 
 	// description for use in router
 	PrisonersDilemmaApp.app = {
@@ -33,5 +33,5 @@ function(app, StateApp, CommonStateApps, PrisonersDilemma) {
 		title: "Prisoner's Dilemma"
 	};
 
-  return PrisonersDilemmaApp;
+	return PrisonersDilemmaApp;
 });

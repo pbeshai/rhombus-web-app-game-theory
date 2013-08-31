@@ -6,13 +6,13 @@ Attendance -> Team Prisoner's Dilemma Play -> Team Prisoner's Dilemam Results
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/common/CommonStateApps",
-  "modules/TeamPrisonersDilemma"
+	"modules/common/CommonStateApps",
+	"modules/TeamPrisonersDilemma"
 ],
 
 function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
@@ -34,5 +34,5 @@ function(app, StateApp, CommonStateApps, TeamPrisonersDilemma) {
 		title: "Team Prisoner's Dilemma"
 	};
 
-  return TeamPrisonersDilemmaApp;
+	return TeamPrisonersDilemmaApp;
 });

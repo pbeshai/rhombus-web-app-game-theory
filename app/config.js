@@ -3,13 +3,40 @@ require.config({
 
   // Initialize the application with the main application file and the JamJS
   // generated configuration file.
-  deps: ["../vendor/jam/require.config", "main"],
+  // deps: ["../vendor/jam/require.config", "main"],
+  deps: ["main"],
+
+  packages: [
+    {
+      "name": "backbone",
+      "location": "../vendor/jam/backbone",
+      "main": "backbone.js"
+    },
+    {
+      "name": "backbone.layoutmanager",
+      "location": "../vendor/jam/backbone.layoutmanager",
+      "main": "backbone.layoutmanager.js"
+    },
+    {
+      "name": "jquery",
+      "location": "../vendor/jam/jquery",
+      "main": "dist/jquery.js"
+    },
+    {
+      "name": "lodash",
+      "location": "../vendor/jam/lodash",
+      "main": "./dist/lodash.compat.js"
+    },
+    {
+      "name": "underscore",
+      "location": "../vendor/jam/underscore",
+      "main": "underscore.js"
+    }
+  ],
 
   paths: {
     // Use the underscore build of Lo-Dash to minimize incompatibilities.
     "lodash": "../vendor/jam/lodash/dist/lodash.underscore",
-
-    socketio: "../socket.io/socket.io",
 
     // JavaScript folders.
     plugins: "../vendor/js/plugins",
@@ -27,6 +54,25 @@ require.config({
   },
 
   shim: {
+    "backbone": {
+      "deps": [
+        "underscore",
+        "jquery"
+      ],
+      "exports": "Backbone"
+    },
+    "backbone.layoutmanager": {
+      "deps": [
+        "jquery",
+        "backbone",
+        "underscore"
+      ],
+      "exports": "Backbone.LayoutManager"
+    },
+    "underscore": {
+      "exports": "_"
+    },
+
     // Backbone.CollectionCache depends on Backbone.
     "plugins/backbone.collectioncache": ["backbone"],
 
@@ -46,10 +92,5 @@ require.config({
       deps: ['d3', 'plugins/d3/d3.layout'],
       exports: 'Rickshaw'
     }
-
-    // // Backbone.ioBind
-    // "plugins/backbone.iobind": ["socketio", "backbone"],
-    // "plugins/backbone.iosync": ["socketio", "backbone"]
-  }
-
+  },
 });

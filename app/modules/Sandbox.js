@@ -4,43 +4,38 @@
 
 */
 define([
-  // Application.
-  "app",
-  "modules/common/Common",
-  "plugins/d3/rickshaw",
-  "util/d3/rickshaw/graphs"
+	// Application.
+	"app",
+	"modules/common/Common",
+	"plugins/d3/rickshaw",
+	"util/d3/rickshaw/graphs"
 ],
 
 function (app, Common, Rickshaw, Graphs) {
 
-  var Sandbox = app.module();
-  Sandbox.Instructions = Common.Models.Instructions.extend({
-    configInit: function (config) {
-      this.attributes.description = "DESC" + config.key;
-      this.attributes.buttonConfig = {
-        B: { description: "testing " + config.key}
-      };
-    }
-  })
-  Sandbox.Views.Sandbox = Backbone.View.extend({
-    template: "sandbox/sandbox",
+	var Sandbox = app.module();
 
-  	beforeRender: function () {
-      var conf ={
-        key: "the big key"
-      };
-      this.insertView(new Common.Views.Instructions({
-        model: new Sandbox.Instructions(null, { config: conf })
-      }))
-  	},
+	Sandbox.Instructions = Common.Models.Instructions.extend({
+		configInit: function (config) {
+			this.attributes.description = "DESC" + config.key;
+			this.attributes.buttonConfig = {
+				B: { description: "testing " + config.key}
+			};
+		}
+	});
 
-    afterRender: function () {
-    },
+	Sandbox.Views.Sandbox = Backbone.View.extend({
+		template: "sandbox/sandbox",
 
-  	initialize: function () {
-    },
+		beforeRender: function () {
+			var conf ={
+				key: "the big key"
+			};
+			this.insertView(new Common.Views.Instructions({
+				model: new Sandbox.Instructions(null, { config: conf })
+			}));
+		}
+	});
 
-  });
-
-  return Sandbox;
+	return Sandbox;
 });

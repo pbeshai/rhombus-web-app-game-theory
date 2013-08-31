@@ -23,7 +23,7 @@ function(app, CommonModels, StateApp) {
 
     run: function () {
       // clear all bots that are currently there. this was when going through here on prev it removes bots
-      this.input.participants.remove(this.input.participants.filter(function (p) { return p.bot; }))
+      this.input.participants.remove(this.input.participants.filter(function (p) { return p.bot; }));
     },
 
     // add bot on exit, so it only happens when going to next state, not back to prev
@@ -39,7 +39,7 @@ function(app, CommonModels, StateApp) {
         participants.addBot();
       }
     }
-  })
+  });
 
   // partner participants
   CommonStates.Partner = StateApp.State.extend({
@@ -77,7 +77,7 @@ function(app, CommonModels, StateApp) {
 
       return new StateApp.StateMessage({ groupModel: groupModel });
     }
-  })
+  });
 
   // score participants
   CommonStates.Score = StateApp.State.extend({
@@ -318,7 +318,7 @@ function(app, CommonModels, StateApp) {
     },
 
     beforeRender: function () {
-      this.groupModel = this.input.groupModel // input must be a group model
+      this.groupModel = this.input.groupModel; // input must be a group model
 
       // listen for setting play
       this.stopListening();
@@ -440,4 +440,4 @@ function(app, CommonModels, StateApp) {
   });
 
   return CommonStates;
-})
+});

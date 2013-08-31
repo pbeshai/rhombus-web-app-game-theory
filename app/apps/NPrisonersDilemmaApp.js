@@ -6,13 +6,13 @@ Attendance -> N-Person Prisoner's Dilemma Play -> N-Person Prisoner's Dilemam Re
 
 */
 define([
-  // Application.
-  "app",
+	// Application.
+	"app",
 
-  "apps/StateApp",
+	"apps/StateApp",
 
-  "modules/common/CommonStateApps",
-  "modules/NPrisonersDilemma"
+	"modules/common/CommonStateApps",
+	"modules/NPrisonersDilemma"
 ],
 
 function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
@@ -33,5 +33,5 @@ function(app, StateApp, CommonStateApps, NPrisonersDilemma) {
 		title: "N-Person Prisoner's Dilemma"
 	};
 
-  return NPrisonersDilemmaApp;
+	return NPrisonersDilemmaApp;
 });

@@ -27,7 +27,7 @@ function (app, Grid, CommonModels) {
         description: this.model.get("description"),
         buttons: [ "A", "B", "C", "D", "E" ],
         buttonConfig: this.model.get("buttonConfig"), // buttonConfig: { A: { description: "" }, B: undefined } undefined = disabled
-      }
+      };
     },
 
     initialize: function () {
@@ -81,7 +81,7 @@ function (app, Grid, CommonModels) {
     template: "common/participant_hidden_play",
 
     afterRender: function () {
-      var played = this.model.get("played")
+      var played = this.model.get("played");
 
       // fade in if at least second render and the participant has played
       if (!this.initialRender && played) {
@@ -160,9 +160,9 @@ function (app, Grid, CommonModels) {
           this.$overlay = $("<div class='overlay'/>").prependTo(this.$el);
         }
         // this.restartCssAnimationFix(this.$overlay.get(0));
-        var el =this.$overlay.get(0)
+        var el =this.$overlay.get(0);
         el.offsetWidth = el.offsetWidth;
-        this.$overlay.attr("class", "overlay " + overlay)
+        this.$overlay.attr("class", "overlay " + overlay);
       }
 
 
@@ -220,7 +220,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     },
 
     add: function (participant) {
-      var newView = new this.ParticipantView({ model: participant })
+      var newView = new this.ParticipantView({ model: participant });
       this.insertView(newView);
       newView.render();
     },
@@ -280,7 +280,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
       }
 
       if (this.InstructionsModel != null) {
-        this.insertView(new CommonViews.Instructions({ model: new this.InstructionsModel(null, { config: this.options.config }) }))
+        this.insertView(new CommonViews.Instructions({ model: new this.InstructionsModel(null, { config: this.options.config }) }));
       }
     },
 
@@ -390,7 +390,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
       }
 
       if (this.InstructionsModel != null) {
-        this.insertView(new CommonViews.Instructions({ model: new this.InstructionsModel(null, { config: this.options.config }) }))
+        this.insertView(new CommonViews.Instructions({ model: new this.InstructionsModel(null, { config: this.options.config }) }));
       }
     },
 
@@ -431,7 +431,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
         group2Label: this.group2Label,
         group1Name: this.model.get("group1Name"),
         group2Name: this.model.get("group2Name")
-      }
+      };
     },
 
     updateGroup1Name: function (evt) {
@@ -474,7 +474,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
         value: this.options.value,
         label: this.options.label,
         inputId: this.inputId
-      }
+      };
     },
 
     initialize: function (options) {
@@ -489,7 +489,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     serialize: function () {
       return {
         header: this.options.header,
-      }
+      };
     },
 
     prettifyLabel: function (attr) {
@@ -527,7 +527,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
       }
       flags.handled = true;
 
-      var curr = this.model[key]
+      var curr = this.model[key];
       if (_.isNumber(curr)) { // if the current value is a number, try making this one a nubmer
         try {
           value = parseFloat(value);
@@ -627,7 +627,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
         states: this.options.activeApp.states,
         currentState: this.options.activeApp.get("currentState"),
         viewsOnly: this.model.get("views-only")
-      }
+      };
     },
 
     nextState: function () {
@@ -661,7 +661,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     serialize: function () {
       return {
         title: this.options.title
-      }
+      };
     },
 
     beforeRender: function () {
@@ -699,7 +699,7 @@ CommonViews.ParticipantImageDisplay = CommonViews.ParticipantDisplay.extend({
     serialize: function () {
       return {
         model: this.model
-      }
+      };
     },
 
     submit: function () {

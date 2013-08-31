@@ -22,7 +22,7 @@ function (app, Participant) {
         // special initialization when deserializing from JSON obj
 
         var jsonModel = options.jsonModel;
-        participants = Participant.Util.collectionFromJSON(jsonModel.participants)
+        participants = Participant.Util.collectionFromJSON(jsonModel.participants);
 
         // convert from JSON object to actual models in the participants collection
         var group1Participants = _.map(jsonModel.group1, function (group1ParticipantAlias) {
@@ -46,7 +46,7 @@ function (app, Participant) {
 
         // ensure we have even number of participants by adding a bot
         if (this.options.forceEven && participants.length % 2 === 1) {
-          this.addBot(participants)
+          this.addBot(participants);
         }
 
         this.set("group1", new Participant.Collection());
@@ -104,7 +104,7 @@ function (app, Participant) {
   CommonModels.GroupModel.fromJSON = function (jsonModel) {
     var model = new CommonModels.GroupModel(undefined, { fromJSON: true, jsonModel: jsonModel });
     return model;
-  }
+  };
 
   CommonModels.Instructions = Backbone.Model.extend({
     initialize: function (attrs, options) {
@@ -134,4 +134,4 @@ function (app, Participant) {
   });
 
   return CommonModels;
-})
+});

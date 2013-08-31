@@ -18,8 +18,8 @@ function(app, StateApp, Attendance, Common) {
 
     initialize: function () {
       this.prependStates = [];
-      this.States || (this.States = []);
-      this.stateOptions || (this.stateOptions = []);
+      this.States = this.States ? this.States : [];
+      this.stateOptions = this.stateOptions ? this.stateOptions : [];
       this.initStateOptions();
       this.initialInput = new StateApp.StateMessage({ participants: this.get("participants") });
       StateApp.App.prototype.initialize.call(this);
@@ -43,7 +43,7 @@ function(app, StateApp, Attendance, Common) {
     definePrependStates: function () {
       // add in attendance unless false
       if (this.prepend.attendance) {
-        this.attendanceOptions = _.extend({ participants: this.get("participants") }, this.attendanceOptions)
+        this.attendanceOptions = _.extend({ participants: this.get("participants") }, this.attendanceOptions);
         this.prependStates.push({ state: Attendance.State, options: this.attendanceOptions });
       }
     },
@@ -61,7 +61,7 @@ function(app, StateApp, Attendance, Common) {
     // helper for those that override defineMainStates
     addAttendance: function () {
       var attendanceState = new Attendance.State(this.attendanceOptions, this);
-      this.states["attendance"] = attendanceState;
+      this.states.attendance = attendanceState;
     },
   });
 
@@ -95,9 +95,9 @@ function(app, StateApp, Attendance, Common) {
     phaseConfigs: null,
 
     initialize: function () {
-      this.phaseConfigs || (this.phaseConfigs = []);
+      this.phaseConfigs = this.phaseConfigs ? this.phaseConfigs : [];
       _.each(this.phaseConfigs, function (phaseConfig) {
-        _.defaults(phaseConfig, this.config)
+        _.defaults(phaseConfig, this.config);
       }, this);
 
       CommonStateApps.BasicGame.prototype.initialize.apply(this, arguments);
@@ -132,4 +132,4 @@ function(app, StateApp, Attendance, Common) {
   });
 
   return CommonStateApps;
-})
+});
