@@ -1,7 +1,7 @@
 define([
 	"base/BaseView",
 	"jquery",
-	"backbone.layoutmanager",
+	"backbone/backbone.layoutmanager",
 	"d3"
 ], function(BaseView) {
 	var io = window.io;

@@ -1,5 +1,5 @@
 define([
-	"plugins/d3/rickshaw"
+	"vendor/d3/rickshaw"
 ],
 
 function (Rickshaw) {

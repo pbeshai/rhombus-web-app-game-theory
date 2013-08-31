@@ -1,5 +1,5 @@
 define([
-	"plugins/d3/rickshaw",
+	"vendor/d3/rickshaw",
 
 	"util/d3/rickshaw/timeseriesTooltip"
 ],

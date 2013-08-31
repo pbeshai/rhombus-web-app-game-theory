@@ -1,4 +1,4 @@
-define(["backbone.layoutmanager"],
+define(["backbone/backbone.layoutmanager"],
 
 function() {
 

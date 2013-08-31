@@ -7,7 +7,7 @@ define([
 	// Application.
 	"app",
 	"modules/common/Common",
-	"plugins/d3/rickshaw",
+	"vendor/d3/rickshaw",
 	"util/d3/rickshaw/graphs"
 ],
 
