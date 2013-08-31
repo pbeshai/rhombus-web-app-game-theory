@@ -34,8 +34,6 @@ require.config({
 
     "d3": "../vendor/d3/d3.v2",
 
-    "backbone": "../vendor/backbone",
-
     // JavaScript folders.
     "vendor": "../vendor",
 
