@@ -7,7 +7,7 @@ Attendance -> Prisoner's Dilemma Play -> Prisoner's Dilemam Results
 */
 define([
 	// Application.
-	"App",
+	"framework/App",
 
 	"framework/apps/StateApp",
 

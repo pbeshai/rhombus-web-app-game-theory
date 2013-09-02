@@ -2,7 +2,7 @@
 	collection of all apps. Used by the router.
 */
 define([
-	"App",
+	"framework/App",
 
 	"apps/GridApp",
 	"apps/PrisonersDilemmaApp",

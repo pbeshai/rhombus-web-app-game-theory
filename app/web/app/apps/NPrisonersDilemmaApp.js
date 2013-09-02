@@ -7,7 +7,7 @@ Attendance -> N-Person Prisoner's Dilemma Play -> N-Person Prisoner's Dilemam Re
 */
 define([
 	// Application.
-	"App",
+	"framework/App",
 
 	"framework/apps/StateApp",
 

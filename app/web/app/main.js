@@ -2,7 +2,7 @@ require([
   "framework/main",
 
   // Application.
-  "App",
+  "framework/App",
 
   "apps/Apps"
 ],

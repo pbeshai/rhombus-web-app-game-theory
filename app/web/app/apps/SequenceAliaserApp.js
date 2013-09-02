@@ -1,7 +1,7 @@
 
 define([
 	// Application.
-	"App",
+	"framework/App",
 
 	"framework/apps/StateApp",
 

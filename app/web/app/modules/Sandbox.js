@@ -5,7 +5,7 @@
 */
 define([
 	// Application.
-	"App",
+	"framework/App",
 	"framework/modules/common/Common",
 	"framework/vendor/d3/rickshaw",
 	"framework/util/d3/rickshaw/graphs"
