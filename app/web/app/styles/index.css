@@ -1,5 +1,5 @@
 /*-- Framework CSS ---*/
-@import "../../framework/styles/index.css";
+@import "../../framework/styles/index.styl";
 
 /*-- Prisoner's Dilemma ---*/
 @import "pd.styl";

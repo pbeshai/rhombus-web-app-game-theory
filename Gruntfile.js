@@ -14,14 +14,14 @@ module.exports = function(grunt) {
 				eqnull: true
 			},
 
-			app: [ 'web/app/**/*.js' ],
+			app: [ 'app/web/app/**/*.js', 'framework/web/framework/**/*.js' ],
 
 			server: {
 				options: {
 					node: true,
 					laxcomma: true
 				},
-				files: { src: [ 'server/**/*.js' ] }
+				files: { src: [ 'app/server/**/*.js', 'framework/server/**/*.js' ] }
 			},
 
 			other: [ 'Gruntfile.js' ]
@@ -35,34 +35,30 @@ module.exports = function(grunt) {
 		jst: {
 			options: {
 				processName: function (name) {
-					return name.substring(4); // remove web/
+					if (name.match(/^app\//)) {
+						return name.substring("app/web/".length);
+					} else if (name.match(/^framework\//)) {
+						return name.substring("framework/web/".length);
+					}
+
+					return name;
 				}
 			},
 
 			"dist/debug/templates.js": [
-				"web/app/templates/**/*.html"
+				"app/web/app/templates/**/*.html",
+				"framework/web/framework/templates/**/*.html"
 			]
 		},
 
-		// This task simplifies working with CSS inside Backbone Boilerplate
-		// projects.  Instead of manually specifying your stylesheets inside the
-		// configuration, you can use `@imports` and this task will concatenate
-		// only those paths.
-		styles: {
-			// Out the concatenated contents of the following styles into the below
-			// development file path.
-			"dist/debug/index.css": {
-				// Point this to where your `index.css` file is location.
-				src: "web/app/styles/index.css",
-
-				// The relative path to use for the @imports.
-				paths: ["web/app/styles"],
-
-				// Point to where styles live.
-				prefix: "web/app/styles/",
-
-				// Additional production-only stylesheets here.
-				additional: []
+		stylus: {
+			compile: {
+				options: {
+					"include css": true,
+				},
+				files: {
+					"dist/debug/index.css": "app/web/app/styles/index.css"
+				}
 			}
 		},
 
@@ -71,8 +67,10 @@ module.exports = function(grunt) {
 		requirejs: {
 			compile: {
 				options: {
+					// appDir: "app/web/app",
+					// baseUrl: "./",
 					// Include the main configuration file.
-					mainConfigFile: "web/app/config.js",
+					mainConfigFile: "app/web/app/config.js",
 
 					// Output file.
 					out: "dist/debug/require.js",
@@ -97,7 +95,7 @@ module.exports = function(grunt) {
 		concat: {
 			dist: {
 				src: [
-					"web/vendor/almond.js",
+					"framework/web/vendor/almond.js",
 					"dist/debug/templates.js",
 					"dist/debug/require.js"
 				],
@@ -207,15 +205,6 @@ module.exports = function(grunt) {
 			all: ["test/qunit/*.html"]
 		},
 
-		// The watch task can be used to monitor the filesystem and execute
-		// specific tasks when files are modified.  By default, the watch task is
-		// available to compile CSS if you are unable to use the runtime compiler
-		// (use if you have a custom server, PhoneGap, Adobe Air, etc.)
-		watch: {
-			files: ["Gruntfile.js", "web/**/*"],
-			tasks: "styles"
-		},
-
 		// The clean task ensures all files are removed from the dist/ directory so
 		// that no files linger from previous builds.
 		clean: ["dist/"],
@@ -226,22 +215,22 @@ module.exports = function(grunt) {
 		copy: {
 			debug: {
 				files: [
-					{ expand: true, flatten: true, src: ['web/*'], dest: 'dist/debug/', filter: 'isFile' },
-					{ expand: true, flatten: true, src: ['web/vendor/bootstrap/img/*'], dest: 'dist/debug/img/', filter: 'isFile' },
+					{ expand: true, flatten: true, src: ['app/web/*'], dest: 'dist/debug/', filter: 'isFile' },
+					{ expand: true, flatten: true, src: ['framework/web/vendor/bootstrap/img/*'], dest: 'dist/debug/img/', filter: 'isFile' },
 				],
 			},
 
 			release: {
 				files: [
-					{ expand: true, flatten: true, src: ['web/*'], dest: 'dist/release/', filter: 'isFile' },
-					{ expand: true, flatten: true, src: ['web/vendor/bootstrap/img/*'], dest: 'dist/debug/img/', filter: 'isFile' },
+					{ expand: true, flatten: true, src: ['app/web/*'], dest: 'dist/release/', filter: 'isFile' },
+					{ expand: true, flatten: true, src: ['framework/web/vendor/bootstrap/img/*'], dest: 'dist/release/img/', filter: 'isFile' },
 				],
 			}
 		}
 
 	});
 
-	// grunt.loadTasks("tasks"); // load the socketserver task
+	// load the socketserver task (this must be npm linked)
 	grunt.loadNpmTasks("grunt-socket-server");
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -252,7 +241,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-bbb-styles');
+	grunt.loadNpmTasks('grunt-contrib-stylus');
 
 	grunt.registerTask("default", ["jshint", "socket-server:dev"]);
 
@@ -263,7 +252,7 @@ module.exports = function(grunt) {
 	// dist/debug/templates.js, compile all the application code into
 	// dist/debug/require.js, and then concatenate the require/define shim
 	// almond.js and dist/debug/templates.js into the require.js file.
-	grunt.registerTask("debug", ["clean", "copy:debug", "jshint", "jst", "requirejs", "concat", "styles"]);
+	grunt.registerTask("debug", ["clean", "copy:debug", "jshint", "jst", "requirejs", "concat", "stylus"]);
 
 	// The release task will run the debug tasks and then minify the
 	// dist/debug/require.js file and CSS files.
