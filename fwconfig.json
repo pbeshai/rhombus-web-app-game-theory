@@ -1,0 +1,9 @@
+{
+	"database": {
+		"filename": "app.db"
+	},
+
+	"participantServer": {
+		"port": 4445
+	}
+}

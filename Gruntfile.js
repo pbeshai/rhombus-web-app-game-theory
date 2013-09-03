@@ -153,13 +153,7 @@ module.exports = function(grunt) {
 					// show stack trace on errors/warnings
 					stack: true,
 
-					index: "app/web/index.html",
-
-					map: {
-						"app" : "app/web/app",
-						"framework" : "framework/web/framework",
-						"vendor": "framework/web/vendor"
-					}
+					baseDir: "app/web/"
 				}
 			},
 
