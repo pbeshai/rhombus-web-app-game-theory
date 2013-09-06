@@ -11,12 +11,10 @@ define([
 	"apps/TeamPrisonersDilemmaApp",
 	"apps/UltimatumGameApp",
 	"apps/UltimatumGamePartitionedApp",
-	"apps/CoinMatchingApp",
-	"apps/SequenceAliaserApp"
+	"apps/CoinMatchingApp"
 ],
 function (App, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisonersDilemmaApp,
-	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp, CoinMatchingApp,
-	SequenceAliaserApp) {
+	TeamPrisonersDilemmaApp, UltimatumGameApp, UltimatumGamePartitionedApp, CoinMatchingApp) {
 
 	var Apps = {
 		"grid": GridApp.app,
@@ -27,7 +25,6 @@ function (App, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisoner
 		"ultimatum": UltimatumGameApp.app,
 		"ultimatum-partitioned": UltimatumGamePartitionedApp.app,
 		"coin-matching": CoinMatchingApp.app,
-		"seq-alias": SequenceAliaserApp.app,
 	};
 
 	return Apps;
