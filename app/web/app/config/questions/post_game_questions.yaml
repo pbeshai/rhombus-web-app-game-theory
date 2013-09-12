@@ -1,0 +1,36 @@
+questions:
+    - question: It was easy to find myself on the screen.
+      answers: &agree
+        A: Strongly Agree
+        B: Agree
+        C: Neutral
+        D: Disagree
+        E: Strongly Disagree
+    - question: I understood the rules of the game.
+      answers: *agree
+    - question: I understood the controls of the game.
+      answers: *agree
+    - question: I understood the results of the game.
+      answers: *agree
+    - question: I liked playing the game.
+      answers: *agree
+    - question: I felt engaged during the game.
+      answers: *agree
+    - question: I would like to use this system in other classes.
+      answers: *agree
+    - question: It was satisfying to use this system to play the game.
+      answers: *agree
+    - question: How was the pace of the game?
+      answers:
+        A: Very Fast
+        B: Fast
+        C: Good
+        D: Slow
+        E: Very Slow
+    - question: How would you rate the system compared to typical iClicker usage?
+      answers:
+        A: Much Better
+        B: Better
+        C: Equivalent
+        D: Worse
+        E: Much Worse

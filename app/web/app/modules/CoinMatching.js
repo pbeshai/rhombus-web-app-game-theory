@@ -20,7 +20,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.config = {
 		pointsPerRound: 1,
-		roundsPerPhase: 2,
+		roundsPerPhase: 10,
 		group1Name: "Team 1",
 		group2Name: "Team 2",
 	};
