@@ -21,6 +21,7 @@ function (App, StateApp, CommonStateApps, Question) {
 		id: "question",
 		version: "1.0",
 		config: Question.config,
+		prepend: { attendance: false },
 		States: [ Question.States.Ask, Question.States.Ask ],
 
 		initStateOptions: function () {

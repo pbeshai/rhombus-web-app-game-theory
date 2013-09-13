@@ -60,7 +60,6 @@ function(App, Common) {
 
       // fade in if at least second render and the participant has played
       if (!this.initialRender && played) {
-				console.log("animating");
         this.$el.css("opacity", 0).delay(50).animate({ opacity: 1 }, 400);
       }
 			App.BaseView.prototype.afterRender.call(this);
@@ -119,7 +118,6 @@ function(App, Common) {
 		}
 	}));
 
-
 	Question.States = {};
 	Question.States.Ask = Common.States.Play.extend({
 		view: "q::layout",
@@ -127,7 +125,9 @@ function(App, Common) {
 
 		beforeRender: function () {
 			Common.States.Play.prototype.beforeRender.call(this);
-			console.log(this.options);
+			this.listenTo(this.participants, "new-queued", function (model, collection) {
+				collection.addNewParticipants();
+			});
 		},
 
 		viewOptions: function () {
