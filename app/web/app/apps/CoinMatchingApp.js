@@ -25,9 +25,9 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
 			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults ],
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalBucket, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalBucket, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalBucket, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
 		],
 		phaseConfigs: [
 			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },

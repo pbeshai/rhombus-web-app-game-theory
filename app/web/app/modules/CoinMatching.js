@@ -7,11 +7,8 @@ define([
 	// Application.
 	"framework/App",
 	"framework/modules/common/Common",
-
 	"framework/modules/Participant",
-
 	"framework/apps/StateApp",
-
 	"framework/util/d3/rickshaw/graphs"
 ],
 function (App, Common, Participant, StateApp, Graphs) {
@@ -54,17 +51,27 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.Views.Play = {};
 
-	CoinMatching.Views.Play.Participant = Common.Views.ParticipantHiddenPlay;
+	CoinMatching.Views.Play.Participant = Common.Views.ParticipantHiddenPlay.extend({
+		bottomText: function (model) {
+			if (model.get("score") != null) {
+				return "Prev. " + model.get("score");
+			}
+		}
+	});
+
+	function total(collection, attribute) {
+		return collection.reduce(function (memo, p) { return memo + p.get(attribute); }, 0);
+	}
 
 	CoinMatching.Views.Play.Layout = App.registerView("coin-matching::play", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
 		header: "Play",
 		ParticipantView: CoinMatching.Views.Play.Participant,
-		InstructionsModel: CoinMatching.Instructions
+		InstructionsModel: CoinMatching.Instructions,
+		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
+		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
 	})));
 
 	CoinMatching.Views.Results = {};
-
-
 
 	CoinMatching.Views.Results.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
 		locked: true,
@@ -82,7 +89,9 @@ function (App, Common, Participant, StateApp, Graphs) {
 			return outcome + " "+model.get("score");
 		},
 		bottomText: function (model) {
-			return "Total " + model.get("phaseTotal");
+			if (model.get("phaseTotal") != null) {
+				return "Total " + model.get("phaseTotal");
+			}
 		}
 	}));
 
@@ -90,6 +99,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 		header: "Results",
 		className: "coin-matching-results",
 		ParticipantView: CoinMatching.Views.Results.Score,
+		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
+		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
 	})));
 
 
@@ -107,6 +118,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 		header: "Results for Phase ",
 		className: "coin-matching-results",
 		ParticipantView: CoinMatching.Views.PhaseResults.Score,
+		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
+		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
 	}));
 
 
@@ -124,6 +137,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 		header: "Total Results",
 		className: "coin-matching-results",
 		ParticipantView: CoinMatching.Views.TotalResults.Score,
+		group1HeaderRight: function () { return total(this.model.get("group1"), "total"); },
+		group2HeaderRight: function () { return total(this.model.get("group2"), "total"); }
 	}));
 
 
@@ -160,8 +175,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 				partnerScore = this.config.pointsPerRound;
 			}
 
-			participant.set("score", score);
-			partner.set("score", partnerScore);
+			participant.set({ "prevScore": participant.get("score"), "score": score });
+			partner.set({ "prevScore": partner.get("score"), "score": partnerScore });
 		},
 
 		onExit: function () {
@@ -273,6 +288,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 					}
 				}
 			}, this);
+			this.groupModel.get("participants").bucket("total", 6);
 		},
 	});
 

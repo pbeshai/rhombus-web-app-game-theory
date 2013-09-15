@@ -37,7 +37,7 @@ function (App, Common, PrisonersDilemma, Participant, StateApp) {
 
 	NPrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
 		cssClass: function () {
-			return "results choice-" + this.model.get("choice");
+			return "big-message results choice-" + this.model.get("choice");
 		}
 	});
 

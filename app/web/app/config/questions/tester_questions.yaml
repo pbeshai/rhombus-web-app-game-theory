@@ -1,0 +1,10 @@
+questions:
+    - question: Does this work?
+      answers:
+        A: Yes of course
+        B: Nope.
+    - question: How's the weather?
+      answers:
+        A: Sunny
+        B: Raining
+        C: Cloudy

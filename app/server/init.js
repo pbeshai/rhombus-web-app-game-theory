@@ -13,6 +13,7 @@ function webInit(site, serverOptions) {
 	console.log("app webInit");
 	console.log("initializing app_results");
 	require("./app_results").initialize(site, serverOptions);
+	require("./api_handler").initialize(site, serverOptions);
 
 	fwInit.webInit(site, serverOptions, fwConfig);
 }

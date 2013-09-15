@@ -44,25 +44,14 @@ function(App, Common) {
 	});
 
 	Question.Views.ParticipantAlias = Common.Views.ParticipantPlay.extend({
-		template: null,
 		className: "participant-alias",
-		tagName: "span",
-
-		afterRender: function () {
-			this.$el.html(this.model.get("alias"));
-			var played = this.model.get("played");
-
-			if (!played) {
-				this.$el.hide();
-			} else {
-				this.$el.show();
+		playedSelector: ".id-text",
+		forceFade: true,
+		mainText: function () { },
+		cssClass: function (model) {
+			if (!model.get("choice")) { // only show if a choice has been made
+				return "hidden";
 			}
-
-      // fade in if at least second render and the participant has played
-      if (!this.initialRender && played) {
-        this.$el.css("opacity", 0).delay(50).animate({ opacity: 1 }, 400);
-      }
-			App.BaseView.prototype.afterRender.call(this);
 		}
 	});
 
@@ -72,12 +61,7 @@ function(App, Common) {
 	});
 
 	Question.Views.Count = App.BaseView.extend({
-		template: "app/templates/question/count",
-		serialize: function () {
-			return {
-				count: this.count || 0
-			};
-		},
+		className: "count",
 
 		beforeRender: function () {
 			// count those that have answered
@@ -89,9 +73,12 @@ function(App, Common) {
 			}, 0);
 		},
 
+		afterRender: function () {
+			this.el.innerHTML = this.count;
+		},
+
 		initialize: function () {
 			App.BaseView.prototype.initialize.apply(this, arguments);
-
 			this.listenTo(this.participants, "update", this.render);
 		}
 	});
@@ -104,7 +91,6 @@ function(App, Common) {
 			var instructionsView = new Common.Views.Instructions({
 				model: new Question.Instructions(null, { config: this.options })
 			});
-			console.log(this.options);
 			this.setView(".instructions-container", instructionsView);
 
 			this.setView(".count-container", new Question.Views.Count({ participants: this.participants }));
