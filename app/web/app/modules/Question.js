@@ -8,17 +8,7 @@ function(App, Common) {
 	Question.config = {
 		questions: [
 			{
-				question: "It was easy to find myself on the screen.",
-				answers: {
-					"A": "Strongly Agree",
-					"B": "Agree",
-					"C": "Neutral",
-					"D": "Disagree",
-					"E": "Strongly Disagree"
-				}
-			},
-			{
-				question: "I understood the rules of the game.",
+				question: "Initializing...",
 				answers: {
 					"A": "Strongly Agree",
 					"B": "Agree",
@@ -34,13 +24,67 @@ function(App, Common) {
 		header: "Answers",
 		configInit: function (config) {
 			this.attributes.buttonConfig = {
-				"A": { description: config.answers.A },
-				"B": { description: config.answers.B },
-				"C": { description: config.answers.C },
-				"D": { description: config.answers.D },
-				"E": { description: config.answers.E },
+				"A": config.answers.A == null ? null : { description: config.answers.A },
+				"B": config.answers.B == null ? null : { description: config.answers.B },
+				"C": config.answers.C == null ? null : { description: config.answers.C },
+				"D": config.answers.D == null ? null : { description: config.answers.D },
+				"E": config.answers.E == null ? null : { description: config.answers.E },
 			};
+
 		}
+	});
+	Question.Views.QuestionSetSelect = App.BaseView.extend({
+		template: "app/templates/question/set_select",
+		className: "form-inline",
+		events: {
+			"change .question-set-select": "selectQuestionSet"
+		},
+
+		selectQuestionSet: function (evt) {
+			var selectedSet = $(evt.target).val();
+			if (selectedSet === "null") {
+				this.trigger("questions-selected", null);
+				return;
+			}
+
+			var that = this;
+			console.log("Question set selected: ", selectedSet);
+			App.api({ call: "apps/q/get/" + selectedSet, success: function (data) {
+				that.trigger("questions-selected", data.questions);
+			}});
+		},
+
+		serialize: function () {
+			return {
+				questionSets: this.questionSets
+			};
+		},
+
+		initialize: function () {
+			App.BaseView.prototype.initialize.apply(this, arguments);
+			var that = this;
+			App.api({ call: "apps/q/sets", success: function (data) {
+				that.questionSetIds = data["question-sets"];
+				that.questionSets = {};
+				_.each(that.questionSetIds, function (id) {
+					var label = _.map(id.split("_"), function (word) { return word[0].toUpperCase() + word.slice(1); }).join(" ");
+					that.questionSets[id] = label;
+				});
+
+				that.render();
+			}});
+		}
+	});
+
+	Question.Views.AppControls = Common.Views.AppControls.extend({
+		beforeRender: function () {
+			var questionSelect = new Question.Views.QuestionSetSelect();
+			this.insertView(".controls-pre", questionSelect);
+			this.listenTo(questionSelect, "questions-selected", function (questions) {
+				this.options.activeApp.loadQuestions(questions);
+			});
+			Common.Views.AppControls.prototype.beforeRender.call(this);
+		},
 	});
 
 	Question.Views.ParticipantAlias = Common.Views.ParticipantPlay.extend({
@@ -105,9 +149,9 @@ function(App, Common) {
 	}));
 
 	Question.States = {};
-	Question.States.Ask = Common.States.Play.extend({
+	Question.States.Question = Common.States.Play.extend({
 		view: "q::layout",
-		name: "ask",
+		name: "question",
 
 		beforeRender: function () {
 			Common.States.Play.prototype.beforeRender.call(this);

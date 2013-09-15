@@ -16,7 +16,7 @@ function questionListSets(req, res) {
 		// match .yaml files and return an array without the extension
 		var questionSets = _.chain(files)
 			.filter(function (file) { return file.match(/\.yaml$/); })
-			.map(function (file) { return file.slice(0,-5); })
+			.map(function (file) { return file.slice(0, -5); })
 			.value();
 		res.send(200, { "question-sets": questionSets });
 	});

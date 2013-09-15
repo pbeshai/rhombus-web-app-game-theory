@@ -1,0 +1,8 @@
+<label>Select a Question Set:
+<select class="question-set-select">
+	<option value="null">--</option>
+	<% _.each(_.keys(questionSets), function (key) { %>
+	<option value="<%= key %>"><%= questionSets[key] %></option>
+	<%	}); %>
+</select>
+</label>

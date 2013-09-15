@@ -22,16 +22,30 @@ function (App, StateApp, CommonStateApps, Question) {
 		version: "1.0",
 		config: Question.config,
 		prepend: { attendance: false },
-		States: [ Question.States.Ask, Question.States.Ask ],
+		States: [  ],
 
 		initStateOptions: function () {
 			_.each(this.config.questions, function (question, i) {
 				this.stateOptions[i] = _.clone(question);
 				if (this.options.numberQuestions) {
 					this.stateOptions[i].question = (i + 1) + ". " + this.stateOptions[i].question;
+					this.stateOptions[i].name = "question-" + (i + 1);
 				}
 			}, this);
-		}
+		},
+
+		loadQuestions: function (questions) {
+			console.log("Loading questions", questions);
+			this.States.length = 0;
+			if (questions) {
+				for (var i = 0; i < questions.length; i++) {
+					this.States.push(Question.States.Question);
+				}
+			}
+
+			this.config.questions = questions;
+			this.initialize(null, this.options);
+		},
 	});
 
 	// description for use in router
