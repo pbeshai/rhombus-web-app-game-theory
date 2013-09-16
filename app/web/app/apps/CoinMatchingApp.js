@@ -62,7 +62,7 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 						}
 					};
 
-				case 4: // options for total results
+				case 3: // options for total results
 					return {
 						config: this.config,
 						numPhases: phaseNum,
@@ -89,7 +89,7 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 			console.log("COIN MATCHING: requested to add new participants", participants.newParticipants);
 			var currState = this.get("currentState");
 			if (currState && currState.addNewParticipants) {
-				currState.addNewParticipants();
+				currState.addNewParticipants(true); // true to render
 			} else {
 				console.log("Could not add in new participants to " + currState);
 			}

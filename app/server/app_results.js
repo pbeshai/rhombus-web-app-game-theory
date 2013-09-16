@@ -313,7 +313,8 @@ function coinMatchingResults(req, res) {
 
 		// for each participant, output choices and scores from each round in each phase
 		function outputGroup(groupNum) {
-			_.each(req.body.phase1[0]["group" + groupNum], function (participant, i) {
+			// use last round of phase4 to catch as many latecomers as possible
+			_.each(req.body.phase4[req.body.phase4.length - 1]["group" + groupNum], function (participant, i) {
 				var data = config["group" + groupNum + "Name"] + "," + participant.alias + "," + participant.partner;
 				var choice;
 				var total = 0;
@@ -324,8 +325,13 @@ function coinMatchingResults(req, res) {
 					// for each round
 					for (r = 0; r < config.roundsPerPhase; r++) {
 						roundData = phaseData[r]["group" + groupNum][i];
-						choice = choiceMap[roundData.choice] || "#";
-						score = roundData.score;
+						if (roundData) {
+							choice = choiceMap[roundData.choice] || "#";
+							score = roundData.score;
+						}	else {
+							choice = "X"; // missing
+							score = 0;
+						}
 						data += "," + choice + "," + score;
 						phaseTotal += parseInt(score, 10);
 					}

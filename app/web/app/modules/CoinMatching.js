@@ -17,7 +17,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.config = {
 		pointsPerRound: 1,
-		roundsPerPhase: 10,
+		roundsPerPhase: 2,
 		group1Name: "Team 1",
 		group2Name: "Team 2",
 	};
@@ -157,24 +157,30 @@ function (App, Common, Participant, StateApp, Graphs) {
 			participant.get("partner").set("role", "col");
 		},
 
-		addNewParticipants: function () {
-			console.log("adding new participants in Play");
+		// called before running
+		addNewParticipants: function (render) {
+			var groupModel = this.input.groupModel;
+			if (!groupModel.hasNewParticipants()) {
+				return;
+			}
+
+			// add the new participants to the main collection
+			var newParticipants = groupModel.get("participants").addNewParticipants();
+			_.each(newParticipants, function (p) {
+				p.set({ played: true, score: null, phaseTotal: null, total: null });
+			});
+			// handles partnering with each other and shuffling
+			var newParticipantsModel = new Common.Models.GroupModel({ participants: newParticipants });
 
 			// TODO: handle bot
-			// TODO: put on groups
-			// TODO: shuffle before adding
-			// add the new participants to the main collection
-			var newParticipants = this.groupModel.get("participants").addNewParticipants();
-			_.each(newParticipants, function (p) {
-				p.set({ score: null, phaseTotal: 0, total: 0 });
-			});
 
-			var newParticipantsModel = new Common.Models.GroupModel({ participants: newParticipants});
-
-			var group1 = this.groupModel.get("group1"), group2 = this.groupModel.get("group2");
+			var group1 = groupModel.get("group1"), group2 = groupModel.get("group2");
 			group1.add(newParticipantsModel.get("group1").models);
 			group2.add(newParticipantsModel.get("group2").models);
 
+			if (render) {
+				this.rerender();
+			}
 		}
 	});
 
@@ -243,9 +249,9 @@ function (App, Common, Participant, StateApp, Graphs) {
 		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
 		numRounds: CoinMatching.config.roundsPerPhase,
 
-		addNewParticipants: function () {
+		addNewParticipants: function (render) {
 			if (this.currentState && this.currentState.addNewParticipants) {
-				this.currentState.addNewParticipants();
+				this.currentState.addNewParticipants(render);
 			} else {
 				console.log("Could not add in new participants to " + this.currentState);
 			}
