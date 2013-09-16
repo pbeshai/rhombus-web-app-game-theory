@@ -83,6 +83,17 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 
 			CommonStateApps.PhaseGame.prototype.handleConfigure.call(this);
 		},
+
+		addNewParticipants: function () {
+			var participants = this.get("participants");
+			console.log("COIN MATCHING: requested to add new participants", participants.newParticipants);
+			var currState = this.get("currentState");
+			if (currState && currState.addNewParticipants) {
+				currState.addNewParticipants();
+			} else {
+				console.log("Could not add in new participants to " + currState);
+			}
+		}
 	});
 
 	// description for use in router

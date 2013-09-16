@@ -51,7 +51,7 @@ function (App, StateApp, CommonStateApps, Question) {
 	// description for use in router
 	QuestionApp.app = {
 		instantiate: function (attrs) {
-			return new QuestionApp(attrs, { writeLogAtEnd: false, numberQuestions: true });
+			return new QuestionApp(attrs, { writeLogAtEnd: false, numberQuestions: true, autoAddNew: true });
 		},
 		AppControlsView: Question.Views.AppControls,
 		title: "Question"

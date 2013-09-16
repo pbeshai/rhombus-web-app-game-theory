@@ -156,6 +156,26 @@ function (App, Common, Participant, StateApp, Graphs) {
 			participant.set("role", "row");
 			participant.get("partner").set("role", "col");
 		},
+
+		addNewParticipants: function () {
+			console.log("adding new participants in Play");
+
+			// TODO: handle bot
+			// TODO: put on groups
+			// TODO: shuffle before adding
+			// add the new participants to the main collection
+			var newParticipants = this.groupModel.get("participants").addNewParticipants();
+			_.each(newParticipants, function (p) {
+				p.set({ score: null, phaseTotal: 0, total: 0 });
+			});
+
+			var newParticipantsModel = new Common.Models.GroupModel({ participants: newParticipants});
+
+			var group1 = this.groupModel.get("group1"), group2 = this.groupModel.get("group2");
+			group1.add(newParticipantsModel.get("group1").models);
+			group2.add(newParticipantsModel.get("group2").models);
+
+		}
 	});
 
 	CoinMatching.States.Score = Common.States.GroupScore.extend({
@@ -185,7 +205,13 @@ function (App, Common, Participant, StateApp, Graphs) {
 			this.groupModel.get("group1").each(function (participant, i) {
 				// sum up total scores from rounds in this phase
 				var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
-					return roundOutput.group1[i].score + memo;
+					var participantOutput = roundOutput.group1[i];
+					if (participantOutput) {
+						return participantOutput.score + memo;
+					} else {
+						return memo;
+					}
+
 				}, 0) + participant.get("score");
 				participant.set("phaseTotal", phaseTotal);
 			}, this);
@@ -193,7 +219,12 @@ function (App, Common, Participant, StateApp, Graphs) {
 			this.groupModel.get("group2").each(function (participant, i) {
 				// sum up total scores from rounds in this phase
 				var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
-					return roundOutput.group2[i].score + memo;
+					var participantOutput = roundOutput.group2[i];
+					if (participantOutput) {
+						return participantOutput.score + memo;
+					} else {
+						return memo;
+					}
 				}, 0) + participant.get("score");
 				participant.set("phaseTotal", phaseTotal);
 			}, this);
@@ -211,6 +242,14 @@ function (App, Common, Participant, StateApp, Graphs) {
 		name: "phase",
 		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
 		numRounds: CoinMatching.config.roundsPerPhase,
+
+		addNewParticipants: function () {
+			if (this.currentState && this.currentState.addNewParticipants) {
+				this.currentState.addNewParticipants();
+			} else {
+				console.log("Could not add in new participants to " + this.currentState);
+			}
+		},
 
 		// what is saved between each round
 		// output is a groupModel

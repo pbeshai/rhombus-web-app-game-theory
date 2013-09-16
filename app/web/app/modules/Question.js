@@ -153,13 +153,6 @@ function(App, Common) {
 		view: "q::layout",
 		name: "question",
 
-		beforeRender: function () {
-			Common.States.Play.prototype.beforeRender.call(this);
-			this.listenTo(this.participants, "new-queued", function (model, collection) {
-				collection.addNewParticipants();
-			});
-		},
-
 		viewOptions: function () {
 			return _.extend(Common.States.Play.prototype.viewOptions.call(this), {
 				question: this.options.question,
