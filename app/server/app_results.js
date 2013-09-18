@@ -2,8 +2,9 @@ module.exports = {
 	initialize: initialize
 };
 
-var fs = require('fs')
-	, _ = require('lodash');
+var fs = require('fs'),
+	_ = require('lodash'),
+	logger = require("../../log/logger");
 
 function initialize(site) {
 	site.post("/api/apps/pd/log", pdResults);
@@ -35,7 +36,7 @@ function pdResults(req, res) {
 
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("Prisoner's Dilemma Results (v" + version + ")");
@@ -66,7 +67,7 @@ function pdmResults(req, res) {
 	var stream = fs.createWriteStream("log/pdm/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("Multiround Prisoner's Dilemma Results (v" + version + ")");
@@ -116,7 +117,7 @@ function npdResults(req, res) {
 	var stream = fs.createWriteStream("log/npd/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("N-Person Prisoner's Dilemma Results (v" + version + ")");
@@ -158,7 +159,7 @@ function teampdResults(req, res) {
 	var stream = fs.createWriteStream("log/teampd/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("Team Prisoner's Dilemma Results (v" + version + ")");
@@ -201,7 +202,7 @@ function ultimatumResults(req, res) {
 	var stream = fs.createWriteStream("log/ultimatum/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("Ultimatum Game Results (v" + version + ")");
@@ -233,7 +234,7 @@ function ultimatumPartitionedResults(req, res) {
 	var stream = fs.createWriteStream("log/ultimatum-partitioned/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("Ultimatum Game (Partitioned) Results (v" + version + ")");
@@ -280,7 +281,7 @@ function coinMatchingResults(req, res) {
 	var stream = fs.createWriteStream("log/coin-matching/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
-			console.log(str);
+			logger.info(str);
 			stream.write(str + "\n");
 		}
 		output("Coin Matching Results (v" + version + ")");
@@ -292,44 +293,56 @@ function coinMatchingResults(req, res) {
 
 		output(numPhases + " phases, " + config.roundsPerPhase + " rounds per phase, " + config.pointsPerRound + " points per round");
 
-		output("PxRy = Phase x Round y");
+		var totals = {};
+
+		outputPhase(1);
+		outputPhase(2);
+		outputPhase(3);
+		outputPhase(4);
+
+		// output totals
 		output("");
+		output("");
+		output("Totals");
+		output("======");
+		output("Alias,TotalScore");
+		_.each(_.keys(totals), function (alias) {
+			output(alias + "," + totals[alias]);
+		});
 
-		var p;
-		var r, header = "Team,Alias,PartnerAlias";
-		for (p = 1; p <= numPhases; p++) {
+		function outputPhase(phaseNum) {
+			var phase = req.body["phase" + phaseNum];
+			if (phase == null) return;
+
+			output("");
+			output("Phase " + phaseNum);
+			output("-------");
+			var r, header = "Team,Alias,PartnerAlias";
 			for (r = 1; r <= config.roundsPerPhase; r++) {
-				header += ",P" + p + "R" + r + "Choice,P" + p + "R" + r + "Score";
+				header += ",P" + phaseNum + "R" + r + "Choice,P" + phaseNum + "R" + r + "Score";
 			}
-			header += ",P" + p + "Total";
-		}
-		header += ",Total";
-		output(header);
+			header += ",P" + phaseNum + "Total";
 
-		if (req.body.phase1) {
+			output(header);
+
 			outputGroup(1);
 			outputGroup(2);
-		}
 
-		// for each participant, output choices and scores from each round in each phase
-		function outputGroup(groupNum) {
-			// use last round of phase4 to catch as many latecomers as possible
-			_.each(req.body.phase4[req.body.phase4.length - 1]["group" + groupNum], function (participant, i) {
-				var data = config["group" + groupNum + "Name"] + "," + participant.alias + "," + participant.partner;
-				var choice;
-				var total = 0;
-				// for each phase
-				for (p = 1; p <= numPhases; p++) {
-					var phaseData = req.body["phase" + p];
+			// for each participant, output choices and scores from each round in each phase
+			function outputGroup(groupNum) {
+				// use last round of phase to catch as many latecomers as possible
+				_.each(phase[phase.length - 1]["group" + groupNum], function (participant, i) {
+					var data = config["group" + groupNum + "Name"] + "," + participant.alias + "," + participant.partner;
+					var choice;
 					var phaseTotal = 0;
 					// for each round
 					for (r = 0; r < config.roundsPerPhase; r++) {
-						roundData = phaseData[r]["group" + groupNum][i];
+						roundData = phase[r]["group" + groupNum][i];
 						if (roundData) {
 							choice = choiceMap[roundData.choice] || "#";
 							score = roundData.score;
 						}	else {
-							choice = "X"; // missing
+							choice = "X"; // missing (e.g. they were late and didn't play)
 							score = 0;
 						}
 						data += "," + choice + "," + score;
@@ -337,16 +350,14 @@ function coinMatchingResults(req, res) {
 					}
 
 					data += "," + phaseTotal;
-					total += phaseTotal;
-				}
-				data += "," + total;
 
-				output(data);
 
-			});
+					totals[participant.alias] = (totals[participant.alias] || 0) + phaseTotal;
+
+					output(data);
+				});
+			}
 		}
-
-
 
 		stream.end();
 	});

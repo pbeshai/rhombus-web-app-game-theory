@@ -20,7 +20,7 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 	// Attendance -> Phase 1 (Play) -> Phase 1 (Results) -> Phase 2 Play -> Phase 2 Results -> Total Results -> ...
 	var CoinMatchingApp = CommonStateApps.PhaseGame.extend({
 		id: "coin-matching",
-		version: "1.0",
+		version: "1.1",
 		config: CoinMatching.config,
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
