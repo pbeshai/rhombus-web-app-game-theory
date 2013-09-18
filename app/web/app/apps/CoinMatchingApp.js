@@ -25,9 +25,9 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
 			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults ],
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Partner, CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Partner, CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Partner, CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
 		],
 		phaseConfigs: [
 			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },
@@ -38,8 +38,11 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 
 		getPhaseStateOptions: function (phaseIndex, stateIndex) {
 			var phaseNum = phaseIndex + 1;
-			switch (stateIndex) {
-				case 0: // options for Round
+			var phaseStates = this.PhaseStates[phaseIndex];
+			var state = phaseStates[stateIndex];
+
+			switch (state.prototype.name) {
+				case "phase": // options for Round
 					return _.extend({
 						config: this.phaseConfigs[phaseIndex],
 						stateOptions:
@@ -50,10 +53,10 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 						]
 					});
 
-				case 1: // options for phase total bucket
+				case "bucket": // options for phase total bucket
 					return { phase: phaseNum };
 
-				case 2: // options for phase results
+				case "phase-results": // options for phase results
 					return {
 						config: this.phaseConfigs[phaseIndex],
 						phase: phaseNum,
@@ -62,7 +65,7 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 						}
 					};
 
-				case 3: // options for total results
+				case "total-results": // options for total results
 					return {
 						config: this.config,
 						numPhases: phaseNum,

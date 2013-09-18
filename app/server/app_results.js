@@ -16,7 +16,7 @@ function initialize(site) {
 }
 
 
-function z (str) { // add leading zero
+function z(str) { // add leading zero
 	return ("0"+str).slice(-2);
 }
 
@@ -273,8 +273,8 @@ function coinMatchingResults(req, res) {
 	var choiceMap = {
 		A: "H",
 		B: "T",
-		C: "H-C", // computer guess
-		D: "T-C", // computer guess
+		C: "HC", // computer guess
+		D: "TC", // computer guess
 	};
 
 	var stream = fs.createWriteStream("log/coin-matching/results." + filenameFormat(now) + ".txt");

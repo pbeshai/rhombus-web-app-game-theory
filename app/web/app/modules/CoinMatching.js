@@ -17,7 +17,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.config = {
 		pointsPerRound: 1,
-		roundsPerPhase: 10,
+		roundsPerPhase: 2,
 		group1Name: "Team 1",
 		group2Name: "Team 2",
 	};
@@ -201,8 +201,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 				partnerScore = this.config.pointsPerRound;
 			}
 
-			participant.set({ "prevScore": participant.get("score"), "score": score });
-			partner.set({ "prevScore": partner.get("score"), "score": partnerScore });
+			participant.set({ "score": score });
+			partner.set({ "score": partnerScore });
 		},
 
 		onExit: function () {
@@ -242,6 +242,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 	CoinMatching.States.Results = Common.States.GroupResults.extend({
 		view: "coin-matching::results",
 	});
+
+	CoinMatching.States.Partner = Common.States.GroupPartner;
 
 
 	CoinMatching.States.Round = StateApp.RoundState.extend({
