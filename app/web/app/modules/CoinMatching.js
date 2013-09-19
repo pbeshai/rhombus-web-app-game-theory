@@ -60,7 +60,9 @@ function (App, Common, Participant, StateApp, Graphs) {
 	});
 
 	function total(collection, attribute) {
-		return collection.reduce(function (memo, p) { return memo + p.get(attribute); }, 0);
+		return collection.reduce(function (memo, p) {
+			return memo + (p.get(attribute) || 0);
+		}, 0);
 	}
 
 	CoinMatching.Views.Play.Layout = App.registerView("coin-matching::play", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
@@ -164,19 +166,41 @@ function (App, Common, Participant, StateApp, Graphs) {
 				return;
 			}
 
-			// add the new participants to the main collection
-			var newParticipants = groupModel.get("participants").addNewParticipants();
+
+
+			// store the new participants and clear them as we will add them later
+			var newParticipants = groupModel.get("participants").clearNewParticipants();
 			_.each(newParticipants, function (p) {
-				p.set({ played: true, score: null, phaseTotal: null, total: null });
+				p.set({ choice: null, played: false, score: null, phaseTotal: null, total: null });
 			});
 			// handles partnering with each other and shuffling
-			var newParticipantsModel = new Common.Models.GroupModel({ participants: newParticipants });
+			var newParticipantsModel = new Common.Models.GroupModel({ participants: newParticipants }, { forceEven: true });
 
-			// TODO: handle bot
+			// if there is an odd number of new participants and there is a bot currently playing, we need to replace it
+			if (newParticipants.length % 2 === 1) {
+				var bot = groupModel.get("participants").find(function (p) { return p.bot; });
+				if (bot) { // replace the bot.
+					var botPartnerGroup = groupModel.get("group1").contains(bot) ? 2 : 1;
 
-			var group1 = groupModel.get("group1"), group2 = groupModel.get("group2");
-			group1.add(newParticipantsModel.get("group1").models);
-			group2.add(newParticipantsModel.get("group2").models);
+					var newBot = newParticipantsModel.get("participants").find(function (p) { return p.bot; });
+					var newBotPartnerGroup = newParticipantsModel.get("group1").contains(newBot) ? 2 : 1;
+
+					var currentBotPartner = bot.get("partner");
+					var newBotPartner = newBot.get("partner");
+					currentBotPartner.set("partner", newBotPartner);
+					newBotPartner.set("partner", currentBotPartner);
+
+					// make sure they are in different groups
+					if (newBotPartnerGroup === botPartnerGroup) {
+						newParticipantsModel.switchGroups(newBotPartner);
+					}
+
+					groupModel.remove(bot);
+					newParticipantsModel.remove(newBot);
+				}
+			}
+
+			groupModel.addFromGroupModel(newParticipantsModel);
 
 			if (render) {
 				this.rerender();
