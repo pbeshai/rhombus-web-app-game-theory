@@ -3,7 +3,8 @@ module.exports = {
 };
 
 var fs = require('fs'),
-		_ = require('lodash');
+		_ = require('lodash'),
+		logger = require("../../log/logger");
 
 
 function initialize(site) {

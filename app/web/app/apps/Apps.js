@@ -27,7 +27,7 @@ function (App, GridApp, PrisonersDilemmaApp, PrisonersDilemmaMultiApp, NPrisoner
 		"ultimatum": UltimatumGameApp.app,
 		"ultimatum-partitioned": UltimatumGamePartitionedApp.app,
 		"coin-matching": CoinMatchingApp.app,
-		"question": QuestionApp.app
+		"q": QuestionApp.app
 	};
 
 	return Apps;

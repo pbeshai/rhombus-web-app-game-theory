@@ -1,8 +1,9 @@
 define([
 	"framework/App",
+	"framework/apps/StateApp",
 	"framework/modules/common/Common"
 ],
-function(App, Common) {
+function(App, StateApp, Common) {
 	var Question = App.module();
 
 	Question.config = {
@@ -30,9 +31,9 @@ function(App, Common) {
 				"D": config.answers.D == null ? null : { description: config.answers.D },
 				"E": config.answers.E == null ? null : { description: config.answers.E },
 			};
-
 		}
 	});
+
 	Question.Views.QuestionSetSelect = App.BaseView.extend({
 		template: "app/templates/question/set_select",
 		className: "form-inline",
@@ -148,6 +149,12 @@ function(App, Common) {
 		}
 	}));
 
+	Question.Views.End = App.registerView("q::end", App.BaseView.extend({
+		afterRender: function () {
+			this.$el.html("<h1>Thanks for participating!</h1>");
+		}
+	}));
+
 	Question.States = {};
 	Question.States.Question = Common.States.Play.extend({
 		view: "q::layout",
@@ -158,7 +165,24 @@ function(App, Common) {
 				question: this.options.question,
 				answers: this.options.answers
 			});
+		},
+		onExit: function () {
+			var logData = {};
+			logData[this.name] = _.chain(this.participants.models)
+				.map(function (model) { return { alias: model.get("alias"), choice: model.get("choice") }})
+				.value();
+				console.log("@@ log", logData, this);
+			this.log(logData);
 		}
+	});
+
+	Question.States.End = StateApp.ViewState.extend({
+		view: "q::end",
+		name: "end",
+
+		afterRender: function () {
+			this.log()
+		},
 	});
 
   return Question;

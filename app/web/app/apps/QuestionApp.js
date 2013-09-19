@@ -16,18 +16,20 @@ define([
 ],
 
 function (App, StateApp, CommonStateApps, Question) {
+	"use strict";
 
 	var QuestionApp = CommonStateApps.BasicApp.extend({
-		id: "question",
+		id: "q",
 		version: "1.0",
 		config: Question.config,
 		prepend: { attendance: false },
-		States: [  ],
+		States: [],
 
 		initStateOptions: function () {
 			_.each(this.config.questions, function (question, i) {
 				this.stateOptions[i] = _.clone(question);
 				if (this.options.numberQuestions) {
+					this.stateOptions[i].questionNumber = i + 1;
 					this.stateOptions[i].question = (i + 1) + ". " + this.stateOptions[i].question;
 					this.stateOptions[i].name = "question-" + (i + 1);
 				}
@@ -42,6 +44,7 @@ function (App, StateApp, CommonStateApps, Question) {
 					this.States.push(Question.States.Question);
 				}
 			}
+			this.States.push(Question.States.End);
 
 			this.config.questions = questions;
 			this.initialize(null, this.options);
@@ -51,7 +54,7 @@ function (App, StateApp, CommonStateApps, Question) {
 	// description for use in router
 	QuestionApp.app = {
 		instantiate: function (attrs) {
-			return new QuestionApp(attrs, { writeLogAtEnd: false, numberQuestions: true, autoAddNew: true });
+			return new QuestionApp(attrs, { numberQuestions: true, autoAddNew: true });
 		},
 		AppControlsView: Question.Views.AppControls,
 		title: "Question"
