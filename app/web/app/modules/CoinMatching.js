@@ -236,7 +236,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 				// sum up total scores from rounds in this phase
 				var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
 					var participantOutput = roundOutput.group1[i];
-					if (participantOutput) {
+					if (participantOutput && participantOutput.alias === participant.get("alias")) {
 						return participantOutput.score + memo;
 					} else {
 						return memo;
@@ -250,7 +250,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 				// sum up total scores from rounds in this phase
 				var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
 					var participantOutput = roundOutput.group2[i];
-					if (participantOutput) {
+					if (participantOutput && participantOutput.alias === participant.get("alias")) {
 						return participantOutput.score + memo;
 					} else {
 						return memo;
@@ -291,7 +291,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 				group1: output.groupModel.get("group1").map(serialize),
 				group2: output.groupModel.get("group2").map(serialize)
 			};
-
+			console.log("@@@ ROUND OUTPUT @@@", roundOutput);
 			return roundOutput;
 
 			function serialize(participant) {

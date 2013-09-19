@@ -337,9 +337,13 @@ function coinMatchingResults(req, res) {
 					var data = config["group" + groupNum + "Name"] + "," + participant.alias + "," + participant.partner;
 					var choice;
 					var phaseTotal = 0;
+
+					var matchAlias = function (p) { return p.alias === participant.alias; };
 					// for each round
 					for (r = 0; r < config.roundsPerPhase; r++) {
-						roundData = phase[r]["group" + groupNum][i];
+						// may not match index in different rounds if a bot drops out in a phase or somebody is added, so look up by alias
+						roundData = _.find(phase[r]["group" + groupNum], matchAlias);
+
 						if (roundData) {
 							choice = choiceMap[roundData.choice] || "#";
 							score = roundData.score;
