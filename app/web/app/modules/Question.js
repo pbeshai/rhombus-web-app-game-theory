@@ -88,11 +88,8 @@ function(App, StateApp, Common) {
 		},
 	});
 
-	Question.Views.ParticipantAlias = Common.Views.ParticipantPlay.extend({
-		className: "participant-alias",
-		playedSelector: ".id-text",
+	Question.Views.Participant = Common.Views.ParticipantAlias.extend({
 		forceFade: true,
-		mainText: function () { },
 		cssClass: function (model) {
 			if (!model.get("choice")) { // only show if a choice has been made
 				return "hidden";
@@ -100,32 +97,8 @@ function(App, StateApp, Common) {
 		}
 	});
 
-	Question.Views.ParticipantsList = Common.Views.ParticipantsGrid.extend({
-		className: null,
-		ParticipantView: Question.Views.ParticipantAlias
-	});
-
-	Question.Views.Count = App.BaseView.extend({
-		className: "count",
-
-		beforeRender: function () {
-			// count those that have answered
-			this.count = this.participants.reduce(function(memo, p) {
-				if (p.get("choice")) {
-					return memo + 1;
-				}
-				return memo;
-			}, 0);
-		},
-
-		afterRender: function () {
-			this.el.innerHTML = this.count;
-		},
-
-		initialize: function () {
-			App.BaseView.prototype.initialize.apply(this, arguments);
-			this.listenTo(this.participants, "update", this.render);
-		}
+	Question.Views.ParticipantsList = Common.Views.ParticipantsList.extend({
+		ParticipantView: Question.Views.Participant
 	});
 
 	Question.Views.Layout = App.registerView("q::layout", App.BaseView.extend({
@@ -138,7 +111,7 @@ function(App, StateApp, Common) {
 			});
 			this.setView(".instructions-container", instructionsView);
 
-			this.setView(".count-container", new Question.Views.Count({ participants: this.participants }));
+			this.setView(".count-container", new Common.Views.Count({ participants: this.participants }));
 			this.insertView(".count-container", new Question.Views.ParticipantsList({ participants: this.participants }));
 		},
 
@@ -171,18 +144,13 @@ function(App, StateApp, Common) {
 			logData[this.name] = _.chain(this.participants.models)
 				.map(function (model) { return { alias: model.get("alias"), choice: model.get("choice") }})
 				.value();
-				console.log("@@ log", logData, this);
 			this.log(logData);
 		}
 	});
 
 	Question.States.End = StateApp.ViewState.extend({
 		view: "q::end",
-		name: "end",
-
-		afterRender: function () {
-			this.log()
-		},
+		name: "end"
 	});
 
   return Question;
