@@ -33,6 +33,20 @@ rect.bar-D-Defected {
   width: 20em;
 }
 
+.overlay.pd-choices-CC
+  background-color rgba(cooperated-colour, .7)
+  border 3px solid rgba(cooperated-colour, .95)
+.overlay.pd-choices-CD
+  background-color rgba(darken(cooperated-colour, 60%), .7)
+  border 3px solid cooperated-colour
+
+.overlay.pd-choices-DC
+  background-color rgba(defected-colour, .7)
+  border 3px solid defected-colour
+.overlay.pd-choices-DD
+  background-color rgba(darken(defected-colour, 60%), .7)
+  border 3px solid defected-colour
+
 .participant.results.choices-CC, .participant.results.choice-C
   background-color cooperated-colour
 
@@ -65,11 +79,13 @@ rect.bar-D-Defected {
   background: cooperated-colour;
 
 .partner-choice {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   display: inline-block;
   border-radius: 3px;
   margin-bottom: 2px;
+  border: 1px solid rgba(255,255,255,.4);
+  box-shadow: 1px 1px 1px #000;
 }
 
 .choices-CC .partner-choice,

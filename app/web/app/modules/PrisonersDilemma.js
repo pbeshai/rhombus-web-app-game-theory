@@ -51,8 +51,11 @@ function (App, Common, Participant, StateApp, variableWidthBarChart, xLine, Grap
 
 	PrisonersDilemma.Views.Results.Participant = Common.Views.ParticipantDisplay.extend({
 		template: "app/templates/pd/results/participant",
-		cssClass: function () {
-			return "results choices-" + this.model.get("pairChoices");
+		cssClass: function (model) {
+			return "results choices-" + model.get("pairChoices");
+		},
+		overlay: function (model) {
+			return "no-animate pd-choices-" + model.get("pairChoices");
 		}
 	});
 
