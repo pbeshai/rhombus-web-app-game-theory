@@ -307,9 +307,10 @@ function coinMatchingResults(req, res) {
 		output("");
 		output("Totals");
 		output("======");
-		output("Alias,TotalScore");
+		output("Alias,Phase1Total,Phase2Total,Phase3Total,Phase4Total,OverallTotal");
 		_.each(_.keys(totals), function (alias) {
-			output(alias + "," + totals[alias]);
+			output(alias + "," + totals[alias].phase1 + "," + totals[alias].phase2 + "," +
+				totals[alias].phase3 + "," + totals[alias].phase4 + "," + totals[alias].total);
 		});
 
 		function outputPhase(phaseNum) {
@@ -357,9 +358,11 @@ function coinMatchingResults(req, res) {
 
 					data += "," + phaseTotal;
 
-
-					totals[participant.alias] = (totals[participant.alias] || 0) + phaseTotal;
-
+					if (totals[participant.alias] === undefined) {
+						totals[participant.alias] = {};
+					}
+					totals[participant.alias]["phase" + phaseNum] = phaseTotal;
+					totals[participant.alias].total = (totals[participant.alias].total || 0) + phaseTotal;
 					output(data);
 				});
 			}
