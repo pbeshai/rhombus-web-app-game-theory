@@ -18,8 +18,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 	CoinMatching.config = {
 		pointsPerRound: 1,
 		roundsPerPhase: 2,
-		group1Name: "Team 1",
-		group2Name: "Team 2",
+		group1Name: "Matchers",
+		group2Name: "Mismatchers",
 		playTime: 10 // seconds for a play round
 	};
 
@@ -112,6 +112,10 @@ function (App, Common, Participant, StateApp, Graphs) {
 	CoinMatching.Views.Results.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
 		locked: true,
 
+		overlay: function (model) {
+			return "no-animate";
+		},
+
 		mainText: function (model) {
 			var choice = CoinMatching.Util.labelChoice(model.get("choice")),
 					partnerChoice = CoinMatching.Util.labelChoice(model.get("partner").get("choice"));
@@ -144,6 +148,9 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.Views.PhaseResults.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
 		locked: true,
+		overlay: function (model) {
+			return "no-animate";
+		},
 
 		mainText: function (model) {
 			return model.get("phaseTotal");
@@ -163,6 +170,9 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.Views.TotalResults.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
 		locked: true,
+		overlay: function (model) {
+			return "no-animate";
+		},
 
 		mainText: function (model) {
 			return model.get("total");
