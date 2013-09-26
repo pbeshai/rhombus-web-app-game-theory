@@ -20,7 +20,6 @@ function (App, Common, Participant, StateApp, Graphs) {
 		roundsPerPhase: 2,
 		group1Name: "Matchers",
 		group2Name: "Mismatchers",
-		playTime: 10 // seconds for a play round
 	};
 
 	CoinMatching.Instructions = Common.Models.Instructions.extend({
@@ -66,43 +65,10 @@ function (App, Common, Participant, StateApp, Graphs) {
 		}, 0);
 	}
 
-	CoinMatching.Views.Countdown = App.BaseView.extend({
-		className: "countdown animated",
-		afterRender: function () {
-			var timeLeft = Math.max(parseInt((this.options.endTime / 1000) - (new Date().getTime() / 1000), 10), 0);
-
-			var seconds = timeLeft % 60;
-			var minutes = parseInt(timeLeft / 60, 10);
-			function z(str) { // add leading zero
-				return ("0"+str).slice(-2);
-			}
-			var formattedTime = z(minutes) + ":" + z(seconds);
-
-			this.$el.html("<div class='countdown-highlight'>" + formattedTime + "</div>" + formattedTime);
-			if (timeLeft < 10) {
-				this.$(".countdown-highlight").css("opacity", 1 - (timeLeft / 10));
-			}
-			if (timeLeft <= 3) {
-				this.$el.removeClass("pulse");
-				this.restartCssAnimationFix();
-				if (timeLeft === 0) {
-					this.$(".countdown-highlight").addClass("animated flash");
-				} else {
-					this.$el.addClass("pulse");
-				}
-			}
-
-			if (timeLeft > 0) {
-				setTimeout(_.bind(this.render, this), 1000);
-			}
-		},
-	});
-
 	CoinMatching.Views.Play.Layout = App.registerView("coin-matching::play", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
 		header: "Play",
 		ParticipantView: CoinMatching.Views.Play.Participant,
 		InstructionsModel: CoinMatching.Instructions,
-		PreGroupsView: CoinMatching.Views.Countdown,
 		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
 		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
 	})));
@@ -205,13 +171,11 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 		viewOptions: function () {
 			var viewOptions = Common.States.GroupPlay.prototype.viewOptions.apply(this, arguments);
-			viewOptions.endTime = this.endTime;
 			return viewOptions;
 		},
 
 		beforeRender: function () {
 			Common.States.GroupPlay.prototype.beforeRender.call(this);
-			this.endTime = new Date().getTime() + (this.config.playTime * 1000);
 		},
 
 
