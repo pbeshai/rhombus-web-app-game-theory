@@ -252,7 +252,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 			// save the phase total (we need to do this before results since we show the phase total there)
 			this.groupModel.get("group1").each(function (participant, i) {
 				// sum up total scores from rounds in this phase
-				var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
+				var phaseTotal = _.reduce(this.options.parentOptions.stateOutputs, function (memo, roundOutput) {
 					var participantOutput = roundOutput.group1[i];
 					if (participantOutput && participantOutput.alias === participant.get("alias")) {
 						return participantOutput.score + memo;
@@ -266,7 +266,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 			this.groupModel.get("group2").each(function (participant, i) {
 				// sum up total scores from rounds in this phase
-				var phaseTotal = _.reduce(this.options.roundOutputs, function (memo, roundOutput) {
+				var phaseTotal = _.reduce(this.options.parentOptions.stateOutputs, function (memo, roundOutput) {
 					var participantOutput = roundOutput.group2[i];
 					if (participantOutput && participantOutput.alias === participant.get("alias")) {
 						return participantOutput.score + memo;
@@ -289,24 +289,18 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 
 	CoinMatching.States.Round = StateApp.MultiState.extend({
-		name: "phase",
-		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results,
-		CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results,
-		CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
-		numRounds: CoinMatching.config.roundsPerPhase,
+		name: "round",
+		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
+	});
 
-		addNewParticipants: function (render) {
-			if (this.currentState && this.currentState.addNewParticipants) {
-				this.currentState.addNewParticipants(render);
-			} else {
-				console.log("Could not add in new participants to " + this.currentState);
-			}
-		},
+	CoinMatching.States.Phase = StateApp.RepeatState.extend({
+		name: "phase",
+		State: CoinMatching.States.Round,
+		numRepeats: CoinMatching.config.roundsPerPhase,
 
 		// what is saved between each round
 		// output is a groupModel
-
-		roundOutput: function (output) {
+		stateOutput: function (output) {
 			var roundOutput = {
 				group1: output.groupModel.get("group1").map(serialize),
 				group2: output.groupModel.get("group2").map(serialize)
@@ -330,12 +324,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 				participant.set({ "phaseTotal": 0});
 			});
 
-			StateApp.RoundState.prototype.onEntry.apply(this, arguments);
+			StateApp.RepeatState.prototype.onEntry.apply(this, arguments);
 		},
-
-		handleConfigure: function () {
-			this.currentState.render();
-		}
 	});
 
 	CoinMatching.States.PhaseTotalBucket = Common.States.Bucket.extend({
@@ -358,7 +348,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 		logResults: function () {
 			var logData = {};
-			logData["phase" + this.options.phase] = this.input.roundOutputs;
+			logData["phase" + this.options.phase] = this.input.stateOutputs;
 			return logData;
 		}
 	});

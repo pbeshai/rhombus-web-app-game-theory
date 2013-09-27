@@ -24,10 +24,10 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 		config: CoinMatching.config,
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
-			[ CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults ],
-			[ CoinMatching.States.Partner, CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Partner, CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Partner, CoinMatching.States.Round, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults ],
+			[ CoinMatching.States.Partner, CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Partner, CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
+			[ CoinMatching.States.Partner, CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
 		],
 		phaseConfigs: [
 			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },
