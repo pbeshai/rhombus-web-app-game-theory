@@ -288,9 +288,11 @@ function (App, Common, Participant, StateApp, Graphs) {
 	CoinMatching.States.Partner = Common.States.GroupPartner;
 
 
-	CoinMatching.States.Round = StateApp.RoundState.extend({
+	CoinMatching.States.Round = StateApp.MultiState.extend({
 		name: "phase",
-		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
+		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results,
+		CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results,
+		CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
 		numRounds: CoinMatching.config.roundsPerPhase,
 
 		addNewParticipants: function (render) {
