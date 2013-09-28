@@ -309,7 +309,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 				group1: output.groupModel.get("group1").map(serialize),
 				group2: output.groupModel.get("group2").map(serialize)
 			};
-			console.log(" ~~~ ROUND OUTPUT FOR ROUND " + this.stateCounter + ":", roundOutput, this);
+
 			return roundOutput;
 
 			function serialize(participant) {
