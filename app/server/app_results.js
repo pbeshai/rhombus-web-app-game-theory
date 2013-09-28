@@ -174,17 +174,17 @@ function teampdResults(req, res) {
 			output("DC," + config.scoringMatrix.DC + ",DD," + config.scoringMatrix.DD);
 		}
 
-		output("Team 1 (" + config.group1Name + ") vs. Team 2 (" + config.group2Name + ")");
+		output(config.group1Name + " vs. " + config.group2Name);
 		output("");
 
-		output("Team 1 (" + config.group1Name + ") Results");
+		output(config.group1Name + " Results");
 		output("Alias,Choice,Payoff,PartnerAlias,PartnerChoice,PartnerPayoff");
 		_.each(results.team1, function (result) {
 			output(result.alias + "," + result.choice + "," + result.score + "," + result.partner.alias + "," + result.partner.choice + "," + result.partner.score);
 		});
 
 		output("");
-		output("Team 2 (" + config.group2Name + ") Results");
+		output(config.group2Name + " Results");
 		output("Alias,Choice,Payoff,PartnerAlias,PartnerChoice,PartnerPayoff");
 		_.each(results.team2, function (result) {
 			output(result.alias + "," + result.choice + "," + result.score + "," + result.partner.alias + "," + result.partner.choice + "," + result.partner.score);

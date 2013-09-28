@@ -13,7 +13,7 @@ function initialize(site) {
 }
 
 function questionListSets(req, res) {
-	fs.readdir("app/web/app/config/questions", function (err, files) {
+	fs.readdir("app/web/app/apps/Question/questions", function (err, files) {
 		// match .yaml files and return an array without the extension
 		var questionSets = _.chain(files)
 			.filter(function (file) { return file.match(/\.yaml$/); })
@@ -31,10 +31,10 @@ function questionGetSet(req, res) {
 		return;
 	}
 
-	if (!fs.existsSync("app/web/app/config/questions/" + questionSet + ".yaml")) {
+	if (!fs.existsSync("app/web/app/apps/Question/questions/" + questionSet + ".yaml")) {
 		res.send(404);
 		return;
 	}
 
-	res.send(200, require("../web/app/config/questions/" + questionSet + ".yaml"));
+	res.send(200, require("../web/app/apps/Question/questions/" + questionSet + ".yaml"));
 }
