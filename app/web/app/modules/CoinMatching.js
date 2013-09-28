@@ -24,10 +24,8 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.Instructions = Common.Models.Instructions.extend({
 		buttonConfig: {
-			"A": { description: "Human - Heads" },
-			"B": { description: "Human - Tails" },
-			"C": { description: "Computer - Heads" },
-			"D": { description: "Computer - Tails" },
+			"A": { description: "Heads" },
+			"B": { description: "Tails" }
 		}
 	});
 
@@ -160,7 +158,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 	CoinMatching.States.Play = Common.States.GroupPlay.extend({
 		view: "coin-matching::play",
 		defaultChoice: null,
-		validChoices: ["A", "B", "C", "D"],
+		validChoices: ["A", "B"],
 
 		// TODO: this only needs to be done once at the start of the game.
 		prepareParticipantGroup1: function (participant) {
@@ -351,7 +349,10 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 		logResults: function () {
 			var logData = {};
-			logData["phase" + this.options.phase] = this.input.stateOutputs;
+			logData["phase" + this.options.phase] = {
+				results: this.input.stateOutputs,
+				config: this.config
+			};
 			return logData;
 		}
 	});

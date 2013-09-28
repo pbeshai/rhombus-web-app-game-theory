@@ -326,6 +326,11 @@ function coinMatchingResults(req, res) {
 			}
 			header += ",P" + phaseNum + "Total";
 
+			var pconfig = phase.config;
+
+			var groupNames = [ pconfig.group1Name + " - " + pconfig.group1NameSuffix,
+												pconfig.group2Name + " - " + pconfig.group2NameSuffix ];
+
 			output(header);
 
 			outputGroup(1);
@@ -334,8 +339,8 @@ function coinMatchingResults(req, res) {
 			// for each participant, output choices and scores from each round in each phase
 			function outputGroup(groupNum) {
 				// use last round of phase to catch as many latecomers as possible
-				_.each(phase[phase.length - 1]["group" + groupNum], function (participant, i) {
-					var data = config["group" + groupNum + "Name"] + "," + participant.alias + "," + participant.partner;
+				_.each(phase.results[phase.results.length - 1]["group" + groupNum], function (participant, i) {
+					var data = groupNames[groupNum - 1] + "," + participant.alias + "," + participant.partner;
 					var choice;
 					var phaseTotal = 0;
 
@@ -343,7 +348,7 @@ function coinMatchingResults(req, res) {
 					// for each round
 					for (r = 0; r < config.roundsPerPhase; r++) {
 						// may not match index in different rounds if a bot drops out in a phase or somebody is added, so look up by alias
-						roundData = _.find(phase[r]["group" + groupNum], matchAlias);
+						roundData = _.find(phase.results[r]["group" + groupNum], matchAlias);
 
 						if (roundData) {
 							choice = choiceMap[roundData.choice] || "#";
