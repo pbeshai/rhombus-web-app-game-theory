@@ -8,11 +8,10 @@ Attendance -> Team Prisoner's Dilemma Play -> Team Prisoner's Dilemam Results
 define([
 	// Application.
 	"framework/App",
-
 	"framework/apps/StateApp",
-
 	"framework/modules/common/CommonStateApps",
-	"modules/TeamPrisonersDilemma"
+
+	"apps/TeamPrisonersDilemma/TeamPrisonersDilemma"
 ],
 
 function (App, StateApp, CommonStateApps, TeamPrisonersDilemma) {

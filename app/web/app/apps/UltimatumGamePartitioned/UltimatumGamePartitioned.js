@@ -6,15 +6,13 @@ define([
 	// Application.
 	"framework/App",
 	"framework/modules/common/Common",
-
 	"framework/modules/Participant",
-	"modules/UltimatumGame",
-
 	"framework/apps/StateApp",
+	"framework/util/d3/rickshaw/graphs",
 
-	"framework/util/d3/rickshaw/graphs"
+	"apps/UltimatumGame/UltimatumGame",
 ],
-function (App, Common, Participant, UltimatumGame, StateApp, Graphs) {
+function (App, Common, Participant, StateApp, Graphs, UltimatumGame) {
 
 	var UltimatumGamePartitioned = App.module();
 

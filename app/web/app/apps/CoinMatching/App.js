@@ -8,11 +8,10 @@ Attendance -> Play -> Results
 define([
 	// Application.
 	"framework/App",
-
 	"framework/apps/StateApp",
-
 	"framework/modules/common/CommonStateApps",
-	"modules/CoinMatching"
+
+	"apps/CoinMatching/Module"
 ],
 
 function (App, StateApp, CommonStateApps, CoinMatching) {
@@ -20,7 +19,7 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 	// Attendance -> Phase 1 (Play) -> Phase 1 (Results) -> Phase 2 Play -> Phase 2 Results -> Total Results -> ...
 	var CoinMatchingApp = CommonStateApps.PhaseGame.extend({
 		id: "coin-matching",
-		version: "1.1",
+		version: "1.2",
 		config: CoinMatching.config,
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
@@ -89,8 +88,6 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 		},
 
 		addNewParticipants: function () {
-			var participants = this.get("participants");
-			console.log("COIN MATCHING: requested to add new participants", participants.newParticipants);
 			var currState = this.get("currentState");
 			if (currState && currState.addNewParticipants) {
 				currState.addNewParticipants(true); // true to render

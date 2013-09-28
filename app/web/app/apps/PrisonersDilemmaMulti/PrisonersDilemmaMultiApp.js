@@ -10,11 +10,10 @@ play many rounds
 define([
 	// Application.
 	"framework/App",
-
 	"framework/apps/StateApp",
-
 	"framework/modules/common/CommonStateApps",
-	"modules/PrisonersDilemmaMulti"
+
+	"apps/PrisonersDilemmaMulti/PrisonersDilemmaMulti"
 ],
 
 function (App, StateApp, CommonStateApps, PrisonersDilemmaMulti) {

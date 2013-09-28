@@ -8,11 +8,10 @@ Attendance -> Ultimatum Game Giver Play -> Receiver Play -> Ultimatum Game Resul
 define([
 	// Application.
 	"framework/App",
-
 	"framework/apps/StateApp",
-
 	"framework/modules/common/CommonStateApps",
-	"modules/UltimatumGame"
+
+	"apps/UltimatumGame/UltimatumGame"
 ],
 
 function (App, StateApp, CommonStateApps, UltimatumGame) {

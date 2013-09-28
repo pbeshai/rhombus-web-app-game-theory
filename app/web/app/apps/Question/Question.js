@@ -3,7 +3,7 @@ define([
 	"framework/apps/StateApp",
 	"framework/modules/common/Common"
 ],
-function(App, StateApp, Common) {
+function (App, StateApp, Common) {
 	var Question = App.module();
 
 	Question.config = {

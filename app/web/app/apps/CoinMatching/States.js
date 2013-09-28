@@ -7,155 +7,18 @@ define([
 	// Application.
 	"framework/App",
 	"framework/modules/common/Common",
-	"framework/modules/Participant",
 	"framework/apps/StateApp",
-	"framework/util/d3/rickshaw/graphs"
+
+	"apps/CoinMatching/Base",
+	"apps/CoinMatching/Views" // depends on Views to register themselves
 ],
-function (App, Common, Participant, StateApp, Graphs) {
-
-	var CoinMatching = App.module();
-
-	CoinMatching.config = {
-		pointsPerRound: 1,
-		roundsPerPhase: 2,
-		group1Name: "Matchers",
-		group2Name: "Mismatchers",
-	};
-
-	CoinMatching.Instructions = Common.Models.Instructions.extend({
-		buttonConfig: {
-			"A": { description: "Heads" },
-			"B": { description: "Tails" }
-		}
-	});
-
-	CoinMatching.Util = {};
-	CoinMatching.Util.labelChoice = function (choice) {
-		if (choice === "A" || choice === "C") {
-			return "H";
-		} else if (choice === "B" || choice === "D") {
-			return "T";
-		}
-		return "#";
-	};
-
-	CoinMatching.Views.Configure = Common.Views.ModelConfigure.Layout.extend({
-		modelOptions: _.extend({}, CoinMatching.config)
-	});
-
-	CoinMatching.Views.AppControls = Common.Views.AppControls.extend({
-		AppConfigView: CoinMatching.Views.Configure
-	});
-
-	CoinMatching.Views.Play = {};
-
-	CoinMatching.Views.Play.Participant = Common.Views.ParticipantHiddenPlay.extend({
-		bottomText: function (model) {
-			if (model.get("score") != null) {
-				return "Prev. " + model.get("score");
-			}
-		}
-	});
-
-	function total(collection, attribute) {
-		return collection.reduce(function (memo, p) {
-			return memo + (p.get(attribute) || 0);
-		}, 0);
-	}
-
-	CoinMatching.Views.Play.Layout = App.registerView("coin-matching::play", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
-		header: "Play",
-		ParticipantView: CoinMatching.Views.Play.Participant,
-		InstructionsModel: CoinMatching.Instructions,
-		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
-		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
-	})));
-
-	CoinMatching.Views.Results = {};
-
-	CoinMatching.Views.Results.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
-		locked: true,
-
-		overlay: function (model) {
-			return "no-animate";
-		},
-
-		mainText: function (model) {
-			var choice = CoinMatching.Util.labelChoice(model.get("choice")),
-					partnerChoice = CoinMatching.Util.labelChoice(model.get("partner").get("choice"));
-
-			var outcome;
-			if (model.get("role") === "row") {
-				outcome = choice+partnerChoice;
-			} else {
-				outcome = partnerChoice+choice;
-			}
-			return outcome + " "+model.get("score");
-		},
-		bottomText: function (model) {
-			if (model.get("phaseTotal") != null) {
-				return "Total " + model.get("phaseTotal");
-			}
-		}
-	}));
-
-	CoinMatching.Views.Results.Layout = App.registerView("coin-matching::results", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
-		header: "Results",
-		className: "coin-matching-results",
-		ParticipantView: CoinMatching.Views.Results.Score,
-		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
-		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); },
-	})));
-
-
-	CoinMatching.Views.PhaseResults = {};
-
-	CoinMatching.Views.PhaseResults.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
-		locked: true,
-		overlay: function (model) {
-			return "no-animate";
-		},
-
-		mainText: function (model) {
-			return model.get("phaseTotal");
-		},
-	}));
-
-	CoinMatching.Views.PhaseResults.Layout = App.registerView("coin-matching::phase-results", Common.Views.GroupLayout.extend({
-		header: "Results for Phase ",
-		className: "coin-matching-results",
-		ParticipantView: CoinMatching.Views.PhaseResults.Score,
-		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
-		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
-	}));
-
-
-	CoinMatching.Views.TotalResults = {};
-
-	CoinMatching.Views.TotalResults.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantDisplay.extend({
-		locked: true,
-		overlay: function (model) {
-			return "no-animate";
-		},
-
-		mainText: function (model) {
-			return model.get("total");
-		},
-	}));
-
-	CoinMatching.Views.TotalResults.Layout = App.registerView("coin-matching::total-results", Common.Views.GroupLayout.extend({
-		header: "Total Results",
-		className: "coin-matching-results",
-		ParticipantView: CoinMatching.Views.TotalResults.Score,
-		group1HeaderRight: function () { return total(this.model.get("group1"), "total"); },
-		group2HeaderRight: function () { return total(this.model.get("group2"), "total"); }
-	}));
+function (App, Common, StateApp, CoinMatching) {
 
 
 	// To be used in StateApps
-	CoinMatching.States = {};
+	var CoinMatchingStates = {};
 
-	CoinMatching.States.Play = Common.States.GroupPlay.extend({
+	CoinMatchingStates.Play = Common.States.GroupPlay.extend({
 		view: "coin-matching::play",
 		defaultChoice: null,
 		validChoices: ["A", "B"],
@@ -225,7 +88,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 		}
 	});
 
-	CoinMatching.States.Score = Common.States.GroupScore.extend({
+	CoinMatchingStates.Score = Common.States.GroupScore.extend({
 		assignScoreGroup2: function () { }, // do nothing (handled in group1)
 		// group 1 is row, group2 is col
 		assignScoreGroup1: function (participant) {
@@ -280,7 +143,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 		}
 	});
 
-	CoinMatching.States.Results = Common.States.GroupResults.extend({
+	CoinMatchingStates.Results = Common.States.GroupResults.extend({
 		view: "coin-matching::results",
 		viewOptions: function () {
 			var viewOptions = Common.States.GroupResults.prototype.viewOptions.apply(this, arguments);
@@ -289,15 +152,15 @@ function (App, Common, Participant, StateApp, Graphs) {
 		},
 	});
 
-	CoinMatching.States.Partner = Common.States.GroupPartner;
+	CoinMatchingStates.Partner = Common.States.GroupPartner;
 
 
-	CoinMatching.States.Round = Common.States.Round.extend({
-		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
+	CoinMatchingStates.Round = Common.States.Round.extend({
+		States: [ CoinMatchingStates.Play, CoinMatchingStates.Score, Common.States.Bucket, CoinMatchingStates.Results ],
 	});
 
-	CoinMatching.States.Phase = Common.States.Phase.extend({
-		State: CoinMatching.States.Round,
+	CoinMatchingStates.Phase = Common.States.Phase.extend({
+		State: CoinMatchingStates.Round,
 		numRounds: CoinMatching.config.roundsPerPhase,
 
 		// what is saved between each round
@@ -329,13 +192,13 @@ function (App, Common, Participant, StateApp, Graphs) {
 		},
 	});
 
-	CoinMatching.States.PhaseTotalBucket = Common.States.Bucket.extend({
+	CoinMatchingStates.PhaseTotalBucket = Common.States.Bucket.extend({
 		bucketAttribute: "phaseTotal",
 	});
 
-	CoinMatching.States.TotalBucket = Common.States.Bucket.extend({ bucketAttribute: "total" });
+	CoinMatchingStates.TotalBucket = Common.States.Bucket.extend({ bucketAttribute: "total" });
 
-	CoinMatching.States.PhaseResults = Common.States.GroupResults.extend({
+	CoinMatchingStates.PhaseResults = Common.States.GroupResults.extend({
 		name: "phase-results",
 		view: "coin-matching::phase-results",
 		beforeRender: function () {
@@ -357,7 +220,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 		}
 	});
 
-	CoinMatching.States.TotalResults = Common.States.GroupResults.extend({
+	CoinMatchingStates.TotalResults = Common.States.GroupResults.extend({
 		name: "total-results",
 		view: "coin-matching::total-results",
 
@@ -377,5 +240,5 @@ function (App, Common, Participant, StateApp, Graphs) {
 		},
 	});
 
-	return CoinMatching;
+	return CoinMatchingStates;
 });

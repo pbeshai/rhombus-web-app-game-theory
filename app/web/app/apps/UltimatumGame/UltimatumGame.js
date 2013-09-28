@@ -5,11 +5,8 @@ define([
 	// Application.
 	"framework/App",
 	"framework/modules/common/Common",
-
 	"framework/modules/Participant",
-
 	"framework/apps/StateApp",
-
 	"framework/util/d3/rickshaw/graphs"
 ],
 function (App, Common, Participant, StateApp, Graphs) {

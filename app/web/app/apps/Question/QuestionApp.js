@@ -8,11 +8,10 @@ Attendance -> N-Person Prisoner's Dilemma Play -> N-Person Prisoner's Dilemam Re
 define([
 	// Application.
 	"framework/App",
-
 	"framework/apps/StateApp",
-
 	"framework/modules/common/CommonStateApps",
-	"modules/Question"
+
+	"apps/Question/Question"
 ],
 
 function (App, StateApp, CommonStateApps, Question) {

@@ -4,7 +4,7 @@ require([
   // Application.
   "framework/App",
 
-  "apps/Apps"
+  "/api/apps", // get the dynamically generated dependencies for apps
 ],
 
 function (frameworkMain, App, Apps) {

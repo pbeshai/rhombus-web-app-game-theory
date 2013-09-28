@@ -6,14 +6,13 @@
 define([
 	// Application.
 	"framework/App",
-
 	"framework/modules/common/Common",
-	"modules/PrisonersDilemma",
 	"framework/modules/Participant",
-
 	"framework/apps/StateApp",
+
+	"apps/PrisonersDilemma/PrisonersDilemma",
 ],
-function (App, Common, PrisonersDilemma, Participant, StateApp) {
+function (App, Common, Participant, StateApp, PrisonersDilemma) {
 
 	var TeamPrisonersDilemma = App.module();
 	TeamPrisonersDilemma.config = {

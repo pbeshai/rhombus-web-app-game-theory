@@ -8,14 +8,13 @@ define([
 	"framework/App",
 
 	"framework/modules/common/Common",
-	"modules/PrisonersDilemma",
 	"framework/modules/Participant",
-
 	"framework/apps/StateApp",
+	"framework/util/d3/rickshaw/graphs",
 
-	"framework/util/d3/rickshaw/graphs"
+	"apps/PrisonersDilemma/PrisonersDilemma",
 ],
-function (App, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
+function (App, Common, Participant, StateApp, Graphs, PrisonersDilemma) {
 
 	var PrisonersDilemmaMulti = App.module();
 	PrisonersDilemmaMulti.config = {
