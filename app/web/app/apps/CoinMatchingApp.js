@@ -45,6 +45,7 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 				case "phase": // options for Round
 					return _.extend({
 						config: this.phaseConfigs[phaseIndex],
+						name: "phase " + phaseNum,
 						roundOptions: [
 								{ viewOptions: { header: "Play Phase " + phaseNum } },
 								undefined, // score

@@ -317,8 +317,14 @@ function coinMatchingResults(req, res) {
 			var phase = req.body["phase" + phaseNum];
 			if (phase == null) return;
 
+			var pconfig = phase.config;
+
+			var groupNames = [ pconfig.group1Name + " - " + pconfig.group1NameSuffix,
+												pconfig.group2Name + " - " + pconfig.group2NameSuffix ];
+
+
 			output("");
-			output("Phase " + phaseNum);
+			output("Phase " + phaseNum +"," + groupNames[0] + "," + groupNames[1]);
 			output("-------");
 			var r, header = "Team,Alias,PartnerAlias";
 			for (r = 1; r <= config.roundsPerPhase; r++) {
@@ -326,10 +332,6 @@ function coinMatchingResults(req, res) {
 			}
 			header += ",P" + phaseNum + "Total";
 
-			var pconfig = phase.config;
-
-			var groupNames = [ pconfig.group1Name + " - " + pconfig.group1NameSuffix,
-												pconfig.group2Name + " - " + pconfig.group2NameSuffix ];
 
 			output(header);
 
