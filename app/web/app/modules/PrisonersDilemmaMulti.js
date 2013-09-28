@@ -184,7 +184,8 @@ function (App, Common, PrisonersDilemma, Participant, StateApp, Graphs) {
 		}
 	});
 
-	PrisonersDilemmaMulti.States.Round = StateApp.RoundState.extend({
+	// TODO: set this up
+	PrisonersDilemmaMulti.States.Round = Common.States.Round.extend({
 		name: "round",
 		States: [ PrisonersDilemmaMulti.States.Play, PrisonersDilemma.States.Score, PrisonersDilemmaMulti.States.Stats, PrisonersDilemmaMulti.States.Results ],
 		minRounds: PrisonersDilemmaMulti.config.minRounds,

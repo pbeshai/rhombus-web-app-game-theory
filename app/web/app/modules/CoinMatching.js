@@ -251,7 +251,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 			// save the phase total (we need to do this before results since we show the phase total there)
 			this.groupModel.get("group1").each(function (participant, i) {
 				// sum up total scores from rounds in this phase
-				var phaseTotal = _.reduce(this.options.parentOptions.stateOutputs, function (memo, roundOutput) {
+				var phaseTotal = _.reduce(this.options.parentOptions.roundOutputs, function (memo, roundOutput) {
 					var participantOutput = roundOutput.group1[i];
 					if (participantOutput && participantOutput.alias === participant.get("alias")) {
 						return participantOutput.score + memo;
@@ -265,7 +265,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 			this.groupModel.get("group2").each(function (participant, i) {
 				// sum up total scores from rounds in this phase
-				var phaseTotal = _.reduce(this.options.parentOptions.stateOutputs, function (memo, roundOutput) {
+				var phaseTotal = _.reduce(this.options.parentOptions.roundOutputs, function (memo, roundOutput) {
 					var participantOutput = roundOutput.group2[i];
 					if (participantOutput && participantOutput.alias === participant.get("alias")) {
 						return participantOutput.score + memo;
@@ -350,7 +350,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 		logResults: function () {
 			var logData = {};
 			logData["phase" + this.options.phase] = {
-				results: this.input.stateOutputs,
+				results: this.input.roundOutputs,
 				config: this.config
 			};
 			return logData;
