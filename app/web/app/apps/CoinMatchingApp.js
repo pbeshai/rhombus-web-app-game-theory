@@ -45,12 +45,12 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 				case "phase": // options for Round
 					return _.extend({
 						config: this.phaseConfigs[phaseIndex],
-						stateOptions:
-						[
-							{ viewOptions: { header: "Play Phase " + phaseNum } },
-							undefined, // score
-							{ viewOptions: { header: "Results Phase " + phaseNum } }
-						]
+						roundOptions: [
+								{ viewOptions: { header: "Play Phase " + phaseNum } },
+								undefined, // score
+								undefined, // bucket
+								{ viewOptions: { header: "Results Phase " + phaseNum } }
+							]
 					});
 
 				case "bucket": // options for phase total bucket

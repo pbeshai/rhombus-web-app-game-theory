@@ -106,7 +106,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 		className: "coin-matching-results",
 		ParticipantView: CoinMatching.Views.Results.Score,
 		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
-		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); }
+		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); },
 	})));
 
 
@@ -171,6 +171,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 		viewOptions: function () {
 			var viewOptions = Common.States.GroupPlay.prototype.viewOptions.apply(this, arguments);
+			viewOptions.round = this.options.round;
 			return viewOptions;
 		},
 
@@ -283,29 +284,32 @@ function (App, Common, Participant, StateApp, Graphs) {
 
 	CoinMatching.States.Results = Common.States.GroupResults.extend({
 		view: "coin-matching::results",
+		viewOptions: function () {
+			var viewOptions = Common.States.GroupResults.prototype.viewOptions.apply(this, arguments);
+			viewOptions.round = this.options.round;
+			return viewOptions;
+		},
 	});
 
 	CoinMatching.States.Partner = Common.States.GroupPartner;
 
 
-	CoinMatching.States.Round = StateApp.MultiState.extend({
-		name: "round",
+	CoinMatching.States.Round = Common.States.Round.extend({
 		States: [ CoinMatching.States.Play, CoinMatching.States.Score, Common.States.Bucket, CoinMatching.States.Results ],
 	});
 
-	CoinMatching.States.Phase = StateApp.RepeatState.extend({
-		name: "phase",
+	CoinMatching.States.Phase = Common.States.Phase.extend({
 		State: CoinMatching.States.Round,
-		numRepeats: CoinMatching.config.roundsPerPhase,
+		numRounds: CoinMatching.config.roundsPerPhase,
 
 		// what is saved between each round
 		// output is a groupModel
-		stateOutput: function (output) {
+		roundOutput: function (output) {
 			var roundOutput = {
 				group1: output.groupModel.get("group1").map(serialize),
 				group2: output.groupModel.get("group2").map(serialize)
 			};
-
+			console.log(" ~~~ ROUND OUTPUT FOR ROUND " + this.stateCounter + ":", roundOutput, this);
 			return roundOutput;
 
 			function serialize(participant) {
@@ -313,8 +317,7 @@ function (App, Common, Participant, StateApp, Graphs) {
 					alias: participant.get("alias"),
 					choice: participant.get("choice"),
 					score: participant.get("score"),
-					partner: participant.get("partner").get("alias"),
-					total: participant.get("total")
+					partner: participant.get("partner").get("alias")
 				};
 			}
 		},
