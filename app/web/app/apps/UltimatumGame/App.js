@@ -8,7 +8,7 @@ Attendance -> Ultimatum Game Giver Play -> Receiver Play -> Ultimatum Game Resul
 define([
 	// Application.
 	"framework/App",
-	"framework/apps/StateApp",
+	"framework/modules/StateApp/Module",
 	"framework/modules/common/CommonStateApps",
 
 	"apps/UltimatumGame/Module"

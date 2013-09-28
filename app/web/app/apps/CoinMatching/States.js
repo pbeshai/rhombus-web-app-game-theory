@@ -7,7 +7,7 @@ define([
 	// Application.
 	"framework/App",
 	"framework/modules/common/Common",
-	"framework/apps/StateApp",
+	"framework/modules/StateApp/Module",
 
 	"apps/CoinMatching/Base",
 	"apps/CoinMatching/Views" // depends on Views to register themselves

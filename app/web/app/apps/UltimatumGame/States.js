@@ -1,7 +1,7 @@
 define([
 	"framework/App",
 	"framework/modules/common/Common",
-	"framework/apps/StateApp",
+	"framework/modules/StateApp/Module",
 
 	"apps/UltimatumGame/Base",
 	"apps/UltimatumGame/Views"

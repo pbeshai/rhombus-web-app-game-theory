@@ -8,7 +8,7 @@ Attendance -> Play -> Results
 define([
 	// Application.
 	"framework/App",
-	"framework/apps/StateApp",
+	"framework/modules/StateApp/Module",
 	"framework/modules/common/CommonStateApps",
 
 	"apps/CoinMatching/Module"
