@@ -2,7 +2,7 @@
 @import "../../framework/styles/index.styl";
 
 /*-- Prisoner's Dilemma ---*/
-@import "pd.styl";
+@import "../apps/PrisonersDilemma/styles/index.styl";
 
 /*-- Ultimatum Game ---*/
-@import "ultimatum.styl";
+@import "../apps/UltimatumGame/styles/index.styl";
