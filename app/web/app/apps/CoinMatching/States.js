@@ -23,11 +23,14 @@ function (App, Common, StateApp, CoinMatching) {
 		defaultChoice: null,
 		validChoices: ["A", "B"],
 
-		// TODO: this only needs to be done once at the start of the game.
 		prepareParticipantGroup1: function (participant) {
 			this.prepareParticipant(participant, "group1");
 			participant.set("role", "row");
-			participant.get("partner").set("role", "col");
+		},
+
+		prepareParticipantGroup2: function (participant) {
+			this.prepareParticipant(participant, "group2");
+			participant.set("role", "col");
 		},
 
 		viewOptions: function () {
@@ -38,53 +41,6 @@ function (App, Common, StateApp, CoinMatching) {
 
 		beforeRender: function () {
 			Common.States.GroupPlay.prototype.beforeRender.call(this);
-		},
-
-
-		// called before running
-		addNewParticipants: function (render) {
-			var groupModel = this.input.groupModel;
-			if (!groupModel.hasNewParticipants()) {
-				return;
-			}
-
-			// store the new participants and clear them as we will add them later
-			var newParticipants = groupModel.get("participants").clearNewParticipants();
-			_.each(newParticipants, function (p) {
-				p.set({ choice: null, played: false, score: null, phaseTotal: null, total: null });
-			});
-			// handles partnering with each other and shuffling
-			var newParticipantsModel = new Common.Models.GroupModel({ participants: newParticipants }, { forceEven: true });
-
-			// if there is an odd number of new participants and there is a bot currently playing, we need to replace it
-			if (newParticipants.length % 2 === 1) {
-				var bot = groupModel.get("participants").find(function (p) { return p.bot; });
-				if (bot) { // replace the bot.
-					var botPartnerGroup = groupModel.get("group1").contains(bot) ? 2 : 1;
-
-					var newBot = newParticipantsModel.get("participants").find(function (p) { return p.bot; });
-					var newBotPartnerGroup = newParticipantsModel.get("group1").contains(newBot) ? 2 : 1;
-
-					var currentBotPartner = bot.get("partner");
-					var newBotPartner = newBot.get("partner");
-					currentBotPartner.set("partner", newBotPartner);
-					newBotPartner.set("partner", currentBotPartner);
-
-					// make sure they are in different groups
-					if (newBotPartnerGroup === botPartnerGroup) {
-						newParticipantsModel.switchGroups(newBotPartner);
-					}
-
-					groupModel.remove(bot);
-					newParticipantsModel.remove(newBot);
-				}
-			}
-
-			groupModel.addFromGroupModel(newParticipantsModel);
-
-			if (render) {
-				this.rerender();
-			}
 		}
 	});
 

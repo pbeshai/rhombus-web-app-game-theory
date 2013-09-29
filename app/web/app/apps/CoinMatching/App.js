@@ -77,24 +77,9 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 		},
 
 		handleConfigure: function () {
-			// update numrounds in each of the rounds
-			_.each(this.states, function (state) {
-				if (state instanceof StateApp.RoundState) {
-					state.numRounds = this.config.roundsPerPhase;
-				}
-			}, this);
-
+			// TODO: update numrounds in each of the rounds
 			CommonStateApps.PhaseGame.prototype.handleConfigure.call(this);
 		},
-
-		addNewParticipants: function () {
-			var currState = this.get("currentState");
-			if (currState && currState.addNewParticipants) {
-				currState.addNewParticipants(true); // true to render
-			} else {
-				console.log("Could not add in new participants to " + currState);
-			}
-		}
 	});
 
 	// description for use in router
