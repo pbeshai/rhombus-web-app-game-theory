@@ -37,10 +37,6 @@ function (App, Common, StateApp, CoinMatching) {
 			var viewOptions = Common.States.GroupPlay.prototype.viewOptions.apply(this, arguments);
 			viewOptions.round = this.options.round;
 			return viewOptions;
-		},
-
-		beforeRender: function () {
-			Common.States.GroupPlay.prototype.beforeRender.call(this);
 		}
 	});
 

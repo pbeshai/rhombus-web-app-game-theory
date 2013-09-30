@@ -14,6 +14,7 @@ function initialize(site) {
 	site.post("/api/apps/ultimatum/log", ultimatumResults);
 	site.post("/api/apps/ultimatum-partition/log", ultimatumPartitionedResults);
 	site.post("/api/apps/coin-matching/log", coinMatchingResults);
+	site.post("/api/apps/stag-hunt/log", stagHuntResults);
 	site.post("/api/apps/q/log", questionResults);
 
 }
@@ -294,6 +295,130 @@ function coinMatchingResults(req, res) {
 		}
 
 		output(numPhases + " phases, " + config.roundsPerPhase + " rounds per phase, " + config.pointsPerRound + " points per round");
+
+		var totals = {};
+
+		outputPhase(1);
+		outputPhase(2);
+		outputPhase(3);
+		outputPhase(4);
+
+		// output totals
+		output("");
+		output("");
+		output("Totals");
+		output("======");
+		output("Alias,Phase1Total,Phase2Total,Phase3Total,Phase4Total,OverallTotal");
+		_.each(_.keys(totals), function (alias) {
+			output(alias + "," + totals[alias].phase1 + "," + totals[alias].phase2 + "," +
+				totals[alias].phase3 + "," + totals[alias].phase4 + "," + totals[alias].total);
+		});
+
+		function outputPhase(phaseNum) {
+			var phase = req.body["phase" + phaseNum];
+			if (phase == null) return;
+
+			var pconfig = phase.config;
+
+			var groupNames = [ pconfig.group1Name + " - " + pconfig.group1NameSuffix,
+												pconfig.group2Name + " - " + pconfig.group2NameSuffix ];
+
+
+			output("");
+			output("Phase " + phaseNum +"," + groupNames[0] + "," + groupNames[1]);
+			output("-------");
+			var r, header = "Team,Alias,PartnerAlias";
+			for (r = 1; r <= config.roundsPerPhase; r++) {
+				header += ",P" + phaseNum + "R" + r + "Choice,P" + phaseNum + "R" + r + "Score";
+			}
+			header += ",P" + phaseNum + "Total";
+
+
+			output(header);
+
+			outputGroup(1);
+			outputGroup(2);
+
+			// for each participant, output choices and scores from each round in each phase
+			function outputGroup(groupNum) {
+				// use last round of phase to catch as many latecomers as possible
+				_.each(phase.results[phase.results.length - 1]["group" + groupNum], function (participant, i) {
+					var data = groupNames[groupNum - 1] + "," + participant.alias + "," + participant.partner;
+					var choice;
+					var phaseTotal = 0;
+
+					var matchAlias = function (p) { return p.alias === participant.alias; };
+					// for each round
+					for (r = 0; r < config.roundsPerPhase; r++) {
+						// may not match index in different rounds if a bot drops out in a phase or somebody is added, so look up by alias
+						roundData = _.find(phase.results[r]["group" + groupNum], matchAlias);
+
+						if (roundData) {
+							choice = choiceMap[roundData.choice] || "#";
+							score = roundData.score;
+						}	else {
+							choice = "X"; // missing (e.g. they were late and didn't play)
+							score = 0;
+						}
+						data += "," + choice + "," + score;
+						phaseTotal += parseInt(score, 10);
+					}
+
+					data += "," + phaseTotal;
+
+					if (totals[participant.alias] === undefined) {
+						totals[participant.alias] = {};
+					}
+					totals[participant.alias]["phase" + phaseNum] = phaseTotal;
+					totals[participant.alias].total = (totals[participant.alias].total || 0) + phaseTotal;
+					output(data);
+				});
+			}
+		}
+
+		stream.end();
+	});
+
+	res.send(200);
+}
+
+
+function stagHuntResults(req, res) {
+	var now = new Date();
+	var config = req.body.config;
+	var version = req.body.version;
+	var round = req.body.round;
+	var numPhases = 4;
+
+	var choiceMap = {
+		A: "S",
+		B: "H",
+	};
+
+	var stream = fs.createWriteStream("log/stag-hunt/results." + filenameFormat(now) + ".txt");
+	stream.once('open', function(fd) {
+		function output (str) {
+			logger.info(str);
+			stream.write(str + "\n");
+		}
+		output("Stag Hunt Results (v" + version + ")");
+		output(now.toString());
+
+		if (config.message) {
+			output(config.message);
+		}
+
+		output(numPhases + " phases, " + config.roundsPerPhase + " rounds per phase");
+
+		if (config.scoringMatrix) {
+			output("");
+			output("Scoring Matrix");
+			output("AA," + config.scoringMatrix.AA + ",AB," + config.scoringMatrix.AB);
+			output("BA," + config.scoringMatrix.BA + ",BB," + config.scoringMatrix.BB);
+		}
+
+		output("");
+		output("A -> Stag,B -> Hare");
 
 		var totals = {};
 

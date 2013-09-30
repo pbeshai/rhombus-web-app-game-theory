@@ -6,3 +6,6 @@
 
 /*-- Ultimatum Game ---*/
 @import "../apps/UltimatumGame/styles/index.styl";
+
+/*-- Stag Hunt ---*/
+@import "../apps/StagHunt/styles/index.styl";

@@ -1,10 +1,4 @@
-/**
-
-	Coin Matching for Peter Danielson's COGS 300 class
-
-*/
 define([
-	// Application.
 	"framework/App",
 	"framework/modules/common/Common",
 ],
@@ -28,9 +22,9 @@ function (App, Common) {
 
 	CoinMatching.Util = {};
 	CoinMatching.Util.labelChoice = function (choice) {
-		if (choice === "A" || choice === "C") {
+		if (choice === "A") {
 			return "H";
-		} else if (choice === "B" || choice === "D") {
+		} else if (choice === "B") {
 			return "T";
 		}
 		return "#";

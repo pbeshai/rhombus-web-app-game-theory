@@ -65,12 +65,17 @@ rect.bar-D-Defected {
   float: right;
   margin-right: 30px;
 
-.legend .defected > span,
-.legend .cooperated > span
-  display: inline-block;
+.legend > div
+  padding-left: 1.2em; /* for swatch */
+
+.legend > div > span /* swatch */
+  display: block;
   width:  1em;
   height: 1em;
   border-radius: 4px;
+  float: left;
+  margin-left: -1.2em;
+  margin-top: 3px;
 
 .legend .defected > span
   background: defected-colour;
