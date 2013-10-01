@@ -8,7 +8,7 @@ function (App, Common) {
 
 	CoinMatching.config = {
 		pointsPerRound: 1,
-		roundsPerPhase: 2,
+		roundsPerPhase: 10,
 		group1Name: "Matchers",
 		group2Name: "Mismatchers",
 	};

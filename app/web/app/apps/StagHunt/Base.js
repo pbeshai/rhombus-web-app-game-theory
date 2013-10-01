@@ -13,7 +13,7 @@ function (App, Common) {
 			BA: 2,
 			BB: 1
 		},
-		roundsPerPhase: 2,
+		roundsPerPhase: 5,
 		group1Name: "Team 1",
 		group2Name: "Team 2",
 	};
