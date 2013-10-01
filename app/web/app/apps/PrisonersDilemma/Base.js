@@ -15,6 +15,7 @@ function (App, Common) {
 	};
 
 	PrisonersDilemma.Instructions = Common.Models.Instructions.extend({
+		layout: { description: "right" },
 		description: { template: "app/apps/PrisonersDilemma/templates/instructions" },
 		buttonConfig: {
 			"C": { description: "Cooperate" },

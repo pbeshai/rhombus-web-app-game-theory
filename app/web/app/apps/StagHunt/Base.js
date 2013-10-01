@@ -19,6 +19,8 @@ function (App, Common) {
 	};
 
 	StagHunt.Instructions = Common.Models.Instructions.extend({
+		layout: { description: "right" },
+		description: { template: "app/apps/StagHunt/templates/instructions" },
 		buttonConfig: {
 			"A": { description: "Hunt a Stag" },
 			"B": { description: "Hunt a Hare" }

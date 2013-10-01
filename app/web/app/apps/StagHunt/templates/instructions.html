@@ -1,21 +1,21 @@
 <div class="row">
 <div class="span4">
-	<p>The Pay-off Matrix</p>
+	<h4>The Pay-off Matrix</h4>
 	<table class="table table-bordered">
 		<tr>
 			<td>(row, col)</td>
-			<th>Cooperate</th>
-			<th>Defect</th>
+			<th>Stag</th>
+			<th>Hare</th>
 		</tr>
 		<tr>
-			<th>Cooperate</th>
-			<td>(<%= scoringMatrix.CC %>, <%= scoringMatrix.CC %>)</td>
-			<td>(<%= scoringMatrix.CD %>, <%= scoringMatrix.DC %>)</td>
+			<th>Stag</th>
+			<td>(<%= scoringMatrix.AA %>, <%= scoringMatrix.AA %>)</td>
+			<td>(<%= scoringMatrix.AB %>, <%= scoringMatrix.BA %>)</td>
 		</tr>
 		<tr>
-			<th>Defect</th>
-			<td>(<%= scoringMatrix.DC %>, <%= scoringMatrix.CD %>)</td>
-			<td>(<%= scoringMatrix.DD %>, <%= scoringMatrix.DD %>)</td>
+			<th>Hare</th>
+			<td>(<%= scoringMatrix.BA %>, <%= scoringMatrix.AB %>)</td>
+			<td>(<%= scoringMatrix.BB %>, <%= scoringMatrix.BB %>)</td>
 		</tr>
 	</table>
 </div>
