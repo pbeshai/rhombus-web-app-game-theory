@@ -16,7 +16,6 @@ function initialize(site) {
 	site.post("/api/apps/coin-matching/log", coinMatchingResults);
 	site.post("/api/apps/stag-hunt/log", stagHuntResults);
 	site.post("/api/apps/q/log", questionResults);
-
 }
 
 
@@ -451,9 +450,9 @@ function stagHuntResults(req, res) {
 			output("");
 			output("Phase " + phaseNum +"," + groupNames[0] + "," + groupNames[1]);
 			output("-------");
-			var r, header = "Team,Alias,PartnerAlias";
+			var r, header = "Team,Alias";
 			for (r = 1; r <= config.roundsPerPhase; r++) {
-				header += ",P" + phaseNum + "R" + r + "Choice,P" + phaseNum + "R" + r + "Score";
+				header += ",P" + phaseNum + "R" + r + "Choice,P" + phaseNum + "R" + r + "Score,P" + phaseNum + "R" + r + "Partner";
 			}
 			header += ",P" + phaseNum + "Total";
 
@@ -467,8 +466,8 @@ function stagHuntResults(req, res) {
 			function outputGroup(groupNum) {
 				// use last round of phase to catch as many latecomers as possible
 				_.each(phase.results[phase.results.length - 1]["group" + groupNum], function (participant, i) {
-					var data = groupNames[groupNum - 1] + "," + participant.alias + "," + participant.partner;
-					var choice;
+					var data = groupNames[groupNum - 1] + "," + participant.alias;
+					var choice, partner;
 					var phaseTotal = 0;
 
 					var matchAlias = function (p) { return p.alias === participant.alias; };
@@ -478,13 +477,15 @@ function stagHuntResults(req, res) {
 						roundData = _.find(phase.results[r]["group" + groupNum], matchAlias);
 
 						if (roundData) {
-							choice = choiceMap[roundData.choice] || "#";
+							choice = choiceMap[roundData.choice];
 							score = roundData.score;
+							partner = roundData.partner;
 						}	else {
 							choice = "X"; // missing (e.g. they were late and didn't play)
 							score = 0;
+							partner = "X";
 						}
-						data += "," + choice + "," + score;
+						data += "," + choice + "," + score + "," + partner;
 						phaseTotal += parseInt(score, 10);
 					}
 

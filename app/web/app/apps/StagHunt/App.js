@@ -21,9 +21,9 @@ function (App, StateApp, CommonStateApps, StagHunt) {
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
 			[ StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults ],
-			[ StagHunt.States.Partner, StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults, StagHunt.States.TotalResults ],
-			[ StagHunt.States.Partner, StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults, StagHunt.States.TotalResults ],
-			[ StagHunt.States.Partner, StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults, StagHunt.States.TotalResults ],
+			[ StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults, StagHunt.States.TotalResults ],
+			[ StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults, StagHunt.States.TotalResults ],
+			[ StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults, StagHunt.States.TotalResults ],
 		],
 		phaseConfigs: [
 			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },

@@ -20,6 +20,7 @@ function (App, Common, StagHunt) {
 
 	StagHuntViews.Play.Participant = Common.Views.ParticipantHiddenPlay.extend({
 		bottomText: function (model) {
+			return model.get("partner").get("alias");
 			if (model.get("score") != null) {
 				return "Prev. " + model.get("score");
 			}

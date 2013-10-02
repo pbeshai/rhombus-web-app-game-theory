@@ -41,7 +41,7 @@ function (App, Common, StateApp, StagHunt) {
 
 
 	StagHuntStates.Round = Common.States.Round.extend({
-		States: [ StagHuntStates.Play, StagHuntStates.Score, Common.States.Bucket, StagHuntStates.Results ],
+		States: [ StagHuntStates.Partner, StagHuntStates.Play, StagHuntStates.Score, Common.States.Bucket, StagHuntStates.Results ],
 	});
 
 	StagHuntStates.Phase = Common.States.Phase.extend({
