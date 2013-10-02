@@ -16,6 +16,7 @@ function (App, Common, StateApp, StagHunt) {
 		view: "stag-hunt::play",
 		defaultChoice: "A",
 		validChoices: ["A", "B"],
+		botStrategy: "A"
 	});
 
 	StagHuntStates.Score = Common.States.GroupScore.extend({
