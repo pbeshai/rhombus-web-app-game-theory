@@ -72,7 +72,7 @@ function (App, Common, StateApp, StagHunt) {
 
 		onEntry: function (input, prevState) {
 			input.groupModel.get("participants").each(function (participant) {
-				participant.set({ "phaseTotal": 0});
+				participant.set({ "phaseTotal": 0, "score": null}); // must reset score to prevent "prevScore" from showing up
 			});
 
 			StateApp.RepeatState.prototype.onEntry.apply(this, arguments);

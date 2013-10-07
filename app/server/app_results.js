@@ -541,7 +541,7 @@ function questionResults(req, res) {
 			output("Question " + (i + 1) + "," + q.question);
 			output("-----------");
 
-			var results = req.body["question-" + (i + 1)];
+			var results = req.body["question " + (i + 1)];
 			var answerCount = { A: 0, B: 0, C: 0, D: 0, E: 0 };
 			_.each(results, function (result) {
 				answerCount[result.choice] = (answerCount[result.choice] || 0) + 1;

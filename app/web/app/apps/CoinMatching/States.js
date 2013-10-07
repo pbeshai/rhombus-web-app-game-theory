@@ -137,7 +137,7 @@ function (App, Common, StateApp, CoinMatching) {
 
 		onEntry: function (input, prevState) {
 			input.groupModel.get("participants").each(function (participant) {
-				participant.set({ "phaseTotal": 0});
+				participant.set({ "phaseTotal": 0, "score": null}); // must reset score to prevent prev score from showing up
 			});
 
 			StateApp.RepeatState.prototype.onEntry.apply(this, arguments);
