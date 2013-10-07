@@ -26,11 +26,8 @@ function (App, Common, StagHunt) {
 		}
 	});
 
-	function total(collection, attribute) {
-		return collection.reduce(function (memo, p) {
-			return memo + (p.get(attribute) || 0);
-		}, 0);
-	}
+	var total = Common.Util.Totals.total;
+
 
 	StagHuntViews.Play.Layout = App.registerView("stag-hunt::play", Common.Mixins.rounds(Common.Views.GroupLayout.extend({
 		header: "Play",
@@ -53,7 +50,7 @@ function (App, Common, StagHunt) {
 			} else if (model.get("choice") === "B") {
 				overlay += " bucket-purple";
 			} else {
-				overlay += " bucket-0";
+				overlay += " bucket-0"; // rare case where they didn't play anything and didn't get default choice
 			}
 
 			return overlay;
@@ -81,55 +78,9 @@ function (App, Common, StagHunt) {
 		template: "app/apps/StagHunt/templates/results/legend"
 	});
 
-	StagHuntViews.Results.PercentageBar = App.BaseView.extend({
-		template: "app/apps/StagHunt/templates/results/percentage_bar",
-		hoverLabels: true,
-		serialize: function () {
-			return {
-				hoverLabels: this.hoverLabels,
-				sections: this.percentageSections()
-			};
-		},
 
-		percentageSections: function () {
-			return this.options.sections;
-		}
-	});
 
-	StagHuntViews.Results.ChoicePercentageBar = StagHuntViews.Results.PercentageBar.extend({
-		choices: {
-			"A" : { label: "A", key: "choice-a" },
-			"B" : { label: "B", key: "choice-b" },
-			"C" : { label: "C", key: "choice-c" },
-			"D" : { label: "D", key: "choice-d" },
-			"E" : { label: "E", key: "choice-e" },
-			"null" : { label: "#", key: "choice-null" }
-		},
-
-		percentageSections: function () {
-			var sections = [];
-
-			var total = this.participants.length;
-
-			var counts = _.countBy(this.participants.pluck("choice"), function (choice) {
-				return choice;
-			});
-
-			_.each(_.keys(this.choices), addSection, this);
-
-			function addSection(choice) {
-				console.log("adding section for ", choice);
-				if (counts[choice]) {
-					var section = _.extend({ percentage: (100 * counts[choice] / total).toFixed(1) }, this.choices[choice]);
-					sections.push(section);
-				}
-			}
-
-			return sections;
-		}
-	});
-
-	StagHuntViews.Results.SHPercentageBar = StagHuntViews.Results.ChoicePercentageBar.extend({
+	StagHuntViews.Results.PercentageBar = Common.Views.ChoicePercentageBar.extend({
 		choices: {
 			"A": { label: "Stag", key: "stag" },
 			"B": { label: "Hare", key: "hare" },
@@ -142,7 +93,7 @@ function (App, Common, StagHunt) {
 		className: "stag-hunt-results",
 		PreHeaderView: StagHuntViews.Results.Legend,
 		ParticipantView: StagHuntViews.Results.Score,
-		PreParticipantsView: StagHuntViews.Results.SHPercentageBar,
+		PreParticipantsView: StagHuntViews.Results.PercentageBar,
 		group1HeaderRight: function () { return total(this.model.get("group1"), "phaseTotal"); },
 		group2HeaderRight: function () { return total(this.model.get("group2"), "phaseTotal"); },
 	})));
