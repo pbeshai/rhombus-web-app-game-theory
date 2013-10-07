@@ -52,6 +52,8 @@ function (App, Common, StagHunt) {
 				overlay += " bucket-green";
 			} else if (model.get("choice") === "B") {
 				overlay += " bucket-purple";
+			} else {
+				overlay += " bucket-0";
 			}
 
 			return overlay;
@@ -62,7 +64,11 @@ function (App, Common, StagHunt) {
 					partnerChoice = StagHunt.Util.labelChoice(model.get("partner").get("choice"));
 
 			var outcome = choice + partnerChoice;
-			return outcome + " "+model.get("score");
+			if (model.get("score") != null) {
+				outcome += " " + model.get("score");
+			}
+
+			return outcome;
 		},
 		bottomText: function (model) {
 			if (model.get("phaseTotal") != null) {
@@ -97,6 +103,7 @@ function (App, Common, StagHunt) {
 			"C" : { label: "C", key: "choice-c" },
 			"D" : { label: "D", key: "choice-d" },
 			"E" : { label: "E", key: "choice-e" },
+			"null" : { label: "#", key: "choice-null" }
 		},
 
 		percentageSections: function () {
@@ -125,7 +132,8 @@ function (App, Common, StagHunt) {
 	StagHuntViews.Results.SHPercentageBar = StagHuntViews.Results.ChoicePercentageBar.extend({
 		choices: {
 			"A": { label: "Stag", key: "stag" },
-			"B": { label: "Hare", key: "hare" }
+			"B": { label: "Hare", key: "hare" },
+			"null" : { label: "#", key: "choice-null" }
 		}
 	});
 
