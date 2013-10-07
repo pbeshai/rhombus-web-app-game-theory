@@ -13,6 +13,15 @@ function (App, StateApp, Common, Question) {
 	QuestionStates.Question = Common.States.Play.extend({
 		view: "q::layout",
 		name: "question",
+		addNewParticipants: function (render) {
+      // no bots, no partners
+      this.addNewParticipantsHelper({
+        render: false,
+        hasBots: false,
+        pairModels: false,
+        keepChoices: true
+      });
+    },
 
 		viewOptions: function () {
 			return _.extend(Common.States.Play.prototype.viewOptions.call(this), {
