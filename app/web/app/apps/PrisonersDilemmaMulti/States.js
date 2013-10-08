@@ -81,12 +81,7 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 		State: PrisonersDilemmaMultiStates.Round,
 		minRounds: PrisonersDilemmaMulti.config.minRounds,
 		maxRounds: PrisonersDilemmaMulti.config.maxRounds,
-
-		// what is saved between each round
-		roundOutput: function (output) {
-			var roundOutput = output.participants.map(PrisonersDilemma.Util.participantResults);
-			return roundOutput;
-		}
+		serializeParticipant: PrisonersDilemma.Util.participantResults
 	});
 
 	return PrisonersDilemmaMultiStates;
