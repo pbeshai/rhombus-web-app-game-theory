@@ -1,9 +1,9 @@
 define([
 	"framework/App",
 
-	"apps/TeamPrisonersDilemma/Base",
-	"apps/TeamPrisonersDilemma/Views",
-	"apps/TeamPrisonersDilemma/States",
+	"apps/PrisonersDilemmaTeam/Base",
+	"apps/PrisonersDilemmaTeam/Views",
+	"apps/PrisonersDilemmaTeam/States",
 ],
 function (App, Base, Views, States) {
 	return _.extend({

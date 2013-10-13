@@ -19,7 +19,7 @@ function (App, Common, variableWidthBarChart, xLine, Graphs, PrisonersDilemma) {
 	PrisonersDilemmaViews.Play.Layout = App.registerView("pd::play", Common.Views.SimpleLayout.extend({
 		header: "Play",
 		ParticipantView: PrisonersDilemmaViews.Play.Participant,
-		InstructionsModel: PrisonersDilemma.Instructions
+		InstructionsModel: PrisonersDilemma.Instructions.Play
 	}));
 
 	PrisonersDilemmaViews.Results.Participant = Common.Views.ParticipantDisplay.extend({
@@ -86,7 +86,8 @@ function (App, Common, variableWidthBarChart, xLine, Graphs, PrisonersDilemma) {
 		header: "Results",
 		PreHeaderView: PrisonersDilemmaViews.Results.Legend,
 		ParticipantView: PrisonersDilemmaViews.Results.Participant,
-		PostParticipantsView: PrisonersDilemmaViews.Results.BarChart
+		PostParticipantsView: PrisonersDilemmaViews.Results.BarChart,
+		InstructionsModel: PrisonersDilemma.Instructions.Results
 	}));
 
 	PrisonersDilemmaViews.Configure = Backbone.View.extend({

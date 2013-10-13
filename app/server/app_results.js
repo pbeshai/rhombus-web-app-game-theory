@@ -10,7 +10,7 @@ function initialize(site) {
 	site.post("/api/apps/pd/log", pdResults);
 	site.post("/api/apps/pdm/log", pdmResults);
 	site.post("/api/apps/npd/log", npdResults);
-	site.post("/api/apps/teampd/log", teampdResults);
+	site.post("/api/apps/pdteam/log", pdteamResults);
 	site.post("/api/apps/ultimatum/log", ultimatumResults);
 	site.post("/api/apps/ultimatum-partition/log", ultimatumPartitionedResults);
 	site.post("/api/apps/coin-matching/log", coinMatchingResults);
@@ -270,7 +270,6 @@ function coinMatchingResults(req, res) {
 	var now = new Date();
 	var config = req.body.config;
 	var version = req.body.version;
-	var round = req.body.round;
 	var numPhases = 4;
 
 	var choiceMap = {
@@ -383,24 +382,37 @@ function coinMatchingResults(req, res) {
 
 
 function stagHuntResults(req, res) {
-	var now = new Date();
-	var config = req.body.config;
-	var version = req.body.version;
-	var round = req.body.round;
-	var numPhases = 4;
-
+	var numPhases = 3;
 	var choiceMap = {
 		A: "S",
 		B: "H",
 	};
 
-	var stream = fs.createWriteStream("log/stag-hunt/results." + filenameFormat(now) + ".txt");
+	teamPhaseMatrixResults(req, res, "stag-hunt", "Stag Hunt", numPhases, choiceMap);
+}
+
+function pdteamResults(req, res) {
+	var numPhases = 3;
+	var choiceMap = {
+		C: "C",
+		D: "D",
+	};
+
+	teamPhaseMatrixResults(req, res, "pdteam", "Prisoner's Dilemma (team)", numPhases, choiceMap);
+}
+
+function teamPhaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
+	var now = new Date();
+	var config = req.body.config;
+	var version = req.body.version;
+
+	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
 			stream.write(str + "\n");
 		}
-		output("Stag Hunt Results (v" + version + ")");
+		output(appName + " Results (v" + version + ")");
 		output(now.toString());
 
 		if (config.message) {
@@ -412,29 +424,43 @@ function stagHuntResults(req, res) {
 		if (config.scoringMatrix) {
 			output("");
 			output("Scoring Matrix");
-			output("AA," + config.scoringMatrix.AA + ",AB," + config.scoringMatrix.AB);
-			output("BA," + config.scoringMatrix.BA + ",BB," + config.scoringMatrix.BB);
+			_.each(_.keys(config.scoringMatrix), function (key) {
+				output(key + "," + config.scoringMatrix[key]);
+			});
 		}
 
 		output("");
-		output("A -> Stag,B -> Hare");
+		if (choiceMap) {
+			output("Choice Map");
+			output(_.map(_.keys(choiceMap), function (key) { return key + " -> " + choiceMap[key]; }).join(","));
+		}
 
 		var totals = {};
 
-		outputPhase(1);
-		outputPhase(2);
-		outputPhase(3);
-		outputPhase(4);
+		for (var i = 0; i < numPhases; i++) {
+			outputPhase(i + 1);
+		}
 
 		// output totals
 		output("");
 		output("");
 		output("Totals");
 		output("======");
-		output("Alias,Phase1Total,Phase2Total,Phase3Total,Phase4Total,OverallTotal");
+		var header = "Alias";
+		for (i = 0; i < numPhases; i++) {
+			header += ",Phase" + (i + 1) + "Total";
+		}
+		header += ",OverallTotal";
+		output(header);
+
 		_.each(_.keys(totals), function (alias) {
-			output(alias + "," + totals[alias].phase1 + "," + totals[alias].phase2 + "," +
-				totals[alias].phase3 + "," + totals[alias].phase4 + "," + totals[alias].total);
+			var data = alias;
+			for (var i = 0; i < numPhases; i++) {
+				data += "," + totals[alias]["phase" + (i + 1)];
+			}
+			data += "," + totals[alias].total;
+
+			output(data);
 		});
 
 		function outputPhase(phaseNum) {
@@ -442,9 +468,16 @@ function stagHuntResults(req, res) {
 			if (phase == null) return;
 
 			var pconfig = phase.config;
+			pconfig.group1Name = pconfig.group1Name || "Group 1";
+			pconfig.group2Name = pconfig.group2Name || "Group 2";
+			if (pconfig.group1NameSuffix) {
+				pconfig.group1Name = pconfig.group1Name + " - " + pconfig.group1NameSuffix;
+			}
+			if (pconfig.group2NameSuffix) {
+				pconfig.group2Name = pconfig.group2Name + " - " + pconfig.group2NameSuffix;
+			}
 
-			var groupNames = [ pconfig.group1Name + " - " + pconfig.group1NameSuffix,
-												pconfig.group2Name + " - " + pconfig.group2NameSuffix ];
+			var groupNames = [ pconfig.group1Name, pconfig.group2Name ];
 
 
 			output("");
