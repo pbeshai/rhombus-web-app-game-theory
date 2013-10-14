@@ -28,7 +28,7 @@ function (App, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 	// description for use in router
 	PrisonersDilemmaMultiApp.app = {
 		instantiate: function (attrs, options) {
-			return new PrisonersDilemmaMultiApp(attrs, { writeLogAtEnd: false });
+			return new PrisonersDilemmaMultiApp(attrs);
 		},
 		AppControlsView: PrisonersDilemmaMulti.Views.AppControls,
 		title: "Prisoner's Dilemma (multiround)"

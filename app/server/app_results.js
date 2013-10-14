@@ -60,7 +60,141 @@ function pdResults(req, res) {
 	res.send(200);
 }
 
+function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
+	var now = new Date();
+	var config = req.body.config;
+	var version = req.body.version;
+	var roundsPerPhase = config.roundsPerPhase || config.numRepeats;
+
+	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".txt");
+	stream.once('open', function(fd) {
+		function output (str) {
+			logger.info(str);
+			stream.write(str + "\n");
+		}
+		output(appName + " Results (v" + version + ")");
+		output(now.toString());
+
+		if (config.message) {
+			output(config.message);
+		}
+
+		output(numPhases + " phases, " + roundsPerPhase + " rounds per phase");
+
+		if (config.scoringMatrix) {
+			output("");
+			output("Scoring Matrix");
+			_.each(_.keys(config.scoringMatrix), function (key) {
+				output(key + "," + config.scoringMatrix[key]);
+			});
+		}
+
+		output("");
+		if (choiceMap) {
+			output("Choice Map");
+			output(_.map(_.keys(choiceMap), function (key) { return key + " -> " + choiceMap[key]; }).join(","));
+		}
+
+		var totals = {};
+
+		for (var i = 0; i < numPhases; i++) {
+			outputPhase(i + 1);
+		}
+
+		// output totals
+		output("");
+		output("");
+		output("Totals");
+		output("======");
+		var header = "Alias";
+		if (numPhases > 1) {
+			for (i = 0; i < numPhases; i++) {
+				header += ",Phase" + (i + 1) + "Total";
+			}
+		}
+
+		header += ",OverallTotal";
+		output(header);
+
+		_.each(_.keys(totals), function (alias) {
+			var data = alias;
+			if (numPhases > 1) {
+				for (var i = 0; i < numPhases; i++) {
+					data += "," + totals[alias]["phase" + (i + 1)];
+				}
+			}
+			data += "," + totals[alias].total;
+
+			output(data);
+		});
+
+		function outputPhase(phaseNum) {
+			var phase = req.body["phase" + phaseNum];
+			if (phase == null) return;
+
+			var pconfig = phase.config;
+
+			output("");
+			output("Phase " + phaseNum);
+			output("-------");
+			var r, header = "Alias";
+			for (r = 1; r <= roundsPerPhase; r++) {
+				header += ",P" + phaseNum + "R" + r + "Choice,P" + phaseNum + "R" + r + "Score,P" + phaseNum + "R" + r + "Partner";
+			}
+			header += ",P" + phaseNum + "Total";
+			output(header);
+
+			// use last round of phase to catch as many latecomers as possible
+			_.each(phase.results[phase.results.length - 1], function (participant, i) {
+				var data = participant.alias;
+				var choice, partner;
+				var phaseTotal = 0;
+
+				var matchAlias = function (p) { return p.alias === participant.alias; };
+				// for each round
+				for (r = 0; r < roundsPerPhase; r++) {
+					// may not match index in different rounds if a bot drops out in a phase or somebody is added, so look up by alias
+					roundData = _.find(phase.results[r], matchAlias);
+
+					if (roundData) {
+						choice = choiceMap[roundData.choice];
+						score = roundData.score;
+						partner = roundData.partner;
+					}	else {
+						choice = "X"; // missing (e.g. they were late and didn't play)
+						score = 0;
+						partner = "X";
+					}
+					data += "," + choice + "," + score + "," + partner;
+					phaseTotal += parseInt(score, 10);
+				}
+
+				data += "," + phaseTotal;
+
+				if (totals[participant.alias] === undefined) {
+					totals[participant.alias] = {};
+				}
+				totals[participant.alias]["phase" + phaseNum] = phaseTotal;
+				totals[participant.alias].total = (totals[participant.alias].total || 0) + phaseTotal;
+				output(data);
+			});
+		}
+
+		stream.end();
+	});
+
+	res.send(200);
+}
+
 function pdmResults(req, res) {
+	var numPhases = 1;
+	var choiceMap = {
+		"C" : "C",
+		"D" : "D"
+	};
+	phaseMatrixResults(req, res, "pdm", "Prisoner's Dilemma (multiround)", numPhases, choiceMap);
+
+	return;
 	var now = new Date();
 	var config = req.body.config;
 	var version = req.body.version;

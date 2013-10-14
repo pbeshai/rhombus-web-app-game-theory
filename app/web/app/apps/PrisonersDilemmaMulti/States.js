@@ -16,7 +16,6 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 		viewOptions: function () {
 			var viewOptions = PrisonersDilemma.States.Play.prototype.viewOptions.apply(this, arguments);
 			viewOptions.stats = this.input.stats;
-			viewOptions.round = this.options.round;
 			return viewOptions;
 		}
 	});
@@ -35,8 +34,13 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 		}
 	});
 
-	PrisonersDilemmaMultiStates.Results = PrisonersDilemma.States.Results.extend({
+	PrisonersDilemmaMultiStates.Results = Common.States.Results.extend({
 		view: "pdm::results",
+		viewOptions: function () {
+			var viewOptions = PrisonersDilemma.States.Play.prototype.viewOptions.apply(this, arguments);
+			viewOptions.stats = this.input.stats;
+			return viewOptions;
+		},
 
 		onExit: function () {
 			// reuse the input message to keep stats moving forward
@@ -59,7 +63,6 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 		State: PrisonersDilemmaMultiStates.Round,
 		minRounds: PrisonersDilemmaMulti.config.minRounds,
 		maxRounds: PrisonersDilemmaMulti.config.maxRounds,
-		serializeParticipant: PrisonersDilemma.Util.participantResults
 	});
 
 	PrisonersDilemmaMultiStates.PhaseTotalBucket = Common.States.Bucket.extend({
