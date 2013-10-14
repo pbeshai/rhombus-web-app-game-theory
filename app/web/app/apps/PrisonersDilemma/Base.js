@@ -38,6 +38,14 @@ function (App, Common) {
 			pairChoices: participant.get("pairChoices")
 		};
 	};
+	PrisonersDilemma.Util.labelChoice = function (choice) {
+		if (choice === "C") {
+			return "C";
+		} else if (choice === "D") {
+			return "D";
+		}
+		return "#";
+	};
 
 	return PrisonersDilemma;
 });

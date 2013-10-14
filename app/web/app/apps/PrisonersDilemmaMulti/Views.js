@@ -95,9 +95,11 @@ function (App, Common, Graphs, PrisonersDilemma, PrisonersDilemmaMulti) {
 	});
 
 
+
 	PrisonersDilemmaMultiViews.Results.Layout =  App.registerView("pdm::results", Common.Mixins.mixin(["gameOver", "rounds"],
 		PrisonersDilemma.Views.Results.Layout.extend({
-			PostParticipantsView: PrisonersDilemmaMultiViews.Results.Chart
+			PostParticipantsView: PrisonersDilemmaMultiViews.Results.Chart,
+			PreParticipantsView: PrisonersDilemma.Views.Results.PercentageBar,
 		})
 	));
 
@@ -105,6 +107,18 @@ function (App, Common, Graphs, PrisonersDilemma, PrisonersDilemmaMulti) {
 
 	PrisonersDilemmaMultiViews.Play.Layout = App.registerView("pdm::play", Common.Mixins.rounds(PrisonersDilemma.Views.Play.Layout.extend({
 		PostParticipantsView: PrisonersDilemmaMultiViews.Results.Chart
+	})));
+
+	PrisonersDilemmaMultiViews.PhaseResults = {};
+
+	PrisonersDilemmaMultiViews.PhaseResults.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantScoreDisplay.extend({
+		scoreAttribute: "phaseTotal"
+	}));
+
+	PrisonersDilemmaMultiViews.PhaseResults.Layout = App.registerView("pdm::phase-results", Common.Mixins.phaseTotals(Common.Views.SimpleLayout.extend({
+		header: "Total Results",
+		className: "pdm-results",
+		ParticipantView: PrisonersDilemmaMultiViews.PhaseResults.Score,
 	})));
 
 	return PrisonersDilemmaMultiViews;

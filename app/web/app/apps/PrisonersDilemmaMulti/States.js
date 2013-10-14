@@ -37,35 +37,6 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 
 	PrisonersDilemmaMultiStates.Results = PrisonersDilemma.States.Results.extend({
 		view: "pdm::results",
-		beforeRender: function () {
-			PrisonersDilemma.States.Results.prototype.beforeRender.call(this);
-			this.config.gameOver = this.options.lastRound; // TODO: handle game over
-		},
-
-		viewOptions: function () {
-			var viewOptions = PrisonersDilemma.States.Results.prototype.viewOptions.apply(this, arguments);
-			viewOptions.round = this.options.round;
-			return viewOptions;
-		},
-
-		logResults: function () {
-			var results = this.participants.map(function (model, i) {
-				return {
-					alias: model.get("alias"),
-					choice: model.get("choice"),
-					score: model.get("score"),
-					partner: {
-						alias: model.get("partner").get("alias"),
-						choice: model.get("partner").get("choice"),
-						score: model.get("partner").get("score"),
-					},
-				};
-			}, this);
-
-			var logData = {};
-			logData["round" + this.config.round] = results;
-			return logData;
-		},
 
 		onExit: function () {
 			// reuse the input message to keep stats moving forward
@@ -73,8 +44,15 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 		}
 	});
 
+	PrisonersDilemmaMultiStates.Score = Common.States.RoundScore.extend({
+		assignScore: function (model) {
+			Common.Util.Scoring.matrix(this.config.scoringMatrix, model);
+		}
+	});
+
+
 	PrisonersDilemmaMultiStates.Round = Common.States.Round.extend({
-		States: [ PrisonersDilemmaMultiStates.Play, PrisonersDilemma.States.Score, PrisonersDilemmaMultiStates.Stats, PrisonersDilemmaMultiStates.Results ],
+		States: [ PrisonersDilemmaMultiStates.Play, PrisonersDilemmaMultiStates.Score, PrisonersDilemmaMultiStates.Stats, Common.States.Bucket, PrisonersDilemmaMultiStates.Results ],
 	});
 
 	PrisonersDilemmaMultiStates.Phase = Common.States.Phase.extend({
@@ -82,6 +60,14 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 		minRounds: PrisonersDilemmaMulti.config.minRounds,
 		maxRounds: PrisonersDilemmaMulti.config.maxRounds,
 		serializeParticipant: PrisonersDilemma.Util.participantResults
+	});
+
+	PrisonersDilemmaMultiStates.PhaseTotalBucket = Common.States.Bucket.extend({
+		bucketAttribute: "phaseTotal",
+	});
+
+	PrisonersDilemmaMultiStates.PhaseResults = Common.States.PhaseResults.extend({
+		view: "pdm::phase-results",
 	});
 
 	return PrisonersDilemmaMultiStates;

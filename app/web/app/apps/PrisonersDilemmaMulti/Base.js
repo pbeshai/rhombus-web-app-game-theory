@@ -7,13 +7,13 @@ function (App, Common) {
 	var PrisonersDilemmaMulti = {};
 	PrisonersDilemmaMulti.config = {
 		scoringMatrix: {
-			CC: 3,
+			CC: 2,
 			CD: 0,
-			DC: 5,
+			DC: 3,
 			DD: 1
 		},
-		minRounds: 3,
-		maxRounds: 6,
+		minRounds: 2,
+		maxRounds: 2,
 	};
 
 	return PrisonersDilemmaMulti;

@@ -31,6 +31,22 @@ function (App, Common, variableWidthBarChart, xLine, Graphs, PrisonersDilemma) {
 			return "no-animate pd-choices-" + model.get("pairChoices");
 		}
 	});
+	PrisonersDilemmaViews.Results.Participant = Common.Mixins.bucketParticipant(Common.Views.ParticipantScoreChoiceDisplay.extend({
+		labelChoice: PrisonersDilemma.Util.labelChoice,
+		bucketChoiceMap: {
+			"C" : "bucket-blue",
+			"D" : "bucket-orange",
+			"default" : "dark-dim"
+		},
+	}));
+
+	PrisonersDilemmaViews.Results.PercentageBar = Common.Views.ChoicePercentageBar.extend({
+		choices: {
+			"C": { label: "Cooperate", key: "cooperate" },
+			"D": { label: "Defect", key: "defect" },
+			"null" : { label: "#", key: "choice-null" }
+		}
+	});
 
 	PrisonersDilemmaViews.Results.BarChart = App.BaseView.extend({
 		template: "framework/templates/common/chart",

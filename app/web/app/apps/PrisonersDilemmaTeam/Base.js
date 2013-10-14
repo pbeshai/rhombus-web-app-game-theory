@@ -20,15 +20,8 @@ function (App, Common, PrisonersDilemma) {
 
 	PrisonersDilemmaTeam.Instructions = PrisonersDilemma.Instructions
 
-	PrisonersDilemmaTeam.Util = {};
-	PrisonersDilemmaTeam.Util.labelChoice = function (choice) {
-		if (choice === "C") {
-			return "C";
-		} else if (choice === "D") {
-			return "D";
-		}
-		return "#";
-	};
+	PrisonersDilemmaTeam.Util = PrisonersDilemma.Util;
+
 
 	return PrisonersDilemmaTeam;
 });

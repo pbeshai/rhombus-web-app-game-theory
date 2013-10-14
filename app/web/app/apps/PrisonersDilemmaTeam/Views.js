@@ -2,9 +2,11 @@ define([
 	"framework/App",
 	"framework/modules/common/Common",
 
-	"apps/PrisonersDilemmaTeam/Base"
+	"apps/PrisonersDilemma/Module",
+	"apps/PrisonersDilemmaTeam/Base",
+
 ],
-function (App, Common, PrisonersDilemmaTeam) {
+function (App, Common, PrisonersDilemma, PrisonersDilemmaTeam) {
 
 	var PrisonersDilemmaTeamViews = {};
 
@@ -31,34 +33,12 @@ function (App, Common, PrisonersDilemmaTeam) {
 
 	PrisonersDilemmaTeamViews.Results = {};
 
-	PrisonersDilemmaTeamViews.Results.Score = Common.Mixins.bucketParticipant(Common.Views.ParticipantScoreChoiceDisplay.extend({
-		labelChoice: PrisonersDilemmaTeam.Util.labelChoice,
-		bucketChoiceMap: {
-			"C" : "bucket-blue",
-			"D" : "bucket-orange",
-			"default" : "dark-dim"
-		},
-	}));
-
-	PrisonersDilemmaTeamViews.Results.Legend = Backbone.View.extend({
-		template: "app/apps/PrisonersDilemma/templates/results/legend"
-	});
-
-
-	PrisonersDilemmaTeamViews.Results.PercentageBar = Common.Views.ChoicePercentageBar.extend({
-		choices: {
-			"C": { label: "Cooperate", key: "cooperate" },
-			"D": { label: "Defect", key: "defect" },
-			"null" : { label: "#", key: "choice-null" }
-		}
-	});
-
 	PrisonersDilemmaTeamViews.Results.Layout = App.registerView("teampd::results", Common.Mixins.mixin(["rounds", "phaseTotals"], Common.Views.GroupLayout.extend({
 		header: "Results",
 		className: "teampd-results",
-		PreHeaderView: PrisonersDilemmaTeamViews.Results.Legend,
-		ParticipantView: PrisonersDilemmaTeamViews.Results.Score,
-		PreParticipantsView: PrisonersDilemmaTeamViews.Results.PercentageBar,
+		PreHeaderView: PrisonersDilemma.Views.Results.Legend,
+		ParticipantView: PrisonersDilemma.Views.Results.Participant,
+		PreParticipantsView: PrisonersDilemma.Views.Results.PercentageBar,
 		InstructionsModel: PrisonersDilemmaTeam.Instructions.Results
 	})));
 

@@ -21,17 +21,17 @@ function (App, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 		id: "pdm",
 		version: "1.0",
 		config: PrisonersDilemmaMulti.config,
-		States: [ PrisonersDilemmaMulti.States.Phase ]
+		States: [ PrisonersDilemmaMulti.States.Phase, PrisonersDilemmaMulti.States.PhaseTotalBucket, PrisonersDilemmaMulti.States.PhaseResults ]
 
 	});
 
 	// description for use in router
 	PrisonersDilemmaMultiApp.app = {
-		instantiate: function (options) {
-			return new PrisonersDilemmaMultiApp(options);
+		instantiate: function (attrs, options) {
+			return new PrisonersDilemmaMultiApp(attrs, { writeLogAtEnd: false });
 		},
 		AppControlsView: PrisonersDilemmaMulti.Views.AppControls,
-		title: "Multiround Prisoner's Dilemma"
+		title: "Prisoner's Dilemma (multiround)"
 	};
 
 	return PrisonersDilemmaMultiApp;
