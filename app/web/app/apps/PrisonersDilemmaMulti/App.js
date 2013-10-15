@@ -22,7 +22,6 @@ function (App, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 		version: "1.0",
 		config: PrisonersDilemmaMulti.config,
 		States: [ PrisonersDilemmaMulti.States.Phase, PrisonersDilemmaMulti.States.PhaseTotalBucket, PrisonersDilemmaMulti.States.PhaseResults ]
-
 	});
 
 	// description for use in router

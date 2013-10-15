@@ -12,8 +12,8 @@ function (App, Common) {
 			DC: 3,
 			DD: 1
 		},
-		minRounds: 2,
-		maxRounds: 2,
+		minRounds: 5,
+		maxRounds: 5,
 	};
 
 	return PrisonersDilemmaMulti;

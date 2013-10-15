@@ -145,6 +145,7 @@ function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
 			output(header);
 
 			// use last round of phase to catch as many latecomers as possible
+			if (!phase.results) return;
 			_.each(phase.results[phase.results.length - 1], function (participant, i) {
 				var data = participant.alias;
 				var choice, partner;
@@ -732,7 +733,7 @@ function questionResults(req, res) {
 				if (allResults[result.alias] === undefined) {
 					allResults[result.alias] = [];
 				}
-				allResults[result.alias].push(result.choice);
+				allResults[result.alias][i] = result.choice;
 			});
 		});
 

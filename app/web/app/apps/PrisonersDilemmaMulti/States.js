@@ -56,7 +56,7 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 
 
 	PrisonersDilemmaMultiStates.Round = Common.States.Round.extend({
-		States: [ PrisonersDilemmaMultiStates.Play, PrisonersDilemmaMultiStates.Score, PrisonersDilemmaMultiStates.Stats, Common.States.Bucket, PrisonersDilemmaMultiStates.Results ],
+		States: [ Common.States.Partner, PrisonersDilemmaMultiStates.Play, PrisonersDilemmaMultiStates.Score, PrisonersDilemmaMultiStates.Stats, Common.States.Bucket, PrisonersDilemmaMultiStates.Results ],
 	});
 
 	PrisonersDilemmaMultiStates.Phase = Common.States.Phase.extend({

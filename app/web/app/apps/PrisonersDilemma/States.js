@@ -48,6 +48,7 @@ function (App, Common, StateApp, PrisonersDilemma) {
 		view: "pd::play",
 		defaultChoice: "C",
 		validChoices: ["C", "D"],
+		botStrategy: "C"
 	});
 
 	PrisonersDilemmaStates.Results = Common.States.Results.extend({
