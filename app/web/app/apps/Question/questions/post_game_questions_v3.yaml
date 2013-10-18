@@ -1,0 +1,27 @@
+questions:
+    - question: It was easy to find myself on the screen.
+      answers: &agree
+        A: Strongly Agree
+        B: Agree
+        C: Neutral
+        D: Disagree
+        E: Strongly Disagree
+    - question: I understood the rules of the game.
+      answers: *agree
+    - question: I understood the controls of the game.
+      answers: *agree
+    - question: I understood the results of the game.
+      answers: *agree
+    - question: I liked playing the game.
+      answers: *agree
+    - question: I felt engaged during the game.
+      answers: *agree
+    - question: I prefer having the instructions adjacent to the game screen.
+      answers: *agree
+    - question: How was the pace of the game?
+      answers:
+        A: Very Fast
+        B: Fast
+        C: Good
+        D: Slow
+        E: Very Slow

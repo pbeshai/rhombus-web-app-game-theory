@@ -591,9 +591,9 @@ function teamPhaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap)
 		_.each(_.keys(totals), function (alias) {
 			var data = alias;
 			for (var i = 0; i < numPhases; i++) {
-				data += "," + totals[alias]["phase" + (i + 1)];
+				data += "," + (totals[alias]["phase" + (i + 1)] || 0);
 			}
-			data += "," + totals[alias].total;
+			data += "," + (totals[alias].total || 0);
 
 			output(data);
 		});
