@@ -5,13 +5,14 @@ module.exports = {
 
 var fs = require("fs"),
 		fwInit = require("../../framework/server/init"),
-		fwConfig = require("../../fwconfig.json");
+		fwConfig = require("../../fwconfig.json"),
+		logger = require("../../log/logger");
 
 
 // function to do extra initialization before starting web server
 function webInit(site, serverOptions) {
-	console.log("app webInit");
-	console.log("initializing app_results");
+	logger.info("app webInit");
+	logger.info("initializing app_results");
 	require("./app_results").initialize(site, serverOptions);
 	require("./api_handler").initialize(site, serverOptions);
 
@@ -20,7 +21,7 @@ function webInit(site, serverOptions) {
 
 // function to do extra initialization after listening with websocket
 function webSocketInit(io, serverOptions) {
-	console.log("app webSocketInit");
+	logger.info("app webSocketInit");
 	io.set('log level', 1); // reduces logging.
 	fwInit.webSocketInit(io, serverOptions, fwConfig);
 }
