@@ -12,7 +12,6 @@ function initialize(site) {
 	site.post("/api/apps/npd/log", npdResults);
 	site.post("/api/apps/pdteam/log", pdteamResults);
 	site.post("/api/apps/ultimatum/log", ultimatumResults);
-	site.post("/api/apps/ultimatum-partition/log", ultimatumPartitionedResults);
 	site.post("/api/apps/coin-matching/log", coinMatchingResults);
 	site.post("/api/apps/stag-hunt/log", stagHuntResults);
 	site.post("/api/apps/q/log", questionResults);
@@ -362,44 +361,6 @@ function ultimatumResults(req, res) {
 	res.send(200);
 }
 
-function ultimatumPartitionedResults(req, res) {
-	var now = new Date();
-	var results = req.body.results;
-	var config = req.body.config;
-	var version = req.body.version;
-
-	var stream = fs.createWriteStream("log/ultimatum-partitioned/results." + filenameFormat(now) + ".txt");
-	stream.once('open', function(fd) {
-		function output (str) {
-			logger.info(str);
-			stream.write(str + "\n");
-		}
-		output("Ultimatum Game (Partitioned) Results (v" + version + ")");
-		output(now.toString());
-		if (config.message) {
-			output(config.message);
-		}
-		output("Total Amount," + config.amount);
-		output("Offer Map," + _.map(_.keys(config.offerMap), function (key) { return key + ":" + config.offerMap[key]; }).join(","));
-		output("");
-
-		output("Givers");
-		output("Alias,AmountToKeep,Score,Partner");
-		_.each(results.givers, function (result) {
-			output(result.alias + "," + result.keep + "," + result.score + "," + result.partner);
-		});
-
-		output("");
-		output("Receivers");
-		output("Alias,Offer,Score,Partner");
-		_.each(results.receivers, function (result) {
-			output(result.alias + "," + result.offer + "," + result.score + "," + result.partner);
-		});
-		stream.end();
-	});
-
-	res.send(200);
-}
 
 function coinMatchingResults(req, res) {
 	var now = new Date();
