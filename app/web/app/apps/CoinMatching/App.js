@@ -26,13 +26,11 @@ function (App, StateApp, CommonStateApps, CoinMatching) {
 			[ CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults ],
 			[ CoinMatching.States.Partner, CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
 			[ CoinMatching.States.Partner, CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
-			[ CoinMatching.States.Partner, CoinMatching.States.Phase, CoinMatching.States.PhaseTotalBucket, CoinMatching.States.PhaseResults, CoinMatching.States.TotalResults ],
 		],
 		phaseConfigs: [
 			{ group1NameSuffix: "Human", group2NameSuffix: "Human" },
 			{ group1NameSuffix: "Human", group2NameSuffix: "Computer" },
 			{ group1NameSuffix: "Computer", group2NameSuffix: "Human" },
-			{ group1NameSuffix: "Computer", group2NameSuffix: "Computer" },
 		],
 	});
 
