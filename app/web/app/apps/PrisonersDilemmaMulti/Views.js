@@ -100,6 +100,7 @@ function (App, Common, Graphs, PrisonersDilemma, PrisonersDilemmaMulti) {
 		PrisonersDilemma.Views.Results.Layout.extend({
 			PostParticipantsView: PrisonersDilemmaMultiViews.Results.Chart,
 			PreParticipantsView: PrisonersDilemma.Views.Results.PercentageBar,
+			ParticipantView: PrisonersDilemma.Views.Results.BucketParticipant
 		})
 	));
 

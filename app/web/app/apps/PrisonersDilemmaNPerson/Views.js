@@ -28,7 +28,7 @@ function (App, Common, PrisonersDilemma, PrisonersDilemmaNPerson) {
 		},
 
 		overlay: function (model) {
-			var choices = this.model.get("choice") + this.model.get("choice");
+			var choices = this.model.get("choice") + "C";
 			return "no-animate pd-choices-" + choices;
 		}
 	});

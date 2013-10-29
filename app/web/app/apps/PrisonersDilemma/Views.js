@@ -22,16 +22,12 @@ function (App, Common, variableWidthBarChart, xLine, Graphs, PrisonersDilemma) {
 		InstructionsModel: PrisonersDilemma.Instructions.Play
 	}));
 
-	PrisonersDilemmaViews.Results.Participant = Common.Views.ParticipantDisplay.extend({
-		template: "app/apps/PrisonersDilemma/templates/results/participant",
-		cssClass: function (model) {
-			return "results choices-" + model.get("pairChoices");
-		},
+	PrisonersDilemmaViews.Results.Participant = Common.Views.ParticipantScoreChoiceDisplay.extend({
 		overlay: function (model) {
 			return "no-animate pd-choices-" + model.get("pairChoices");
 		}
 	});
-	PrisonersDilemmaViews.Results.Participant = Common.Mixins.bucketParticipant(Common.Views.ParticipantScoreChoiceDisplay.extend({
+	PrisonersDilemmaViews.Results.BucketParticipant = Common.Mixins.bucketParticipant(Common.Views.ParticipantScoreChoiceDisplay.extend({
 		labelChoice: PrisonersDilemma.Util.labelChoice,
 		bucketChoiceMap: {
 			"C" : "bucket-blue",

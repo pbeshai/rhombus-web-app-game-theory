@@ -37,7 +37,7 @@ function (App, Common, PrisonersDilemma, PrisonersDilemmaTeam) {
 		header: "Results",
 		className: "teampd-results",
 		PreHeaderView: PrisonersDilemma.Views.Results.Legend,
-		ParticipantView: PrisonersDilemma.Views.Results.Participant,
+		ParticipantView: PrisonersDilemma.Views.Results.BucketParticipant,
 		PreParticipantsView: PrisonersDilemma.Views.Results.PercentageBar,
 		InstructionsModel: PrisonersDilemmaTeam.Instructions.Results
 	})));
