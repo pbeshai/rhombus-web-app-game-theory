@@ -11,16 +11,16 @@ define([
 	"framework/modules/StateApp/Module",
 	"framework/modules/common/CommonStateApps",
 
-	"apps/NPrisonersDilemma/Module"
+	"apps/PrisonersDilemmaNPerson/Module"
 ],
 
-function (App, StateApp, CommonStateApps, NPrisonersDilemma) {
+function (App, StateApp, CommonStateApps, PrisonersDilemmaNPerson) {
 
 	var NPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
-		id: "npd",
+		id: "pdn",
 		version: "1.0",
-		config: NPrisonersDilemma.config,
-		States: [ NPrisonersDilemma.States.Play, NPrisonersDilemma.States.Score, NPrisonersDilemma.States.Stats, NPrisonersDilemma.States.Results]
+		config: PrisonersDilemmaNPerson.config,
+		States: [ PrisonersDilemmaNPerson.States.Play, PrisonersDilemmaNPerson.States.Score, PrisonersDilemmaNPerson.States.Stats, PrisonersDilemmaNPerson.States.Results]
 	});
 
 	// description for use in router
@@ -28,8 +28,8 @@ function (App, StateApp, CommonStateApps, NPrisonersDilemma) {
 		instantiate: function (attrs) {
 			return new NPrisonersDilemmaApp(attrs);
 		},
-		AppControlsView: NPrisonersDilemma.Views.AppControls,
-		title: "N-Person Prisoner's Dilemma"
+		AppControlsView: PrisonersDilemmaNPerson.Views.AppControls,
+		title: "Prisoner's Dilemma (n_person)"
 	};
 
 	return NPrisonersDilemmaApp;

@@ -9,7 +9,7 @@ var fs = require('fs'),
 function initialize(site) {
 	site.post("/api/apps/pd/log", pdResults);
 	site.post("/api/apps/pdm/log", pdmResults);
-	site.post("/api/apps/npd/log", npdResults);
+	site.post("/api/apps/pdn/log", pdnResults);
 	site.post("/api/apps/pdteam/log", pdteamResults);
 	site.post("/api/apps/ultimatum/log", ultimatumResults);
 	site.post("/api/apps/coin-matching/log", coinMatchingResults);
@@ -242,7 +242,7 @@ function pdmResults(req, res) {
 	res.send(200);
 }
 
-function npdResults(req, res) {
+function pdnResults(req, res) {
 	var now = new Date();
 	var results = req.body.results;
 	var config = req.body.config;
@@ -250,7 +250,7 @@ function npdResults(req, res) {
 	var payoff = req.body.payoff;
 	var N = (payoff !== undefined) ? (parseInt(payoff.numCooperators, 10) + parseInt(payoff.numDefectors, 10)) : 0;
 
-	var stream = fs.createWriteStream("log/npd/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/pdn/results." + filenameFormat(now) + ".txt");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);

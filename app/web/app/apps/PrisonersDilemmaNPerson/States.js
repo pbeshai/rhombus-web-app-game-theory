@@ -4,18 +4,18 @@ define([
 	"framework/modules/StateApp/Module",
 
 	"apps/PrisonersDilemma/Module",
-	"apps/NPrisonersDilemma/Base",
-	"apps/NPrisonersDilemma/Views"
+	"apps/PrisonersDilemmaNPerson/Base",
+	"apps/PrisonersDilemmaNPerson/Views"
 ],
-function (App, Common, StateApp, PrisonersDilemma, NPrisonersDilemma) {
+function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaNPerson) {
 
-	var NPrisonersDilemmaStates = {};
+	var PrisonersDilemmaNPersonStates = {};
 
-	NPrisonersDilemmaStates.Play = PrisonersDilemma.States.Play.extend({
-		view: "npd::play",
+	PrisonersDilemmaNPersonStates.Play = PrisonersDilemma.States.Play.extend({
+		view: "pdn::play",
 	});
 
-	NPrisonersDilemmaStates.Score = Common.States.Score.extend({
+	PrisonersDilemmaNPersonStates.Score = Common.States.Score.extend({
 		assignScores: function (models) {
 			// See Goehring and Kahan (1976) The Uniform N-Person Prisoner's Dilemma Game : Construction and Test of an Index of Cooperation
 			var R = this.config.Rratio*(models.length - 1); // 0 < R < N-1, closer to 1 means more incentive for cooperation
@@ -55,19 +55,19 @@ function (App, Common, StateApp, PrisonersDilemma, NPrisonersDilemma) {
 		}
 	});
 
-	NPrisonersDilemmaStates.Stats = PrisonersDilemma.States.Stats;
+	PrisonersDilemmaNPersonStates.Stats = PrisonersDilemma.States.Stats;
 
-	NPrisonersDilemmaStates.Results = Common.States.Results.extend({
-		view: "npd::results",
+	PrisonersDilemmaNPersonStates.Results = Common.States.Results.extend({
+		view: "pdn::results",
 
 		beforeRender: function () {
-			Common.States.Results.prototype.beforeRender.call(this);
+			Common.States.Results.prototype.beforeRender.apply(this, arguments);
 			console.log("input", this.input);
 			this.payoff = this.input.payoff;
 		},
 
 		viewOptions: function () {
-			var options = Common.States.Results.prototype.viewOptions.call(this);
+			var options = Common.States.Results.prototype.viewOptions.apply(this, arguments);
 			options.payoff = this.payoff;
 			options.stats = this.input.stats;
 			return options;
@@ -85,5 +85,5 @@ function (App, Common, StateApp, PrisonersDilemma, NPrisonersDilemma) {
 		},
 	});
 
-	return NPrisonersDilemmaStates;
+	return PrisonersDilemmaNPersonStates;
 });
