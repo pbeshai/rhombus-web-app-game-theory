@@ -108,7 +108,9 @@ function (App, Common, variableWidthBarChart, xLine, Graphs, PrisonersDilemma) {
 
 	PrisonersDilemmaViews.Configure = Backbone.View.extend({
 		template: "app/apps/PrisonersDilemma/templates/configure",
-		modelOptions: _.clone(PrisonersDilemma.config),
+		modelOptions: function () { // function so we get it fresh each time
+			return PrisonersDilemma.config();
+		},
 
 		events: {
 			"change .pay-off-matrix input": "updateMatrix",
@@ -128,8 +130,7 @@ function (App, Common, variableWidthBarChart, xLine, Graphs, PrisonersDilemma) {
 		},
 
 		initialize: function () {
-			// use defaults so we don't overwrite if already there
-			_.defaults(this.model.attributes, this.modelOptions);
+			_.defaults(this.model.attributes, this.modelOptions());
 		}
 	});
 

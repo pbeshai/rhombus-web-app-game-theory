@@ -15,7 +15,7 @@ function (App, Common, CoinMatching) {
 	var CoinMatchingViews = {};
 
 	CoinMatchingViews.Configure = Common.Views.ModelConfigure.Layout.extend({
-		modelOptions: _.extend({}, CoinMatching.config)
+		modelOptions: function () { return CoinMatching.config(); }
 	});
 
 	CoinMatchingViews.AppControls = Common.Views.AppControls.extend({

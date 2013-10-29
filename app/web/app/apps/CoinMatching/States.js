@@ -69,7 +69,7 @@ function (App, Common, StateApp, CoinMatching) {
 
 	CoinMatchingStates.Phase = Common.States.Phase.extend({
 		State: CoinMatchingStates.Round,
-		numRounds: CoinMatching.config.roundsPerPhase,
+		numRounds: CoinMatching.config().roundsPerPhase,
 	});
 
 	CoinMatchingStates.PhaseTotalBucket = Common.States.Bucket.extend({

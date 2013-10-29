@@ -5,13 +5,15 @@ define([
 function (App, Common) {
 
 	var PrisonersDilemma = {};
-	PrisonersDilemma.config = {
-		scoringMatrix: {
-			CC: 3,
-			CD: 0,
-			DC: 5,
-			DD: 1
-		}
+	PrisonersDilemma.config = function () {
+		return {
+			scoringMatrix: {
+				CC: 3,
+				CD: 0,
+				DC: 5,
+				DD: 1
+			}
+		};
 	};
 
 	PrisonersDilemma.Instructions = {};

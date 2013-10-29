@@ -6,11 +6,13 @@ function (App, Common) {
 
 	var CoinMatching = {};
 
-	CoinMatching.config = {
-		pointsPerRound: 1,
-		roundsPerPhase: 10,
-		group1Name: "Matchers",
-		group2Name: "Mismatchers",
+	CoinMatching.config = function () {
+		return {
+			pointsPerRound: 1,
+			roundsPerPhase: 10,
+			group1Name: "Matchers",
+			group2Name: "Mismatchers",
+		};
 	};
 
 	CoinMatching.Instructions = Common.Models.Instructions.extend({
