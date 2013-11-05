@@ -21,8 +21,8 @@ function (App, Common, UltimatumGame) {
 
 	UltimatumGameViews.GiverPlay.Giver = Common.Views.ParticipantHiddenPlay;
 
-	UltimatumGameViews.PreParticipants = Backbone.View.extend({
-		template: "apps/UltimatumGame/templates/pre_participants",
+	UltimatumGameViews.PreParticipants = App.BaseView.extend({
+		template: "app/apps/UltimatumGame/templates/pre_participants",
 		serialize: function () {
 			return { total: this.options.config.amount };
 		},
@@ -51,7 +51,7 @@ function (App, Common, UltimatumGame) {
 	UltimatumGameViews.Results = {};
 
 	UltimatumGameViews.Results.Score = Common.Views.ParticipantDisplay.extend({
-		template: "apps/UltimatumGame/templates/score",
+		template: "app/apps/UltimatumGame/templates/score",
 		serialize: function () {
 			return {
 				alias: this.model.get("alias"),
@@ -62,6 +62,9 @@ function (App, Common, UltimatumGame) {
 				receiverScore: this.model.get("receiverScore"),
 				receiverScoreClass: (this.model.get("receiverScore") === 0) ? "rejected" : "accepted"
 			};
+		},
+		overlay: function () {
+			return "dark-dim no-animate";
 		}
 	});
 

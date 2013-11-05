@@ -13,6 +13,8 @@ function (App, Common, StateApp, UltimatumGame) {
 	UltimatumGameStates.GiverPlay = Common.States.Play.extend({
 		name: "giver-play",
 		view: "ug::giver-play",
+		validChoices: _.keys(UltimatumGame.config().offerMap),
+
 		handleConfigure: function () {
 			this.render();
 		},
@@ -32,20 +34,13 @@ function (App, Common, StateApp, UltimatumGame) {
 		name: "receiver-play",
 		view: "ug::receiver-play",
 		validChoices: ["A", "B"],
-
-		handleConfigure: function () {
-			UltimatumGame.Util.assignOffers(this.participants,
-				this.config.amount, this.config.offerMap);
-
-			this.render();
-		},
 	});
 
 	UltimatumGameStates.Score = Common.States.Score.extend({
 		assignScore: function (participant) {
 			var receiver = participant;
 			var giver = receiver.get("partner");
-			if (receiver.get("choice") === this.config.acceptChoice) {
+			if (receiver.get("choice") === "A") {
 				receiver.set("receiverScore", receiver.get("offer"));
 				giver.set("giverScore", giver.get("keep"));
 			} else {
@@ -57,11 +52,6 @@ function (App, Common, StateApp, UltimatumGame) {
 
 	UltimatumGameStates.Results = Common.States.Results.extend({
 		view: "ug::results",
-
-		handleConfigure: function () {
-			UltimatumGame.Util.assignOffers(this.participants,
-				this.config.amount, this.config.offerMap);
-		},
 
 		logResults: function () {
 			var results = this.participants.map(function (model) {

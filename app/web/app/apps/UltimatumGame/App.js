@@ -22,7 +22,7 @@ function (App, StateApp, CommonStateApps, UltimatumGame) {
 	var UltimatumGameApp = CommonStateApps.BasicGame.extend({
 		id: "ultimatum",
 		version: "1.0",
-		config: UltimatumGame.config,
+		config: UltimatumGame.config(),
 		partnerOptions: { symmetric: false },
 		botCheckOptions: false, // disable bots
 		States: [ UltimatumGame.States.GiverPlay, UltimatumGame.States.ReceiverPlay, UltimatumGame.States.Score, UltimatumGame.States.Results ]

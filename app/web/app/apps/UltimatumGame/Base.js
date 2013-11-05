@@ -6,28 +6,26 @@ function (App, Common) {
 
 	var UltimatumGame = {};
 
-	UltimatumGame.config = {
-		amount: 10,
-		offerMap: { // map of choices givers make to amounts offered
-			"A": 5,
-			"B": 4,
-			"C": 3,
-			"D": 2,
-			"E": 1
-		},
-	};
+	UltimatumGame.config = function () {
+		return {
+			amount: 10,
+			offerMap: { // map of choices givers make to amounts offered
+				"A": 5,
+				"B": 1,
+			}
+		};
+	}
 
 	UltimatumGame.Instructions = {};
 	UltimatumGame.Instructions.GiverPlay = Common.Models.Instructions.extend({
 		header: "Giver Instructions",
 		configInit: function (config) {
-			this.attributes.buttonConfig = {
-				"A": { description: "Offer " + config.offerMap.A },
-				"B": { description: "Offer " + config.offerMap.B },
-				"C": { description: "Offer " + config.offerMap.C },
-				"D": { description: "Offer " + config.offerMap.D },
-				"E": { description: "Offer " + config.offerMap.E },
-			};
+			var buttonConfig = {};
+
+			_.each(_.keys(config.offerMap), function (key) {
+				buttonConfig[key] = { description: "Demand " + (config.amount - config.offerMap[key]) + " / Offer " + config.offerMap[key] };
+			});
+			this.attributes.buttonConfig = buttonConfig;
 		}
 	});
 	UltimatumGame.Instructions.ReceiverPlay = Common.Models.Instructions.extend({
