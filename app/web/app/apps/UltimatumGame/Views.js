@@ -68,12 +68,85 @@ function (App, Common, UltimatumGame) {
 		}
 	});
 
-	UltimatumGameViews.Results.Layout = App.registerView("ug::results", Common.Views.SimpleLayout.extend({
-		header: "Results",
+	UltimatumGameViews.Results.Participant = Common.Views.ParticipantScoreChoiceDisplay.extend({
+		overlay: function (model) {
+			return "no-animate";
+		}
+	});
+
+	UltimatumGameViews.Results.BucketParticipant = Common.Mixins.bucketParticipant(Common.Views.ParticipantScoreDisplay.extend({
+		// labelChoice: UltimatumGame.Util.labelChoice,
+	}));
+
+	UltimatumGameViews.Results.GiverParticipant = UltimatumGameViews.Results.BucketParticipant.extend({
+		scoreAttribute: "giverScore",
+
+		overlay: function (model) {
+			var overlay = UltimatumGameViews.Results.BucketParticipant.prototype.overlay.apply(this, arguments);
+			var offer = model.get("keep"), score = this.getScore(model);
+			if (offer === score) {
+				overlay += " bucket-green";
+			} else {
+				overlay += " bucket-red";
+			}
+			return overlay;
+		},
+
+		mainText: function (model) {
+			var offer = model.get("keep"), score = this.getScore(model);
+			if (offer === score) {
+				return score;
+			}
+			return offer + " &rarr; " + score;
+		}
+	});
+
+	UltimatumGameViews.Results.ReceiverParticipant = UltimatumGameViews.Results.BucketParticipant.extend({
+		scoreAttribute: "receiverScore",
+
+		overlay: function (model) {
+			var overlay = UltimatumGameViews.Results.BucketParticipant.prototype.overlay.apply(this, arguments);
+			var offer = model.get("offer"), score = this.getScore(model);
+			if (offer === score) {
+				overlay += " bucket-green";
+			} else {
+				overlay += " bucket-red";
+			}
+			return overlay;
+		},
+
+		mainText: function (model) {
+			var offer = model.get("offer"), score = this.getScore(model);
+			if (offer === score) {
+				return score;
+			}
+			return offer + " &rarr; " + score;
+		}
+	});
+
+	UltimatumGameViews.Results.GiverLayout = App.registerView("ug::giver-results", Common.Views.SimpleLayout.extend({
+		header: "Giver Results",
 		className: "ultimatum-results",
 		PreParticipantsView: UltimatumGameViews.PreParticipants,
-		ParticipantView: UltimatumGameViews.Results.Score
+		ParticipantView: UltimatumGameViews.Results.GiverParticipant
 	}));
+
+
+	UltimatumGameViews.Results.ReceiverLayout = App.registerView("ug::receiver-results", Common.Views.SimpleLayout.extend({
+		header: "Receiver Results",
+		className: "ultimatum-results",
+		PreParticipantsView: UltimatumGameViews.PreParticipants,
+		ParticipantView: UltimatumGameViews.Results.ReceiverParticipant
+	}));
+
+
+	UltimatumGameViews.Results.ScoreLayout = App.registerView("ug::score-results", Common.Views.SimpleLayout.extend({
+		header: "Combined Results",
+		className: "ultimatum-results",
+		PreParticipantsView: UltimatumGameViews.PreParticipants,
+		ParticipantView: UltimatumGameViews.Results.BucketParticipant
+	}));
+
 
 	return UltimatumGameViews;
 });

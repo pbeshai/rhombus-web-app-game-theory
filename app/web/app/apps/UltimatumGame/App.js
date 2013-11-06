@@ -25,7 +25,17 @@ function (App, StateApp, CommonStateApps, UltimatumGame) {
 		config: UltimatumGame.config(),
 		partnerOptions: { symmetric: false },
 		botCheckOptions: false, // disable bots
-		States: [ UltimatumGame.States.GiverPlay, UltimatumGame.States.ReceiverPlay, UltimatumGame.States.Score, UltimatumGame.States.Results ]
+		States: [
+			UltimatumGame.States.GiverPlay,
+			UltimatumGame.States.ReceiverPlay,
+			UltimatumGame.States.Score,
+			UltimatumGame.States.GiverBucket,
+			UltimatumGame.States.GiverResults,
+			UltimatumGame.States.ReceiverBucket,
+			UltimatumGame.States.ReceiverResults,
+			UltimatumGame.States.ScoreBucket,
+			UltimatumGame.States.ScoreResults,
+		]
 	});
 
 	// description for use in router

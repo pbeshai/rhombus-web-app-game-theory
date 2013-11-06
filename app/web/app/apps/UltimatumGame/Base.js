@@ -46,5 +46,14 @@ function (App, Common) {
 		}, this);
 	};
 
+	UltimatumGame.Util.labelChoice = function (choice) {
+		if (choice === "A") {
+			return "Y";
+		} else if (choice === "B") {
+			return "X";
+		}
+		return "#";
+	};
+
 	return UltimatumGame;
 });

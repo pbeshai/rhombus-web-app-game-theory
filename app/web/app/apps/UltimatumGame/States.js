@@ -15,11 +15,6 @@ function (App, Common, StateApp, UltimatumGame) {
 		view: "ug::giver-play",
 		validChoices: _.keys(UltimatumGame.config().offerMap),
 
-		handleConfigure: function () {
-			this.render();
-		},
-
-		// outputs a participant collection
 		onExit: function () {
 			var result = Common.States.Play.prototype.onExit.call(this);
 
@@ -47,11 +42,43 @@ function (App, Common, StateApp, UltimatumGame) {
 				receiver.set("receiverScore", 0);
 				giver.set("giverScore", 0);
 			}
+
+			// store the total
+			giver.set("score", giver.get("score") + giver.get("giverScore"));
+			receiver.set("score", receiver.get("score") + receiver.get("receiverScore"));
+		},
+
+		assignScores: function (participants) {
+			// reset their score
+			participants.each(function (p) { p.set("score", 0); });
+
+			// assign a new score
+			participants.each(this.assignScore, this);
 		}
 	});
 
-	UltimatumGameStates.Results = Common.States.Results.extend({
-		view: "ug::results",
+	UltimatumGameStates.GiverBucket = Common.States.Bucket.extend({
+		bucketAttribute: "giverScore",
+	});
+
+	UltimatumGameStates.ReceiverBucket = Common.States.Bucket.extend({
+		bucketAttribute: "receiverScore",
+	});
+
+	UltimatumGameStates.ScoreBucket = Common.States.Bucket;
+
+	UltimatumGameStates.GiverResults = Common.States.Results.extend({
+		name: "giver-results",
+		view: "ug::giver-results"
+	});
+
+	UltimatumGameStates.ReceiverResults = Common.States.Results.extend({
+		name: "receiver-results",
+		view: "ug::receiver-results"
+	});
+
+	UltimatumGameStates.ScoreResults = Common.States.Results.extend({
+		view: "ug::score-results",
 
 		logResults: function () {
 			var results = this.participants.map(function (model) {
