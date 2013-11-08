@@ -9,6 +9,7 @@ function (App, Common) {
 	UltimatumGame.config = function () {
 		return {
 			amount: 10,
+			roundsPerPhase: 5,
 			offerMap: { // map of choices givers make to amounts offered
 				"A": 5,
 				"B": 1,
@@ -26,6 +27,7 @@ function (App, Common) {
 				buttonConfig[key] = { description: "Demand " + (config.amount - config.offerMap[key]) + " / Offer " + config.offerMap[key] };
 			});
 			this.attributes.buttonConfig = buttonConfig;
+			this.attributes.description = "Total Amount: " + config.amount;
 		}
 	});
 	UltimatumGame.Instructions.ReceiverPlay = Common.Models.Instructions.extend({
@@ -33,6 +35,10 @@ function (App, Common) {
 		buttonConfig: {
 			A: { description: "Accept offer" },
 			B: { description: "Reject offer" },
+		},
+
+		configInit: function (config) {
+			this.attributes.description = "Total Amount: " + config.amount;
 		}
 	});
 
@@ -44,15 +50,6 @@ function (App, Common) {
 			giver.set("keep", keep); // amount kept
 			giver.get("partner").set("offer", offerMap[giver.get("choice")]); // amount given away
 		}, this);
-	};
-
-	UltimatumGame.Util.labelChoice = function (choice) {
-		if (choice === "A") {
-			return "Y";
-		} else if (choice === "B") {
-			return "X";
-		}
-		return "#";
 	};
 
 	return UltimatumGame;

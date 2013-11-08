@@ -31,7 +31,7 @@ function (App, Common, StateApp, UltimatumGame) {
 		validChoices: ["A", "B"],
 	});
 
-	UltimatumGameStates.Score = Common.States.Score.extend({
+	UltimatumGameStates.Score = Common.States.RoundScore.extend({
 		assignScore: function (participant) {
 			var receiver = participant;
 			var giver = receiver.get("partner");
@@ -84,6 +84,7 @@ function (App, Common, StateApp, UltimatumGame) {
 			var results = this.participants.map(function (model) {
 				return {
 					alias: model.get("alias"),
+					score: model.get("score"),
 					giverOffer: model.get("keep"),
 					giverScore: model.get("giverScore"),
 					giverPartner: model.get("partner").get("alias"),
@@ -96,6 +97,44 @@ function (App, Common, StateApp, UltimatumGame) {
 			return { results: results };
 		}
 	});
+
+	UltimatumGameStates.Partner = Common.States.Partner.extend({
+
+	});
+
+
+	UltimatumGameStates.Round = Common.States.Round.extend({
+		States: [
+			UltimatumGameStates.Partner,
+			UltimatumGameStates.GiverPlay,
+			UltimatumGameStates.ReceiverPlay,
+			UltimatumGameStates.Score,
+			UltimatumGameStates.GiverBucket,
+			UltimatumGameStates.GiverResults,
+			UltimatumGameStates.ReceiverBucket,
+			UltimatumGameStates.ReceiverResults,
+			UltimatumGameStates.ScoreBucket,
+			UltimatumGameStates.ScoreResults,
+		],
+	});
+
+	UltimatumGameStates.Phase = Common.States.Phase.extend({
+		State: UltimatumGameStates.Round,
+		numRounds: UltimatumGame.config().roundsPerPhase,
+	});
+
+	UltimatumGameStates.PhaseTotalBucket = Common.States.Bucket.extend({
+		bucketAttribute: "phaseTotal",
+	});
+
+	UltimatumGameStates.PhaseResults = Common.States.PhaseResults.extend({
+		view: "ug::phase-results",
+	});
+
+	UltimatumGameStates.TotalResults = Common.States.TotalPhaseResults.extend({
+		view: "ug::total-results",
+	});
+
 
 	return UltimatumGameStates;
 });
