@@ -14,6 +14,7 @@ function (App, Common, StateApp, UltimatumGame) {
 		name: "giver-play",
 		view: "ug::giver-play",
 		validChoices: _.keys(UltimatumGame.config().offerMap),
+		addNewParticipants: undefined, // have to be added in partner phase
 
 		onExit: function () {
 			var result = Common.States.Play.prototype.onExit.call(this);
@@ -29,6 +30,7 @@ function (App, Common, StateApp, UltimatumGame) {
 		name: "receiver-play",
 		view: "ug::receiver-play",
 		validChoices: ["A", "B"],
+		addNewParticipants: undefined  // have to be added in partner phase
 	});
 
 	UltimatumGameStates.Score = Common.States.RoundScore.extend({
