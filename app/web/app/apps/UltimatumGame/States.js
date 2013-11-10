@@ -121,6 +121,20 @@ function (App, Common, StateApp, UltimatumGame) {
 	UltimatumGameStates.Phase = Common.States.Phase.extend({
 		State: UltimatumGameStates.Round,
 		numRounds: UltimatumGame.config().roundsPerPhase,
+
+		// how to save a participant in round output
+    serializeParticipant: function (participant) {
+      return {
+        alias: participant.get("alias"),
+				score: participant.get("score"),
+				giverOffer: participant.get("keep"),
+				giverScore: participant.get("giverScore"),
+				giverPartner: participant.get("partner").get("alias"),
+				receiverOffer: participant.get("offer"),
+				receiverScore: participant.get("receiverScore"),
+				receiverPartner: participant.get("partnerBackward").get("alias")
+      };
+    },
 	});
 
 	UltimatumGameStates.PhaseTotalBucket = Common.States.Bucket.extend({

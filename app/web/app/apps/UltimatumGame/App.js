@@ -34,7 +34,7 @@ function (App, StateApp, CommonStateApps, UltimatumGame) {
 
 		getPhaseRoundOptions: function (phaseIndex, stateIndex) {
 			var phaseNum = phaseIndex + 1;
-			return [
+			var options = [
 					{ symmetric: false }, // UltimatumGameStates.Partner,
 					{ viewOptions: { header: "Giver Play Phase " + phaseNum } }, // UltimatumGameStates.GiverPlay,
 					{ viewOptions: { header: "Receiver Play Phase " + phaseNum } }, // UltimatumGameStates.ReceiverPlay,
@@ -46,6 +46,15 @@ function (App, StateApp, CommonStateApps, UltimatumGame) {
 					undefined, // UltimatumGameStates.ScoreBucket,
 					{ viewOptions: { header: "Combined Results Phase " + phaseNum } }, // UltimatumGameStates.ReceiverResults,
 				];
+
+				if (phaseNum === 2) {
+					options[2].viewOptions.header = "Computer Receiver Play";
+				} else if (phaseNum === 3) {
+					options[1].viewOptions.header = "Computer Giver Play";
+				}
+
+			return options;
+
 		},
 	});
 
