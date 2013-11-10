@@ -23,12 +23,47 @@ function (App, Common, UltimatumGame) {
 
 	UltimatumGameViews.GiverPlay.Layout = App.registerView("ug::giver-play", Common.Mixins.rounds(Common.Views.SimpleLayout.extend({
 		header: "Givers Play",
-		PreParticipantsView: UltimatumGameViews.PreParticipants,
 		ParticipantView: UltimatumGameViews.GiverPlay.Giver,
 		InstructionsModel: UltimatumGame.Instructions.GiverPlay
 	})));
 
 	UltimatumGameViews.ReceiverPlay = {};
+
+	UltimatumGameViews.ReceiverPlay.Legend = Common.Views.Legend.extend({
+		items: {
+			"blue": "Offer 5",
+			"orange": "Offer 1"
+		}
+	});
+
+	UltimatumGameViews.ReceiverPlay.PercentageBar = Common.Views.PercentageBar.extend({
+    labels: {
+      "o5" : { label: "Offer 5", key: "choice-a" },
+      "o1" : { label: "Offer 1", key: "choice-b" },
+    },
+    percentageSections: function () {
+      var sections = [];
+
+      var total = this.participants.length;
+
+      var counts = _.countBy(this.participants.pluck("offer"), function (offer) {
+        return "o"+offer;
+      });
+
+      var labels = this.labels;
+      addSection("o5");
+      addSection("o1");
+
+      function addSection(offer) {
+        if (counts[offer]) {
+          var section = _.extend({ percentage: (100 * counts[offer] / total) }, labels[offer]);
+          sections.push(section);
+        }
+      }
+
+      return sections;
+    }
+  });
 
 	UltimatumGameViews.ReceiverPlay.Receiver = Common.Views.ParticipantMessagePlay.extend({
 		messageAttribute: "offer"
@@ -36,12 +71,54 @@ function (App, Common, UltimatumGame) {
 
 	UltimatumGameViews.ReceiverPlay.Layout = App.registerView("ug::receiver-play", Common.Mixins.rounds(Common.Views.SimpleLayout.extend({
 		header: "Receivers Play",
-		PreParticipantsView: UltimatumGameViews.PreParticipants,
+		PreHeaderView: UltimatumGameViews.ReceiverPlay.Legend,
+		PreParticipantsView: UltimatumGameViews.ReceiverPlay.PercentageBar,
 		ParticipantView: UltimatumGameViews.ReceiverPlay.Receiver,
 		InstructionsModel: UltimatumGame.Instructions.ReceiverPlay
 	})));
 
 	UltimatumGameViews.Results = {};
+
+	UltimatumGameViews.Results.Legend = Common.Views.Legend.extend({
+		items: {
+			"green": "Accepted",
+			"red": "Rejected"
+		}
+	});
+
+	UltimatumGameViews.Results.PercentageBar = Common.Views.PercentageBar.extend({
+    labels: {
+      "accepted" : { label: "Accepted", key: "green" },
+      "rejected" : { label: "Rejected", key: "red" },
+    },
+    scoreAttribute: "giverScore",
+
+    percentageSections: function () {
+      var sections = [];
+
+      var total = this.participants.length;
+
+      var counts = _.countBy(this.participants.models, function (model, i) {
+        if (model.get("keep") === model.get(this.scoreAttribute)) {
+          return "accepted";
+        }
+        return "rejected";
+      }, this);
+
+      var labels = this.labels;
+      addSection("accepted");
+      addSection("rejected");
+
+      function addSection(offer) {
+        if (counts[offer]) {
+          var section = _.extend({ percentage: (100 * counts[offer] / total) }, labels[offer]);
+          sections.push(section);
+        }
+      }
+
+      return sections;
+    }
+  });
 
 	UltimatumGameViews.Results.Participant = Common.Views.ParticipantScoreChoiceDisplay.extend({
 		overlay: function (model) {
@@ -107,7 +184,8 @@ function (App, Common, UltimatumGame) {
 	UltimatumGameViews.Results.GiverLayout = App.registerView("ug::giver-results", Common.Mixins.rounds(Common.Views.SimpleLayout.extend({
 		header: "Giver Results",
 		className: "ultimatum-results",
-		PreParticipantsView: UltimatumGameViews.PreParticipants,
+		PreHeaderView: UltimatumGameViews.Results.Legend,
+		PreParticipantsView: UltimatumGameViews.Results.PercentageBar,
 		ParticipantView: UltimatumGameViews.Results.GiverParticipant
 	})));
 
@@ -115,7 +193,8 @@ function (App, Common, UltimatumGame) {
 	UltimatumGameViews.Results.ReceiverLayout = App.registerView("ug::receiver-results", Common.Mixins.rounds(Common.Views.SimpleLayout.extend({
 		header: "Receiver Results",
 		className: "ultimatum-results",
-		PreParticipantsView: UltimatumGameViews.PreParticipants,
+		PreHeaderView: UltimatumGameViews.Results.Legend,
+		PreParticipantsView: UltimatumGameViews.Results.PercentageBar,
 		ParticipantView: UltimatumGameViews.Results.ReceiverParticipant
 	})));
 
@@ -123,7 +202,8 @@ function (App, Common, UltimatumGame) {
 	UltimatumGameViews.Results.ScoreLayout = App.registerView("ug::score-results", Common.Mixins.rounds(Common.Views.SimpleLayout.extend({
 		header: "Combined Results",
 		className: "ultimatum-results",
-		PreParticipantsView: UltimatumGameViews.PreParticipants,
+		PreHeaderView: UltimatumGameViews.Results.Legend,
+		PreParticipantsView: UltimatumGameViews.Results.PercentageBar,
 		ParticipantView: UltimatumGameViews.Results.BucketParticipant
 	})));
 
