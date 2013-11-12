@@ -9,7 +9,7 @@ function (App, Common) {
 	UltimatumGame.config = function () {
 		return {
 			amount: 10,
-			roundsPerPhase: 2,
+			roundsPerPhase: 5,
 			offerMap: { // map of choices givers make to amounts offered
 				"A": 5,
 				"B": 1,
