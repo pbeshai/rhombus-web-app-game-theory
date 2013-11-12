@@ -38,19 +38,19 @@ function (App, StateApp, CommonStateApps, UltimatumGame) {
 					{ symmetric: false }, // UltimatumGameStates.Partner,
 					{ viewOptions: { header: "Giver Play Phase " + phaseNum } }, // UltimatumGameStates.GiverPlay,
 					{ viewOptions: { header: "Receiver Play Phase " + phaseNum } }, // UltimatumGameStates.ReceiverPlay,
-					undefined, // UltimatumGameStates.Score,
+					undefined, // UltimatumGameStates.Score,4
 					undefined, // UltimatumGameStates.GiverBucket,
-					{ viewOptions: { header: "Giver Results Phase " + phaseNum } }, // UltimatumGameStates.GiverResults,
+					{ viewOptions: { header: "Giver Results P" + phaseNum } }, // UltimatumGameStates.GiverResults,
 					undefined, // UltimatumGameStates.ReceiverBucket,
-					{ viewOptions: { header: "Receiver Results Phase " + phaseNum } }, // UltimatumGameStates.ReceiverResults,
+					{ viewOptions: { header: "Receiver Results P" + phaseNum } }, // UltimatumGameStates.ReceiverResults,
 					undefined, // UltimatumGameStates.ScoreBucket,
-					{ viewOptions: { header: "Combined Results Phase " + phaseNum } }, // UltimatumGameStates.ReceiverResults,
+					{ viewOptions: { header: "Combined Results P" + phaseNum } }, // UltimatumGameStates.ReceiverResults,
 				];
 
 				if (phaseNum === 2) {
-					options[2].viewOptions.header = "Computer Receiver Play";
+					options[2].viewOptions.header = "Comp. Receiver Play";
 				} else if (phaseNum === 3) {
-					options[1].viewOptions.header = "Computer Giver Play";
+					options[1].viewOptions.header = "Comp. Giver Play";
 				}
 
 			return options;

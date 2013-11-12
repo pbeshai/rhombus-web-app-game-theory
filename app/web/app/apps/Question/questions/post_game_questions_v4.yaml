@@ -34,7 +34,7 @@ questions:
       C: Equivalent
       D: Worse
       E: Much Worse
-  - question: How helpful were the in-class multiple choice questions with regards to learning?
+  - question: How helpful are the in-class multiple choice questions with regards to learning?
     answers: &helpful
       A: Very helpful
       B: Helpful
@@ -43,7 +43,7 @@ questions:
       E: Very Harmful
   - question: How helpful was playing the games with this system with regards to learning?
     answers: *helpful
-  - question: It was worth taking class time to do multiple choice questions.
+  - question: It is worth taking class time to do multiple choice questions.
     answers: *agree
   - question: It was worth taking class time to play games with this system.
     answers: *agree

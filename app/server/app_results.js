@@ -33,7 +33,7 @@ function pdResults(req, res) {
 	var config = req.body.config;
 	var version = req.body.version;
 
-	var stream = fs.createWriteStream("log/pd/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/pd/results." + filenameFormat(now) + ".csv");
 
 	stream.once('open', function(fd) {
 		function output (str) {
@@ -65,7 +65,7 @@ function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
 	var version = req.body.version;
 	var roundsPerPhase = config.roundsPerPhase || config.numRepeats;
 
-	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
@@ -200,7 +200,7 @@ function pdmResults(req, res) {
 	var version = req.body.version;
 	var round = req.body.round;
 
-	var stream = fs.createWriteStream("log/pdm/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/pdm/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
@@ -250,7 +250,7 @@ function pdnResults(req, res) {
 	var payoff = req.body.payoff;
 	var N = (payoff !== undefined) ? (parseInt(payoff.numCooperators, 10) + parseInt(payoff.numDefectors, 10)) : 0;
 
-	var stream = fs.createWriteStream("log/pdn/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/pdn/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
@@ -292,7 +292,7 @@ function teampdResults(req, res) {
 	var config = req.body.config;
 	var version = req.body.version;
 
-	var stream = fs.createWriteStream("log/teampd/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/teampd/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
@@ -338,7 +338,7 @@ function ultimatumResults(req, res) {
 	var offerMap = config.offerMap;
 	var totals = {};
 
-	var stream = fs.createWriteStream("log/ultimatum/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/ultimatum/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
@@ -385,7 +385,6 @@ function ultimatumResults(req, res) {
 			var phase = req.body["phase" + phaseNum];
 
 			output("");
-			// output("Phase " + phaseNum +"," + groupNames[0] + "," + groupNames[1]);
 			output("Phase " + phaseNum);
 			output("-------");
 
@@ -393,7 +392,7 @@ function ultimatumResults(req, res) {
 			// output for each round
 			var header = "Alias";
 			for (var r = 1; r <= config.roundsPerPhase; r++) {
-				header += ",P"+phaseNum+"R"+r+"GiverOffer,P"+phaseNum+"R"+r+"GiverScore,P"+phaseNum+"R"+r+"GiverPartner,P" +
+				header += ",P"+phaseNum+"R"+r+"GiverDemand,P"+phaseNum+"R"+r+"GiverScore,P"+phaseNum+"R"+r+"GiverPartner,P" +
 									phaseNum+"R"+r+"ReceiverOffer,P"+phaseNum+"R"+r+"ReceiverScore,P"+phaseNum+"R"+r+"ReceiverPartner";
 			}
 			header += ",P"+phaseNum+"Total";
@@ -489,7 +488,7 @@ function teamPhaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap)
 	var config = req.body.config;
 	var version = req.body.version;
 
-	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
@@ -636,7 +635,7 @@ function questionResults(req, res) {
 		return;
 	}
 
-	var stream = fs.createWriteStream("log/q/results." + filenameFormat(now) + ".txt");
+	var stream = fs.createWriteStream("log/q/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
 			logger.info(str);
