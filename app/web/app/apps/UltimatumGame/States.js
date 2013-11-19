@@ -36,11 +36,15 @@ function (App, Common, StateApp, UltimatumGame) {
 	UltimatumGameStates.Score = Common.States.RoundScore.extend({
 		assignScore: function (participant) {
 			var receiver = participant;
-			var giver = receiver.get("partner");
+			var giver = receiver.get("partnerBackward");
+			console.log(giver.get("alias") + " offered " + receiver.get("alias") + " " + receiver.get("offer"));
 			if (receiver.get("choice") === "A") {
+				console.log("ACCEPTED");
+
 				receiver.set("receiverScore", receiver.get("offer"));
 				giver.set("giverScore", giver.get("keep"));
 			} else {
+				console.log("REJECTED");
 				receiver.set("receiverScore", 0);
 				giver.set("giverScore", 0);
 			}

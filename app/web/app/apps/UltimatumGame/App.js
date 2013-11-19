@@ -23,7 +23,7 @@ function (App, StateApp, CommonStateApps, UltimatumGame) {
 		id: "ultimatum",
 		version: "1.0",
 		config: UltimatumGame.config(),
-		prepend: { attendance: true, botCheck: true, partner: false, group: false },
+		prepend: { attendance: true, botCheck: false, partner: false, group: false },
 		PhaseStates: [
 			[ UltimatumGame.States.Phase, UltimatumGame.States.PhaseTotalBucket, UltimatumGame.States.PhaseResults ],
 			[ UltimatumGame.States.Phase, UltimatumGame.States.PhaseTotalBucket, UltimatumGame.States.PhaseResults, UltimatumGame.States.TotalResults ],
