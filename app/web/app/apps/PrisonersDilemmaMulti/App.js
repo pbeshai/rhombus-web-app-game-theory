@@ -20,7 +20,7 @@ function (App, StateApp, CommonStateApps, PrisonersDilemmaMulti) {
 	var PrisonersDilemmaMultiApp = CommonStateApps.BasicGame.extend({
 		id: "pdm",
 		version: "1.0",
-		config: PrisonersDilemmaMulti.config,
+		config: PrisonersDilemmaMulti.config(),
 		States: [ PrisonersDilemmaMulti.States.Phase, PrisonersDilemmaMulti.States.PhaseTotalBucket, PrisonersDilemmaMulti.States.PhaseResults ]
 	});
 

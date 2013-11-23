@@ -17,7 +17,7 @@ function (App, StateApp, CommonStateApps, PrisonersDilemmaTeam) {
 	var PrisonersDilemmaTeamApp = CommonStateApps.PhaseGame.extend({
 		id: "pdteam",
 		version: "1.0",
-		config: PrisonersDilemmaTeam.config,
+		config: PrisonersDilemmaTeam.config(),
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
 			[ PrisonersDilemmaTeam.States.Phase, PrisonersDilemmaTeam.States.PhaseTotalBucket, PrisonersDilemmaTeam.States.PhaseResults ],

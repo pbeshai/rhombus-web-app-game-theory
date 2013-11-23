@@ -9,7 +9,7 @@ function (App, Common, StagHunt) {
 	var StagHuntViews = {};
 
 	StagHuntViews.Configure = Common.Views.ModelConfigure.Layout.extend({
-		modelOptions: _.extend({}, StagHunt.config)
+		modelOptions: StagHunt.config()
 	});
 
 	StagHuntViews.AppControls = Common.Views.AppControls.extend({

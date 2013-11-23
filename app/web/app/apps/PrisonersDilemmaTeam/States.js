@@ -38,7 +38,7 @@ function (App, Common, StateApp, PrisonersDilemmaTeam) {
 
 	PrisonersDilemmaTeamStates.Phase = Common.States.Phase.extend({
 		State: PrisonersDilemmaTeamStates.Round,
-		numRounds: PrisonersDilemmaTeam.config.roundsPerPhase,
+		numRounds: PrisonersDilemmaTeam.config().roundsPerPhase,
 	});
 
 	PrisonersDilemmaTeamStates.PhaseTotalBucket = Common.States.Bucket.extend({

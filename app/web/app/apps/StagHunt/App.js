@@ -17,7 +17,7 @@ function (App, StateApp, CommonStateApps, StagHunt) {
 	var StagHuntApp = CommonStateApps.PhaseGame.extend({
 		id: "stag-hunt",
 		version: "1.1",
-		config: StagHunt.config,
+		config: StagHunt.config(),
 		prepend: { attendance: true, botCheck: true, group: true },
 		PhaseStates: [
 			[ StagHunt.States.Phase, StagHunt.States.PhaseTotalBucket, StagHunt.States.PhaseResults ],

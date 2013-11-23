@@ -5,19 +5,21 @@ define([
 function (App, Common) {
 	var Question = {};
 
-	Question.config = {
-		questions: [
-			{
-				question: "Initializing...",
-				answers: {
-					"A": "Strongly Agree",
-					"B": "Agree",
-					"C": "Neutral",
-					"D": "Disagree",
-					"E": "Strongly Disagree"
+	Question.config = function () {
+		return {
+			questions: [
+				{
+					question: "Initializing...",
+					answers: {
+						"A": "Strongly Agree",
+						"B": "Agree",
+						"C": "Neutral",
+						"D": "Disagree",
+						"E": "Strongly Disagree"
+					}
 				}
-			}
-		]
+			]
+		};
 	};
 
 	Question.Instructions = Common.Models.Instructions.extend({

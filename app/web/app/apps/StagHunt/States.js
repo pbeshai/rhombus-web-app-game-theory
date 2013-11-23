@@ -38,7 +38,7 @@ function (App, Common, StateApp, StagHunt) {
 
 	StagHuntStates.Phase = Common.States.Phase.extend({
 		State: StagHuntStates.Round,
-		numRounds: StagHunt.config.roundsPerPhase,
+		numRounds: StagHunt.config().roundsPerPhase,
 	});
 
 	StagHuntStates.PhaseTotalBucket = Common.States.Bucket.extend({

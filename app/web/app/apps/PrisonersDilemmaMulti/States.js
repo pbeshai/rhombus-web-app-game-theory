@@ -61,8 +61,8 @@ function (App, Common, StateApp, PrisonersDilemma, PrisonersDilemmaMulti) {
 
 	PrisonersDilemmaMultiStates.Phase = Common.States.Phase.extend({
 		State: PrisonersDilemmaMultiStates.Round,
-		minRounds: PrisonersDilemmaMulti.config.minRounds,
-		maxRounds: PrisonersDilemmaMulti.config.maxRounds,
+		minRounds: PrisonersDilemmaMulti.config().minRounds,
+		maxRounds: PrisonersDilemmaMulti.config().maxRounds,
 	});
 
 	PrisonersDilemmaMultiStates.PhaseTotalBucket = Common.States.Bucket.extend({

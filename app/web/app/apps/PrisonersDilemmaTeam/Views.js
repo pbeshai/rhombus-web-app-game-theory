@@ -11,7 +11,7 @@ function (App, Common, PrisonersDilemma, PrisonersDilemmaTeam) {
 	var PrisonersDilemmaTeamViews = {};
 
 	PrisonersDilemmaTeamViews.Configure = Common.Views.ModelConfigure.Layout.extend({
-		modelOptions: _.extend({}, PrisonersDilemmaTeam.config)
+		modelOptions: PrisonersDilemmaTeam.config()
 	});
 
 	PrisonersDilemmaTeamViews.AppControls = Common.Views.AppControls.extend({

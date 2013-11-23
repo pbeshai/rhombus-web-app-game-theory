@@ -57,7 +57,7 @@ function (App, Common, PrisonersDilemma, PrisonersDilemmaNPerson) {
 
 	PrisonersDilemmaNPersonViews.Configure = Backbone.View.extend({
 		template: "app/apps/PrisonersDilemmaNPerson/templates/configure",
-		modelOptions: _.clone(PrisonersDilemmaNPerson.config),
+		modelOptions: PrisonersDilemmaNPerson.config(),
 
 		events: {
 			"change #r-ratio-input": "updateRratio",

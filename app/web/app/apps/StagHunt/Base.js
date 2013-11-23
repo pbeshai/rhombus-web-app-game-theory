@@ -6,16 +6,18 @@ function (App, Common) {
 
 	var StagHunt = {};
 
-	StagHunt.config = {
-		scoringMatrix: {
-			AA: 3,
-			AB: 0,
-			BA: 2,
-			BB: 1
-		},
-		roundsPerPhase: 5,
-		group1Name: "Team 1",
-		group2Name: "Team 2",
+	StagHunt.config = function () {
+		return {
+			scoringMatrix: {
+				AA: 3,
+				AB: 0,
+				BA: 2,
+				BB: 1
+			},
+			roundsPerPhase: 5,
+			group1Name: "Team 1",
+			group2Name: "Team 2",
+		};
 	};
 
 	StagHunt.Instructions = Common.Models.Instructions.extend({

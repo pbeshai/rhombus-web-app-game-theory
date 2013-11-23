@@ -20,7 +20,7 @@ function (App, StateApp, CommonStateApps, Question) {
 	var QuestionApp = CommonStateApps.BasicApp.extend({
 		id: "q",
 		version: "1.0",
-		config: Question.config,
+		config: Question.config(),
 		prepend: { attendance: false },
 		States: [],
 

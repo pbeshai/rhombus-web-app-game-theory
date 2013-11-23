@@ -19,7 +19,7 @@ function (App, StateApp, CommonStateApps, PrisonersDilemmaNPerson) {
 	var NPrisonersDilemmaApp = CommonStateApps.BasicGame.extend({
 		id: "pdn",
 		version: "1.0",
-		config: PrisonersDilemmaNPerson.config,
+		config: PrisonersDilemmaNPerson.config(),
 		States: [ PrisonersDilemmaNPerson.States.Play, PrisonersDilemmaNPerson.States.Score, PrisonersDilemmaNPerson.States.Stats, PrisonersDilemmaNPerson.States.Results]
 	});
 
