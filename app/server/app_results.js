@@ -65,6 +65,13 @@ function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
 	var version = req.body.version;
 	var roundsPerPhase = config.roundsPerPhase || config.numRepeats;
 
+	var flags = req.body.flags;
+
+	if (flags && flags.round) {
+		roundResults(req, res, appDir, appName, choiceMap);
+		return;
+	}
+
 	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
@@ -186,60 +193,110 @@ function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
 	res.send(200);
 }
 
+// used for intermediate logging after each round
+function roundResults(req, res, appDir, appName, choiceMap) {
+	var now = new Date();
+	var roundOutputs = req.body.roundOutputs; // { current, phase, previous }
+	var config = req.body.config;
+	var version = req.body.version;
+	var roundsPerPhase = config.roundsPerPhase || config.numRepeats;
+
+	var stream = fs.createWriteStream("log/" +appDir + "/rounds/round_results." + filenameFormat(now) + ".csv");
+	stream.once('open', function(fd) {
+		function output (str) {
+			logger.info(str);
+			stream.write(str + "\n");
+		}
+		output(appName + " Intermediate Round Results (v" + version + ")");
+		output(now.toString());
+
+		if (config.message) {
+			output(config.message);
+		}
+
+		output("Phase," + roundOutputs.phase);
+		var numRounds = 1 + ((roundOutputs.previous === undefined) ? 0 : roundOutputs.previous.length);
+		output("Rounds completed," + numRounds);
+		output(roundsPerPhase + " rounds per phase");
+
+		if (config.scoringMatrix) {
+			output("");
+			output("Scoring Matrix");
+			_.each(_.keys(config.scoringMatrix), function (key) {
+				output(key + "," + config.scoringMatrix[key]);
+			});
+		}
+
+		if (choiceMap) {
+			output("");
+			output("Choice Map");
+			output(_.map(_.keys(choiceMap), function (key) { return key + " -> " + choiceMap[key]; }).join(","));
+		}
+
+		output("");
+
+		var participantData = {}; // collect the data by participant to make it easier to work with
+		var r, i;
+		var header = "Alias";
+		for (r = 1; r <= numRounds; r++) {
+			header += ",R" + r + "Choice,R" + r + "Score,R" + r + "Partner";
+
+			var roundData;
+			if (r === numRounds) {
+				roundData = roundOutputs.current;
+			} else {
+				roundData = roundOutputs.previous[r - 1];
+			}
+
+			// add to the participant data
+			for (i = 0; i < roundData.length; i++) {
+				var participant = roundData[i];
+				if (participantData[participant.alias] === undefined) {
+					participantData[participant.alias] = [];
+				}
+				participantData[participant.alias][r - 1] = participant; // save the data for this round
+			}
+		}
+
+		output(header);
+
+		_.each(_.keys(participantData), function (alias) {
+			var data, choice, score, partner;
+			var participant = participantData[alias];
+			data = alias;
+			for (r = 1; r <= numRounds; r++) {
+				var roundData = participant[r - 1];
+
+				if (roundData) {
+					choice = choiceMap[roundData.choice];
+					score = roundData.score;
+					partner = roundData.partner;
+				}	else {
+					choice = "X"; // missing (e.g. they were late and didn't play)
+					score = 0;
+					partner = "X";
+				}
+				data += "," + choice + "," + score + "," + partner;
+			}
+			output(data);
+		});
+
+
+	});
+
+	res.send(200);
+}
+
 function pdmResults(req, res) {
 	var numPhases = 1;
 	var choiceMap = {
 		"C" : "C",
 		"D" : "D"
 	};
+
 	phaseMatrixResults(req, res, "pdm", "Prisoner's Dilemma (multiround)", numPhases, choiceMap);
 
 	return;
-	var now = new Date();
-	var config = req.body.config;
-	var version = req.body.version;
-	var round = req.body.round;
-
-	var stream = fs.createWriteStream("log/pdm/results." + filenameFormat(now) + ".csv");
-	stream.once('open', function(fd) {
-		function output (str) {
-			logger.info(str);
-			stream.write(str + "\n");
-		}
-		output("Multiround Prisoner's Dilemma Results (v" + version + ")");
-		output(now.toString());
-
-		if (config.message) {
-			output(config.message);
-		}
-		if (config.scoringMatrix) {
-			output("CC," + config.scoringMatrix.CC + ",CD," + config.scoringMatrix.CD);
-			output("DC," + config.scoringMatrix.DC + ",DD," + config.scoringMatrix.DD);
-		}
-
-		output(config.numRounds + " rounds (range was " + config.minRounds + "-" + config.maxRounds +")");
-		var r, header = "Alias,PartnerAlias";
-		for (r = 1; r <= config.numRounds; r++) {
-			header += ",Round" + r + "Choice,Round" + r + "Payoff";
-		}
-		output(header);
-
-		// for each participant, output choices and scores from each round
-		_.each(req.body.round1, function (participant, i) {
-			var roundData, data = participant.alias + "," + participant.partner.alias;
-
-			for (r = 1; r <= config.numRounds; r++) {
-				roundData = req.body["round" + r][i];
-				data += "," + roundData.choice + "," + roundData.score;
-			}
-
-			output(data);
-		});
-
-		stream.end();
-	});
-
-	res.send(200);
 }
 
 function pdnResults(req, res) {
