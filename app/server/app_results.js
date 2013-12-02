@@ -256,14 +256,22 @@ function participantDataFromRoundsGrouped(roundOutputs) {
 	return participantData;
 }
 
+function capitalize(str) {
+	if (str) {
+		return str[0].toUpperCase() + str.substring(1)
+	}
+	return str;
+}
+
 // used for intermediate logging after each round
-function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc, grouped) {
+function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc, grouped, participantAttributes) {
 	var now = new Date();
 	var roundOutputs = req.body.roundOutputs; // { current, phase, previous }
 	var config = req.body.config;
 	var version = req.body.version;
 	var roundsPerPhase = config.roundsPerPhase || config.numRepeats;
-
+	participantAttributes = participantAttributes || [ "choice", "score", "partner" ];
+	console.log("RR");
 	var stream = fs.createWriteStream("log/" +appDir + "/rounds/round_results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
@@ -300,13 +308,16 @@ function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc,
 
 		// collect the data by participant to make it easier to work with
 		var participantData = participantDataFunc(roundOutputs);
-		var r;
+		var r, i;
 		var header = "Alias";
+
 		if (grouped) {
 			header = "Team," + header;
 		}
 		for (r = 1; r <= numRounds; r++) {
-			header += ",R" + r + "Choice,R" + r + "Score,R" + r + "Partner";
+			for (i = 0; i < participantAttributes.length; i++) {
+				header += ",R" + r + capitalize(participantAttributes[i]);
+			}
 		}
 
 		output(header);
@@ -315,9 +326,10 @@ function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc,
 			var data, choice, score, partner;
 			var participant = participantData[alias];
 			var addedGroup = false;
+			var roundData, attr, value;
 			data = alias;
 			for (r = 1; r <= numRounds; r++) {
-				var roundData = participant[r - 1];
+				roundData = participant[r - 1];
 
 				if (roundData) {
 					if (grouped && !addedGroup) {
@@ -325,15 +337,27 @@ function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc,
 						addedGroup = true;
 					}
 
-					choice = choiceMap[roundData.choice];
-					score = roundData.score;
-					partner = roundData.partner;
+					for (i = 0; i < participantAttributes.length; i++) {
+						attr = participantAttributes[i];
+						value = roundData[attr];
+
+						if (attr === "choice") {
+							value = choiceMap[value];
+						}
+						data += "," + value;
+					}
 				}	else {
-					choice = "X"; // missing (e.g. they were late and didn't play)
-					score = 0;
-					partner = "X";
+					for (i = 0; i < participantAttributes.length; i++) {
+						// missing (e.g. they were late and didn't play)
+						attr = participantAttributes[i];
+						value = "X";
+
+						if (attr === "score") {
+							value = 0;
+						}
+						data += "," + value;
+					}
 				}
-				data += "," + choice + "," + score + "," + partner;
 			}
 
 			if (grouped && !addedGroup) { // team was unknown (shouldn't happen)
@@ -410,6 +434,16 @@ function ultimatumResults(req, res) {
 	var results = req.body.results;
 	var config = req.body.config;
 	var version = req.body.version;
+
+	var flags = req.body.flags;
+
+	if (flags && flags.round) {
+		console.log("ROUND");
+		roundResults(req, res, "ultimatum", "Ultimatum Game", null, participantDataFromRounds, false,
+			[ "giverOffer", "giverScore", "giverPartner", "receiverOffer", "receiverScore", "receiverPartner"]);
+		return;
+	}
+
 	var numPhases = 3;
 	var offerMap = config.offerMap;
 	var totals = {};
