@@ -68,7 +68,7 @@ function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
 	var flags = req.body.flags;
 
 	if (flags && flags.round) {
-		roundResults(req, res, appDir, appName, choiceMap);
+		roundResults(req, res, appDir, appName, choiceMap, participantDataFromRounds);
 		return;
 	}
 
@@ -193,8 +193,71 @@ function phaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap) {
 	res.send(200);
 }
 
+function participantDataFromRounds(roundOutputs) {
+	var participantData = {}; // collect the data by participant to make it easier to work with
+	var r, i, participant, roundData;
+	var numRounds = 1 + ((roundOutputs.previous === undefined) ? 0 : roundOutputs.previous.length);
+
+	for (r = 1; r <= numRounds; r++) {
+		if (r === numRounds) {
+			roundData = roundOutputs.current;
+		} else {
+			roundData = roundOutputs.previous[r - 1];
+		}
+
+		// add to the participant data
+		for (i = 0; i < roundData.length; i++) {
+			participant = roundData[i];
+			if (participantData[participant.alias] === undefined) {
+				participantData[participant.alias] = [];
+			}
+			participantData[participant.alias][r - 1] = participant; // save the data for this round
+		}
+	}
+
+	return participantData;
+}
+
+function participantDataFromRoundsGrouped(roundOutputs) {
+	var participantData = {}; // collect the data by participant to make it easier to work with
+	var r, i, participant, roundData;
+	var numRounds = 1 + ((roundOutputs.previous === undefined) ? 0 : roundOutputs.previous.length);
+
+	for (r = 1; r <= numRounds; r++) {
+		if (r === numRounds) {
+			roundData = roundOutputs.current;
+		} else {
+			roundData = roundOutputs.previous[r - 1];
+		}
+
+		// add to the participant data
+		if (roundData.group1) {
+			for (i = 0; i < roundData.group1.length; i++) {
+				participant = roundData.group1[i];
+				participant._group = 1;
+				if (participantData[participant.alias] === undefined) {
+					participantData[participant.alias] = [];
+				}
+				participantData[participant.alias][r - 1] = participant; // save the data for this round
+			}
+		}
+		if (roundData.group2) {
+			for (i = 0; i < roundData.group2.length; i++) {
+				participant = roundData.group2[i];
+				participant._group = 2;
+				if (participantData[participant.alias] === undefined) {
+					participantData[participant.alias] = [];
+				}
+				participantData[participant.alias][r - 1] = participant; // save the data for this round
+			}
+		}
+	}
+
+	return participantData;
+}
+
 // used for intermediate logging after each round
-function roundResults(req, res, appDir, appName, choiceMap) {
+function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc, grouped) {
 	var now = new Date();
 	var roundOutputs = req.body.roundOutputs; // { current, phase, previous }
 	var config = req.body.config;
@@ -235,27 +298,15 @@ function roundResults(req, res, appDir, appName, choiceMap) {
 
 		output("");
 
-		var participantData = {}; // collect the data by participant to make it easier to work with
-		var r, i;
+		// collect the data by participant to make it easier to work with
+		var participantData = participantDataFunc(roundOutputs);
+		var r;
 		var header = "Alias";
+		if (grouped) {
+			header = "Team," + header;
+		}
 		for (r = 1; r <= numRounds; r++) {
 			header += ",R" + r + "Choice,R" + r + "Score,R" + r + "Partner";
-
-			var roundData;
-			if (r === numRounds) {
-				roundData = roundOutputs.current;
-			} else {
-				roundData = roundOutputs.previous[r - 1];
-			}
-
-			// add to the participant data
-			for (i = 0; i < roundData.length; i++) {
-				var participant = roundData[i];
-				if (participantData[participant.alias] === undefined) {
-					participantData[participant.alias] = [];
-				}
-				participantData[participant.alias][r - 1] = participant; // save the data for this round
-			}
 		}
 
 		output(header);
@@ -263,11 +314,17 @@ function roundResults(req, res, appDir, appName, choiceMap) {
 		_.each(_.keys(participantData), function (alias) {
 			var data, choice, score, partner;
 			var participant = participantData[alias];
+			var addedGroup = false;
 			data = alias;
 			for (r = 1; r <= numRounds; r++) {
 				var roundData = participant[r - 1];
 
 				if (roundData) {
+					if (grouped && !addedGroup) {
+						data = "Team " + roundData._group + "," + data;
+						addedGroup = true;
+					}
+
 					choice = choiceMap[roundData.choice];
 					score = roundData.score;
 					partner = roundData.partner;
@@ -277,6 +334,10 @@ function roundResults(req, res, appDir, appName, choiceMap) {
 					partner = "X";
 				}
 				data += "," + choice + "," + score + "," + partner;
+			}
+
+			if (grouped && !addedGroup) { // team was unknown (shouldn't happen)
+				data = "," + data;
 			}
 			output(data);
 		});
@@ -343,48 +404,6 @@ function pdnResults(req, res) {
 	res.send(200);
 }
 
-function teampdResults(req, res) {
-	var now = new Date();
-	var results = req.body.results;
-	var config = req.body.config;
-	var version = req.body.version;
-
-	var stream = fs.createWriteStream("log/teampd/results." + filenameFormat(now) + ".csv");
-	stream.once('open', function(fd) {
-		function output (str) {
-			logger.info(str);
-			stream.write(str + "\n");
-		}
-		output("Team Prisoner's Dilemma Results (v" + version + ")");
-		output(now.toString());
-		if (config.message) {
-			output(config.message);
-		}
-		if (config.scoringMatrix) {
-			output("CC," + config.scoringMatrix.CC + ",CD," + config.scoringMatrix.CD);
-			output("DC," + config.scoringMatrix.DC + ",DD," + config.scoringMatrix.DD);
-		}
-
-		output(config.group1Name + " vs. " + config.group2Name);
-		output("");
-
-		output(config.group1Name + " Results");
-		output("Alias,Choice,Payoff,PartnerAlias,PartnerChoice,PartnerPayoff");
-		_.each(results.team1, function (result) {
-			output(result.alias + "," + result.choice + "," + result.score + "," + result.partner.alias + "," + result.partner.choice + "," + result.partner.score);
-		});
-
-		output("");
-		output(config.group2Name + " Results");
-		output("Alias,Choice,Payoff,PartnerAlias,PartnerChoice,PartnerPayoff");
-		_.each(results.team2, function (result) {
-			output(result.alias + "," + result.choice + "," + result.score + "," + result.partner.alias + "," + result.partner.choice + "," + result.partner.score);
-		});
-		stream.end();
-	});
-
-	res.send(200);
-}
 
 function ultimatumResults(req, res) {
 	var now = new Date();
@@ -544,6 +563,14 @@ function teamPhaseMatrixResults(req, res, appDir, appName, numPhases, choiceMap)
 	var now = new Date();
 	var config = req.body.config;
 	var version = req.body.version;
+
+	var flags = req.body.flags;
+
+	if (flags && flags.round) {
+		roundResults(req, res, appDir, appName, choiceMap, participantDataFromRoundsGrouped, true);
+		return;
+	}
+
 
 	var stream = fs.createWriteStream("log/" +appDir + "/results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
