@@ -205,6 +205,8 @@ function participantDataFromRounds(roundOutputs) {
 			roundData = roundOutputs.previous[r - 1];
 		}
 
+		if (!roundData) continue;
+
 		// add to the participant data
 		for (i = 0; i < roundData.length; i++) {
 			participant = roundData[i];
@@ -229,6 +231,8 @@ function participantDataFromRoundsGrouped(roundOutputs) {
 		} else {
 			roundData = roundOutputs.previous[r - 1];
 		}
+
+		if (!roundData) continue;
 
 		// add to the participant data
 		if (roundData.group1) {
@@ -271,7 +275,7 @@ function roundResults(req, res, appDir, appName, choiceMap, participantDataFunc,
 	var version = req.body.version;
 	var roundsPerPhase = config.roundsPerPhase || config.numRepeats;
 	participantAttributes = participantAttributes || [ "choice", "score", "partner" ];
-	console.log("RR");
+
 	var stream = fs.createWriteStream("log/" +appDir + "/rounds/round_results." + filenameFormat(now) + ".csv");
 	stream.once('open', function(fd) {
 		function output (str) {
