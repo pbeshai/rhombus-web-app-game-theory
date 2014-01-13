@@ -13,6 +13,7 @@ function initialize(site) {
 	site.post("/api/apps/pdteam/log", pdteamResults);
 	site.post("/api/apps/ultimatum/log", ultimatumResults);
 	site.post("/api/apps/coin-matching/log", coinMatchingResults);
+	site.post("/api/apps/coordination/log", coordinationResults);
 	site.post("/api/apps/stag-hunt/log", stagHuntResults);
 	site.post("/api/apps/q/log", questionResults);
 }
@@ -573,8 +574,20 @@ function coinMatchingResults(req, res) {
 		B: "T",
 	};
 
-	teamPhaseMatrixResults(req, res, "stag-hunt", "Stag Hunt", numPhases, choiceMap);
+	teamPhaseMatrixResults(req, res, "coin-matching", "Coin Matching", numPhases, choiceMap);
 }
+
+
+function coordinationResults(req, res) {
+	var numPhases = 3;
+	var choiceMap = {
+		A: "A",
+		B: "B",
+	};
+
+	teamPhaseMatrixResults(req, res, "coordination", "Coordination", numPhases, choiceMap);
+}
+
 
 
 function stagHuntResults(req, res) {
