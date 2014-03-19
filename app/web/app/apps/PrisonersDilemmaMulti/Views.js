@@ -11,7 +11,7 @@ function (App, Common, Graphs, PrisonersDilemma, PrisonersDilemmaMulti) {
 	var PrisonersDilemmaMultiViews = {};
 
 	PrisonersDilemmaMultiViews.Configure = Common.Views.ModelConfigure.Layout.extend({
-		modelOptions: _.clone(PrisonersDilemmaMulti.config)
+		modelOptions: PrisonersDilemmaMulti.config()
 	});
 
 	PrisonersDilemmaMultiViews.AppControls = Common.Views.AppControls.extend({
