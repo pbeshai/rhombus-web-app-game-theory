@@ -17,6 +17,10 @@ function pdResults(req, res) {
 	var config = req.body.config;
 	var version = req.body.version;
 
+
+	if (!fs.existsSync("log/pd")) {
+		fs.mkdirSync("log/pd"); // ensure the directory exists
+	}
 	var stream = fs.createWriteStream("log/pd/results." + util.filenameFormat(now) + ".csv");
 
 	stream.once('open', function(fd) {
