@@ -1,8 +1,2 @@
 /*-- Framework CSS ---*/
 @import "../../framework/styles/index.styl";
-
-/*-- Prisoner's Dilemma ---*/
-@import "../apps/PrisonersDilemma/styles/index.styl";
-
-/*-- Stag Hunt ---*/
-@import "../apps/StagHunt/styles/index.styl";
